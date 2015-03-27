@@ -18,9 +18,9 @@ import java.util.LinkedList;
 import java.util.Queue;
 import uav.UAV;
 import world.Circle;
-import world.Obstacle;
-import world.Target;
-import world.Threat;
+import world.model.Obstacle;
+import world.model.Target;
+import world.model.Threat;
 
 /**
  *

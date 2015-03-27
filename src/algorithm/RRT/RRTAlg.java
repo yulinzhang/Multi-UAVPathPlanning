@@ -6,16 +6,16 @@
 package algorithm.RRT;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 import util.BoundUtil;
 import util.ConflictCheckUtil;
 import util.DistanceUtil;
 import static util.DistanceUtil.distanceBetween;
-import util.RRTUtil;
-import static util.RRTUtil.sortHashMap;
+import util.MapSortUtil;
 import util.VectorUtil;
-import world.Obstacle;
-import world.Threat;
+import world.model.Obstacle;
+import world.model.Threat;
 
 /**
  *
@@ -90,7 +90,7 @@ public class RRTAlg {
             random_goal = randGoal(this.goal_coordinate, goal_probability, bound_width, bound_height, obstacles, threats);
             //choose the nearest node to extend
             nearest_node = nearestVertex(random_goal, G);
-            //extend the child node and validate its confliction
+            //extend the child node and validate its confliction 
             new_node = extendTowardGoalV2(nearest_node, random_goal, this.max_delta_distance, max_angle);
 
             boolean conflicted = ConflictCheckUtil.checkNodeInObstaclesAndThreats(obstacles, threats, new_node);
@@ -109,7 +109,46 @@ public class RRTAlg {
         return G;
     }
 
-    public RRTTree buildRRTStar(float[] init_coordinate, float current_angle) {
+    public RRTTree buildRRTStar2(float[] init_coordinate, float current_angle) {
+        this.setInit_coordinate(init_coordinate);
+        RRTTree G = new RRTTree();
+        RRTNode start_node = new RRTNode(init_coordinate[0], init_coordinate[1]);
+        start_node.setCurrent_angle(current_angle);
+        G.addNode(start_node, null);
+
+        float[] random_goal;
+        Vector<RRTNode> near_node_set;
+        RRTNode nearest_node;
+        RRTNode new_node = null;
+        double radius =9999;
+
+        for (int time_step = 1; time_step <= k_step;) {
+            //random choose a direction or goal
+            random_goal = randGoal(this.goal_coordinate, goal_probability, bound_width, bound_height, obstacles, threats);
+            //choose the nearest node to extend
+            near_node_set = neareSortedNodesToNode(G, random_goal, radius);
+
+            for (int i = 0; i < near_node_set.size(); i++) {
+                nearest_node = near_node_set.get(i);
+                new_node = extendTowardGoalV2(nearest_node, random_goal, this.max_delta_distance, max_angle);
+                if (new_node == null) {
+                    continue;
+                }
+                G.addNode(new_node, nearest_node);
+                
+                nearest_node=new_node;
+                
+                while(DistanceUtil.distanceBetween(new_node.getCoordinate(), random_goal)>this.max_delta_distance)
+                {
+                    new_node = extendTowardGoalV2(nearest_node, random_goal, this.max_delta_distance, max_angle);
+                    
+                }
+            }
+        }
+        return null;
+    }
+
+    public RRTTree buildRRTStar1(float[] init_coordinate, float current_angle) {
         this.setInit_coordinate(init_coordinate);
         RRTTree G = new RRTTree();
         RRTNode start_node = new RRTNode(init_coordinate[0], init_coordinate[1]);
@@ -119,7 +158,7 @@ public class RRTAlg {
         float[] random_goal;
         RRTNode nearest_node;
         RRTNode new_node = null;
-        double radius = this.max_delta_distance;
+        double radius = 9999;
 
         for (int time_step = 1; time_step <= k_step;) {
             //random choose a direction or goal
@@ -140,7 +179,7 @@ public class RRTAlg {
                     return G;
                 }
                 int max_num = 200;//(int) (2 * Math.E * Math.log(G.getNodeCount()));
-                Vector<RRTNode> nearestNodesToNewNodeSet = nearestNodesToNewNode(G, new_node, radius);
+                Vector<RRTNode> nearestNodesToNewNodeSet = neareSortedNodesToNode(G, new_node.getCoordinate(), radius);
                 if (nearestNodesToNewNodeSet.size() > max_num) {
                     radius = DistanceUtil.distanceBetween(new_node.getCoordinate(), nearestNodesToNewNodeSet.get(max_num).getCoordinate());
                 }
@@ -173,36 +212,29 @@ public class RRTAlg {
         }
     }
 
-    private Vector<RRTNode> nearestNodesToNewNode(RRTTree G, RRTNode new_node, double radius) {
+    /**
+     * sort the near nodes with distance, the shorter, the index is smaller
+     *
+     * @param G
+     * @param node
+     * @param radius
+     * @return
+     */
+    private Vector<RRTNode> neareSortedNodesToNode(RRTTree G, float[] node_coordinate, double radius) {
         RRTNode temp_node;
-        Vector<RRTNode> NearestNodeSet=new Vector<RRTNode>();
-//        HashMap<RRTNode, Float> NearestNodeSet = new HashMap<RRTNode, Float>();
-        float temp_dist;
+        Map<RRTNode, Double> NeareNodeSet = new HashMap<RRTNode, Double>();
+        double temp_dist;
         int total_node_num = G.getNodeCount();
-        float[] new_node_coordinate = new_node.getCoordinate();
         for (int i = 0; i < total_node_num; i++) {
             temp_node = G.getNode(i);
-            temp_dist = distanceBetween(new_node_coordinate, temp_node.getCoordinate());
+            temp_dist = DistanceUtil.distanceBetween(node_coordinate, temp_node.getCoordinate());
             if (temp_dist < radius) {
-//                NearestNodeSet.put(temp_node, temp_dist);
-                NearestNodeSet.add(temp_node);
+                NeareNodeSet.put(temp_node, temp_dist);
             }
         }
-//
-//        HashMap<RRTNode, Float> sortedNodes = new HashMap<RRTNode, Float>();
-//        sortedNodes = RRTUtil.sortHashMap(NearestNodeSet);
-//
-//        Vector<RRTNode> candidateNodes = new Vector<RRTNode>();
-//
-//        for (RRTNode n : sortedNodes.keySet()) {
-//            candidateNodes.add(n);
-//        }
-
-        return NearestNodeSet;
+        MapSortUtil<RRTNode> map_sort_util = new MapSortUtil<RRTNode>();
+        return map_sort_util.sortMap(NeareNodeSet);
     }
-
-
-    
 
     /**
      * find the nearest vertex in RRTTree

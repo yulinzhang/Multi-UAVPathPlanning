@@ -12,11 +12,10 @@ import config.UserParameterConfig;
 import java.util.LinkedList;
 import java.util.Vector;
 import world.Circle;
-import world.Obstacle;
-import world.Target;
-import world.Threat;
+import world.model.Obstacle;
+import world.model.Target;
+import world.model.Threat;
 import world.World;
-import static world.World.bound_height;
 
 /**
  *
@@ -54,12 +53,20 @@ public class UAV extends Unit {
         this.uav_radar = new Circle(center_coordinates[0], center_coordinates[1], scout_radar_radius);
         this.path_prefound = new LinkedList<RRTNode>();
         setPreviousWaypoint();
-        this.obstacles = obstacles;
-        this.threats = threats;
+        this.obstacles = new Vector<Obstacle>();
+        this.threats = new Vector<Threat>();
+        for(Obstacle obs:obstacles)
+        {
+            this.obstacles.add(obs);
+        }
+        for(Threat threat:threats)
+        {
+            this.threats.add(threat);
+        }
         if (role_target == null) {
-            rrt_alg = new RRTAlg(super.getCenter_coordinates(), null, UserParameterConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, UserParameterConfig.rrt_iteration_times, speed, obstacles, threats);
+            rrt_alg = new RRTAlg(super.getCenter_coordinates(), null, UserParameterConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, UserParameterConfig.rrt_iteration_times, speed, this.obstacles, this.threats);
         } else {
-            rrt_alg = new RRTAlg(super.getCenter_coordinates(), role_target.getCoordinates(), UserParameterConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, UserParameterConfig.rrt_iteration_times, speed, obstacles, threats);
+            rrt_alg = new RRTAlg(super.getCenter_coordinates(), role_target.getCoordinates(), UserParameterConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, UserParameterConfig.rrt_iteration_times, speed, this.obstacles, this.threats);
         }
     }
 
@@ -74,7 +81,7 @@ public class UAV extends Unit {
     public void runRRTStar() {
         rrt_alg.setGoal_coordinate(role_target.getCoordinates());
         rrt_alg.setInit_coordinate(center_coordinates);
-        rrt_tree = rrt_alg.buildRRTStar(center_coordinates,current_angle);
+        rrt_tree = rrt_alg.buildRRTStar1(center_coordinates,current_angle);
         this.setPath_prefound(rrt_tree.getPath_found());
         this.resetCurrentIndexOfPath();
     }

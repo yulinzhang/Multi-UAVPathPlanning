@@ -5,6 +5,9 @@
  */
 package world;
 
+import world.model.Threat;
+import world.model.Target;
+import world.model.Obstacle;
 import algorithm.RRT.RRTAlg;
 import algorithm.RRT.RRTNode;
 import algorithm.RRT.RRTTree;
@@ -149,8 +152,8 @@ public class World {
             }
             while (!moved) {
                 System.out.println("generate path and previous size=" + scout.getPath_prefound().size());
-                scout.runRRTStar();
-//                scout.runRRT();
+//                scout.runRRTStar();
+                scout.runRRT();
                 moved = scout.moveToNextWaypoint();
             }
         }

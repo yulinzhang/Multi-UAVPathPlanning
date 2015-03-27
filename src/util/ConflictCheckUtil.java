@@ -8,8 +8,8 @@ package util;
 import algorithm.RRT.RRTNode;
 import java.awt.Rectangle;
 import java.util.Vector;
-import world.Obstacle;
-import world.Threat;
+import world.model.Obstacle;
+import world.model.Threat;
 
 /**
  *

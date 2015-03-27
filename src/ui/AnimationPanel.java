@@ -23,9 +23,9 @@ import javax.swing.JPanel;
 import uav.UAV;
 import uav.UAVBase;
 import util.ImageUtil;
-import world.Obstacle;
-import world.Target;
-import world.Threat;
+import world.model.Obstacle;
+import world.model.Target;
+import world.model.Threat;
 import world.World;
 
 /**

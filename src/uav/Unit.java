@@ -5,7 +5,7 @@
  */
 package uav;
 
-import world.Target;
+import world.model.Target;
 import world.Triangle;
 
 /**

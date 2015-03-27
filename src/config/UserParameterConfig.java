@@ -6,7 +6,7 @@
 package config;
 
 import javax.swing.Timer;
-import world.Target;
+import world.model.Target;
 
 /**
  *

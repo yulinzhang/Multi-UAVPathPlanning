@@ -11,9 +11,9 @@ import uav.UAVBase;
 import util.ConflictCheckUtil;
 import util.ObtacleUtil;
 import world.Circle;
-import world.Obstacle;
-import world.Target;
-import world.Threat;
+import world.model.Obstacle;
+import world.model.Target;
+import world.model.Threat;
 
 /**
  *
