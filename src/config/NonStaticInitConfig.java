@@ -10,27 +10,23 @@ import java.util.Vector;
 import uav.UAVBase;
 import util.ConflictCheckUtil;
 import util.ObtacleUtil;
-import world.Circle;
 import world.model.Obstacle;
-import world.model.Target;
-import world.model.Threat;
+import world.model.StaticThreat;
 
 /**
  *
  * @author boluo
  */
-public class InitConfig {
+public class NonStaticInitConfig {
 
 
     private int enemy_num;
-    private int target_num;
+    private int static_threat_num;
     private int attacker_num;
     private int scout_num;
-    private int threat_num;
 
     private Vector<Obstacle> obstacles;
-    private Vector<Target> targets;
-    private Vector<Threat> threats;
+    private Vector<StaticThreat> static_threats;
 
     private UAVBase uav_base;
 
@@ -41,44 +37,37 @@ public class InitConfig {
     private int bound_width = 800;
     private int bound_height = 600;
     
-    public static boolean obstacles_customized=false;
 
     
-
-    public InitConfig(int enemy_num, int target_num, int attacker_num, int scout_num, int threat_num, UAVBase uav_base) {
+    public NonStaticInitConfig(int enemy_num, int static_threat_num, int attacker_num, int scout_num, int threat_num, UAVBase uav_base) {
         this.enemy_num = enemy_num;
-        this.target_num = target_num;
+        this.static_threat_num = static_threat_num;
         this.attacker_num = attacker_num;
         this.scout_num = scout_num;
-        this.threat_num = threat_num;
         this.uav_base = uav_base;
         
         initObstacles();
         initThreats();
-        initTargets();
     }
     
-    public InitConfig()
+    public NonStaticInitConfig()
     {
         this.enemy_num=0;
-        this.target_num=1;
+        this.static_threat_num=1;
         this.attacker_num=0;
         this.scout_num=1;
-        this.threat_num=0;
         float[] coordinate=new float[]{0,0};
         UAVBase uav_base=new UAVBase(coordinate,100,100);
         this.uav_base=uav_base;
         initObstacles();
         initThreats();
-        initTargets();
-//        initTargetAndEnemyUAV();
     }
 
     
-    private void initTargets() {
-        targets = new Vector<Target>();
+    private void initThreats() {
+        static_threats = new Vector<StaticThreat>();
         Random random = new Random(System.currentTimeMillis());
-        for (int i = 0; i < target_num; i++) {
+        for (int i = 0; i < static_threat_num; i++) {
             float coordinate_x = 0;
             float coordinate_y = 0;
             boolean found = false;
@@ -87,48 +76,28 @@ public class InitConfig {
                 coordinate_y = random.nextFloat()*(bound_height-2*attacker_patrol_range)+attacker_patrol_range;
 //                coordinate_x=400;
 //                coordinate_y=400;
-                found = !ConflictCheckUtil.checkPointInObstaclesAndThreats(obstacles,threats,coordinate_x, coordinate_y);
+                found = !ConflictCheckUtil.checkPointInObstaclesAndThreats(obstacles,coordinate_x, coordinate_y);
             }
-            Target target = new Target(i, new float[]{coordinate_x, coordinate_y});
-            targets.add(target);
+            StaticThreat static_threat = new StaticThreat(i, new float[]{coordinate_x, coordinate_y});
+            static_threats.add(static_threat);
         }
     }
 
     private void initConfigurationFromParameterConfiguration() {
-        this.attacker_num = UserParameterConfig.ATTACKER_NUM;
-        this.scout_num = UserParameterConfig.SCOUT_NUM;
-        this.enemy_num = UserParameterConfig.ENEMY_UAV_NUM;
-        this.threat_num = UserParameterConfig.THREAT_NUM;
-        this.target_num = UserParameterConfig.TARGET_NUM;
+        this.attacker_num = StaticInitConfig.ATTACKER_NUM;
+        this.scout_num = StaticInitConfig.SCOUT_NUM;
+        this.enemy_num = StaticInitConfig.ENEMY_UAV_NUM;
+        this.static_threat_num = StaticInitConfig.STATIC_THREAT_NUM;
     }
 
     private void initObstacles() {
-        if (UserParameterConfig.EXTERNAL_KML_FILE_PATH == null) {
+        if (StaticInitConfig.EXTERNAL_KML_FILE_PATH == null) {
             obstacles = ObtacleUtil.readObstacleFromResourceKML("/resources/Obstacle.kml");
         } else {
-            obstacles = ObtacleUtil.readObstacleFromExternalKML(UserParameterConfig.EXTERNAL_KML_FILE_PATH);
+            obstacles = ObtacleUtil.readObstacleFromExternalKML(StaticInitConfig.EXTERNAL_KML_FILE_PATH);
         }
     }
 
-    private void initThreats() {
-        threats=new Vector<Threat>();
-        Random random = new Random(System.currentTimeMillis());
-        for (int i = 0; i < threat_num; i++) {
-            float coordinate_x = 0;
-            float coordinate_y = 0;
-            boolean found = false;
-            while (!found) {
-                coordinate_x = random.nextFloat()*(bound_width-2*threat_radius)+threat_radius;
-                coordinate_y = random.nextFloat()*(bound_height-2*threat_radius)+threat_radius;
-                found = !ConflictCheckUtil.checkPointInObstaclesAndThreats(obstacles,threats, coordinate_x, coordinate_y);
-            }
-
-            Circle circle = new Circle(coordinate_x, coordinate_y, threat_radius);
-            Threat threat = new Threat(circle, i);
-            threats.add(threat);
-        }
-        
-    }
 
     public int getEnemy_num() {
         return enemy_num;
@@ -136,14 +105,6 @@ public class InitConfig {
 
     public void setEnemy_num(int enemy_num) {
         this.enemy_num = enemy_num;
-    }
-
-    public int getTarget_num() {
-        return target_num;
-    }
-
-    public void setTarget_num(int target_num) {
-        this.target_num = target_num;
     }
 
     public int getAttacker_num() {
@@ -162,14 +123,6 @@ public class InitConfig {
         this.scout_num = scout_num;
     }
 
-    public int getThreat_num() {
-        return threat_num;
-    }
-
-    public void setThreat_num(int threat_num) {
-        this.threat_num = threat_num;
-    }
-
     public Vector<Obstacle> getObstacles() {
         return obstacles;
     }
@@ -178,22 +131,7 @@ public class InitConfig {
         this.obstacles = obstacles;
     }
 
-    public Vector<Target> getTargets() {
-        return targets;
-    }
-
-    public void setTargets(Vector<Target> targets) {
-        this.targets = targets;
-    }
-
-    public Vector<Threat> getThreats() {
-        return threats;
-    }
-
-    public void setThreats(Vector<Threat> threats) {
-        this.threats = threats;
-    }
-
+ 
     public UAVBase getUav_base() {
         return uav_base;
     }
@@ -232,6 +170,22 @@ public class InitConfig {
 
     public void setBound_height(int bound_height) {
         this.bound_height = bound_height;
+    }
+
+    public int getStatic_threat_num() {
+        return static_threat_num;
+    }
+
+    public void setStatic_threat_num(int static_threat_num) {
+        this.static_threat_num = static_threat_num;
+    }
+
+    public Vector<StaticThreat> getStatic_threats() {
+        return static_threats;
+    }
+
+    public void setStatic_threats(Vector<StaticThreat> static_threats) {
+        this.static_threats = static_threats;
     }
     
 

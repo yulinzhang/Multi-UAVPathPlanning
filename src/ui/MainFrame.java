@@ -5,7 +5,7 @@
  */
 package ui;
 
-import config.InitConfig;
+import config.NonStaticInitConfig;
 
 /**
  *

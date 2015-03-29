@@ -5,7 +5,7 @@
  */
 package ui;
 
-import config.UserParameterConfig;
+import config.StaticInitConfig;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
@@ -24,8 +24,8 @@ public class ScoutAndAttackerInitPanel extends javax.swing.JPanel {
     }
 
     private void initSpinnerValue() {
-        this.jSpinner2.setModel(new SpinnerNumberModel(UserParameterConfig.SCOUT_NUM, UserParameterConfig.MIN_SPINNER_VALUE, UserParameterConfig.MAX_SPINNER_VALUE, UserParameterConfig.STEP_SIZE_OF_SPINNER));
-        this.jSpinner3.setModel(new SpinnerNumberModel(UserParameterConfig.ATTACKER_NUM, UserParameterConfig.MIN_SPINNER_VALUE, UserParameterConfig.MAX_SPINNER_VALUE, UserParameterConfig.STEP_SIZE_OF_SPINNER));
+        this.jSpinner2.setModel(new SpinnerNumberModel(StaticInitConfig.SCOUT_NUM, StaticInitConfig.MIN_SPINNER_VALUE, StaticInitConfig.MAX_SPINNER_VALUE, StaticInitConfig.STEP_SIZE_OF_SPINNER));
+        this.jSpinner3.setModel(new SpinnerNumberModel(StaticInitConfig.ATTACKER_NUM, StaticInitConfig.MIN_SPINNER_VALUE, StaticInitConfig.MAX_SPINNER_VALUE, StaticInitConfig.STEP_SIZE_OF_SPINNER));
     }
 
     /**
@@ -115,13 +115,13 @@ public class ScoutAndAttackerInitPanel extends javax.swing.JPanel {
     private void jSpinner2StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner2StateChanged
         // TODO add your handling code here:
         JSpinner source = (JSpinner) evt.getSource();
-        UserParameterConfig.SCOUT_NUM = (Integer) source.getValue();
+        StaticInitConfig.SCOUT_NUM = (Integer) source.getValue();
     }//GEN-LAST:event_jSpinner2StateChanged
 
     private void jSpinner3StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner3StateChanged
         // TODO add your handling code here:
         JSpinner source = (JSpinner) evt.getSource();
-        UserParameterConfig.ATTACKER_NUM = (Integer) source.getValue();
+        StaticInitConfig.ATTACKER_NUM = (Integer) source.getValue();
     }//GEN-LAST:event_jSpinner3StateChanged
 
 

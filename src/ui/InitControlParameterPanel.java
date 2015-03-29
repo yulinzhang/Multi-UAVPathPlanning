@@ -5,7 +5,7 @@
  */
 package ui;
 
-import config.UserParameterConfig;
+import config.StaticInitConfig;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -107,9 +107,9 @@ public class InitControlParameterPanel extends javax.swing.JPanel {
         if (JFileChooser.APPROVE_OPTION == chooser.showOpenDialog(null)) {//用户点击了确定  
             path = chooser.getSelectedFile().getAbsolutePath();//取得路径选择  
         }
-        UserParameterConfig.EXTERNAL_KML_FILE_PATH = path;
+        StaticInitConfig.EXTERNAL_KML_FILE_PATH = path;
         if (path != null) {
-            UserParameterConfig.EXTERNAL_KML_FILE_PATH = path;
+            StaticInitConfig.EXTERNAL_KML_FILE_PATH = path;
             button.setText("地图已选择");
         } else{
             button.setText("打开地图(KML)");

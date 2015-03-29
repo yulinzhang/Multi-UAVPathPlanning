@@ -5,17 +5,17 @@
  */
 package world.model;
 
+import config.StaticInitConfig;
+
 /**
  *
  * @author boluo
  */
-public class Target extends EnvConstraint{
-    protected float[] coordinates;
-    protected int target_type=0;
-    public Target(int index,float[] coordinates, int target_type) {
-        super( index, null);
+public class DynamicThreat extends Target{
+    private float[] coordinates;
+    public DynamicThreat(int index,float[] coordinates) {
+        super( index, null,StaticInitConfig.DYNAMIC_THREAT_TYPE);
         this.coordinates=coordinates;
-        this.target_type=target_type;
     }
 
     public float[] getCoordinates() {
@@ -25,4 +25,6 @@ public class Target extends EnvConstraint{
     public void setCoordinates(float[] coordinates) {
         this.coordinates = coordinates;
     }
+
+    
 }

@@ -19,8 +19,7 @@ import java.util.Queue;
 import uav.UAV;
 import world.Circle;
 import world.model.Obstacle;
-import world.model.Target;
-import world.model.Threat;
+import world.model.StaticThreat;
 
 /**
  *
@@ -97,12 +96,6 @@ public class MyGraphic {
         }
     }
 
-    public void drawThreat(Graphics2D graphics, Threat threat, Color threat_color) {
-        graphics.setComposite(AlphaComposite.SrcOver);
-        graphics.setColor(threat_color);
-        graphics.fill(threat.getShape());
-    }
-
     public void drawObstacle(Graphics2D graphics, Obstacle obstacle, Color obstacle_center_color, Color obstacle_edge_color) {
         graphics.setComposite(AlphaComposite.SrcOver);
         graphics.setStroke(new BasicStroke(1f));
@@ -112,11 +105,11 @@ public class MyGraphic {
         graphics.draw(obstacle.getShape());
     }
 
-    public void drawTarget(Graphics2D graphics, Target target, Color target_color) {
+    public void drawTarget(Graphics2D graphics, StaticThreat target, Color target_color) {
         graphics.setComposite(AlphaComposite.SrcOver);
         graphics.setColor(target_color);
         graphics.setStroke(new BasicStroke(3.0f));
-        graphics.drawRect((int) target.getCoordinates()[0] - GraphicConfig.target_width / 2, (int) target.getCoordinates()[1] - GraphicConfig.target_height / 2, GraphicConfig.target_width, GraphicConfig.target_height);
+        graphics.drawRect((int) target.getCoordinates()[0] - GraphicConfig.static_threat_width / 2, (int) target.getCoordinates()[1] - GraphicConfig.static_threat_height / 2, GraphicConfig.static_threat_width, GraphicConfig.static_threat_height);
     }
 
 }

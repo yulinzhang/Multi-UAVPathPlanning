@@ -5,7 +5,7 @@
  */
 package ui;
 
-import config.UserParameterConfig;
+import config.StaticInitConfig;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
@@ -24,9 +24,9 @@ public class EnemyThreatAndTargetInitPanel extends javax.swing.JPanel {
     }
 
     private void initSpinnerValue() {
-        this.jSpinner1.setModel(new SpinnerNumberModel(UserParameterConfig.ENEMY_UAV_NUM, UserParameterConfig.MIN_SPINNER_VALUE, UserParameterConfig.MAX_SPINNER_VALUE, UserParameterConfig.STEP_SIZE_OF_SPINNER));
-        this.jSpinner4.setModel(new SpinnerNumberModel(UserParameterConfig.THREAT_NUM, UserParameterConfig.MIN_SPINNER_VALUE, UserParameterConfig.MAX_SPINNER_VALUE, UserParameterConfig.STEP_SIZE_OF_SPINNER));
-        this.jSpinner5.setModel(new SpinnerNumberModel(UserParameterConfig.TARGET_NUM, UserParameterConfig.MIN_SPINNER_VALUE, UserParameterConfig.MAX_SPINNER_VALUE, UserParameterConfig.STEP_SIZE_OF_SPINNER));
+        this.jSpinner1.setModel(new SpinnerNumberModel(StaticInitConfig.ENEMY_UAV_NUM, StaticInitConfig.MIN_SPINNER_VALUE, StaticInitConfig.MAX_SPINNER_VALUE, StaticInitConfig.STEP_SIZE_OF_SPINNER));
+        this.jSpinner4.setModel(new SpinnerNumberModel(StaticInitConfig.STATIC_THREAT_NUM, StaticInitConfig.MIN_SPINNER_VALUE, StaticInitConfig.MAX_SPINNER_VALUE, StaticInitConfig.STEP_SIZE_OF_SPINNER));
+        this.jSpinner5.setModel(new SpinnerNumberModel(StaticInitConfig.STATIC_THREAT_NUM, StaticInitConfig.MIN_SPINNER_VALUE, StaticInitConfig.MAX_SPINNER_VALUE, StaticInitConfig.STEP_SIZE_OF_SPINNER));
     }
 
     public void diabled() {
@@ -147,19 +147,19 @@ public class EnemyThreatAndTargetInitPanel extends javax.swing.JPanel {
     private void jSpinner4StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner4StateChanged
         // TODO add your handling code here:
         JSpinner source = (JSpinner) evt.getSource();
-        UserParameterConfig.THREAT_NUM = (Integer) source.getValue();
+        StaticInitConfig.STATIC_THREAT_NUM = (Integer) source.getValue();
     }//GEN-LAST:event_jSpinner4StateChanged
 
     private void jSpinner5StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner5StateChanged
         // TODO add your handling code here:
         JSpinner source = (JSpinner) evt.getSource();
-        UserParameterConfig.TARGET_NUM = (Integer) source.getValue();
+        StaticInitConfig.STATIC_THREAT_NUM = (Integer) source.getValue();
     }//GEN-LAST:event_jSpinner5StateChanged
 
     private void jSpinner1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner1StateChanged
         // TODO add your handling code here:
         JSpinner source = (JSpinner) evt.getSource();
-        UserParameterConfig.ENEMY_UAV_NUM = (Integer) source.getValue();
+        StaticInitConfig.ENEMY_UAV_NUM = (Integer) source.getValue();
     }//GEN-LAST:event_jSpinner1StateChanged
 
 

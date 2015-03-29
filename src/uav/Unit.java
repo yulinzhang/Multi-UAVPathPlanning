@@ -5,8 +5,9 @@
  */
 package uav;
 
-import world.model.Target;
+import world.model.StaticThreat;
 import world.Triangle;
+import world.model.Target;
 
 /**
  *
@@ -19,7 +20,7 @@ public class Unit {
      *
      */
     protected int index;
-    protected Target role_target;
+    protected Target target_indicated_by_role;
     //which side the unit belongs to 
     protected int flag_of_war;
     protected float[] center_coordinates = new float[2];
@@ -33,9 +34,9 @@ public class Unit {
     public static int center_height = 10;
     public static int center_width = 8;
 
-    public Unit(int index, Target role_target, int flag_of_war, float[] center_coordinates) {
+    public Unit(int index, Target target_indicated_by_role, int flag_of_war, float[] center_coordinates) {
         this.index = index;
-        this.role_target = role_target;
+        this.target_indicated_by_role = target_indicated_by_role;
         this.flag_of_war=flag_of_war;
         this.center_coordinates[0] = center_coordinates[0];
         this.center_coordinates[1] = center_coordinates[1];
@@ -59,11 +60,11 @@ public class Unit {
     }
 
     public Target getRole_target() {
-        return role_target;
+        return target_indicated_by_role;
     }
 
-    public void setRole_target(Target role_target) {
-        this.role_target = role_target;
+    public void setRole_target(StaticThreat role_target) {
+        this.target_indicated_by_role = role_target;
     }
 
 

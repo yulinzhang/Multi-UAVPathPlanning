@@ -15,7 +15,6 @@ import static util.DistanceUtil.distanceBetween;
 import util.MapSortUtil;
 import util.VectorUtil;
 import world.model.Obstacle;
-import world.model.Threat;
 
 /**
  *
@@ -28,7 +27,6 @@ public class RRTAlg {
      *
      */
     private Vector<Obstacle> obstacles;
-    private Vector<Threat> threats;
     private int bound_width = 800;
     private int bound_height = 600;
     private float[] init_coordinate;
@@ -62,12 +60,11 @@ public class RRTAlg {
      * @param threats
      * @return
      */
-    public RRTAlg(float[] init_coordinate, float[] goal_coordinate, float goal_probability, int bound_width, int bound_height, int k_step, float max_delta_distance, Vector<Obstacle> obstacles, Vector<Threat> threats) {
+    public RRTAlg(float[] init_coordinate, float[] goal_coordinate, float goal_probability, int bound_width, int bound_height, int k_step, float max_delta_distance, Vector<Obstacle> obstacles) {
         this.init_coordinate = init_coordinate;
         this.k_step = k_step;
         this.max_delta_distance = max_delta_distance;
         this.obstacles = obstacles;
-        this.threats = threats;
         this.bound_height = bound_height;
         this.bound_width = bound_width;
         this.goal_probability = goal_probability;
@@ -87,13 +84,13 @@ public class RRTAlg {
 
         for (int time_step = 1; time_step <= k_step;) {
             //random choose a direction or goal
-            random_goal = randGoal(this.goal_coordinate, goal_probability, bound_width, bound_height, obstacles, threats);
+            random_goal = randGoal(this.goal_coordinate, goal_probability, bound_width, bound_height, obstacles);
             //choose the nearest node to extend
             nearest_node = nearestVertex(random_goal, G);
             //extend the child node and validate its confliction 
             new_node = extendTowardGoalV2(nearest_node, random_goal, this.max_delta_distance, max_angle);
 
-            boolean conflicted = ConflictCheckUtil.checkNodeInObstaclesAndThreats(obstacles, threats, new_node);
+            boolean conflicted = ConflictCheckUtil.checkNodeInObstacles(obstacles,  new_node);
             boolean within_bound = BoundUtil.withinBound(new_node, bound_width, bound_height);
             //if not conflicted,add the child to the tree
             if (!conflicted && true) {
@@ -124,7 +121,7 @@ public class RRTAlg {
 
         for (int time_step = 1; time_step <= k_step;) {
             //random choose a direction or goal
-            random_goal = randGoal(this.goal_coordinate, goal_probability, bound_width, bound_height, obstacles, threats);
+            random_goal = randGoal(this.goal_coordinate, goal_probability, bound_width, bound_height, obstacles);
             //choose the nearest node to extend
             near_node_set = neareSortedNodesToNode(G, random_goal, radius);
 
@@ -162,13 +159,13 @@ public class RRTAlg {
 
         for (int time_step = 1; time_step <= k_step;) {
             //random choose a direction or goal
-            random_goal = randGoal(this.goal_coordinate, goal_probability, bound_width, bound_height, obstacles, threats);
+            random_goal = randGoal(this.goal_coordinate, goal_probability, bound_width, bound_height, obstacles);
             //choose the nearest node to extend
             nearest_node = nearestVertex(random_goal, G);
             //extend the child node and validate its confliction
             new_node = extendTowardGoalV2(nearest_node, random_goal, this.max_delta_distance, max_angle);
 
-            boolean conflicted = ConflictCheckUtil.checkNodeInObstaclesAndThreats(obstacles, threats, new_node);
+            boolean conflicted = ConflictCheckUtil.checkNodeInObstacles(obstacles,  new_node);
             boolean within_bound = BoundUtil.withinBound(new_node, bound_width, bound_height);
             //if not conflicted,add the child to the tree
             if (!conflicted && true) {
@@ -273,7 +270,7 @@ public class RRTAlg {
      * @param threats
      * @return
      */
-    private float[] randGoal(float[] goal_coordinate, float goal_probability, float width, float height, Vector<Obstacle> obstacles, Vector<Threat> threats) {
+    private float[] randGoal(float[] goal_coordinate, float goal_probability, float width, float height, Vector<Obstacle> obstacles) {
         float probability = (float) Math.random();
         if (probability <= goal_probability) {
             return goal_coordinate;
@@ -285,7 +282,7 @@ public class RRTAlg {
         while (collisioned) {
             random_goal_coordinate[0] = (float) (Math.random() * width);
             random_goal_coordinate[1] = (float) (Math.random() * height);
-            if (!ConflictCheckUtil.checkPointInObstaclesAndThreats(obstacles, threats, random_goal_coordinate[0], random_goal_coordinate[1])) {
+            if (!ConflictCheckUtil.checkPointInObstaclesAndThreats(obstacles, random_goal_coordinate[0], random_goal_coordinate[1])) {
                 collisioned = false;
             }
         }

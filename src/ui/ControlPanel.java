@@ -5,7 +5,7 @@
  */
 package ui;
 
-import config.UserParameterConfig;
+import config.StaticInitConfig;
 
 /**
  *
@@ -194,8 +194,8 @@ public class ControlPanel extends javax.swing.JPanel {
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
-        UserParameterConfig.SHOW_PLANNED_TREE = !UserParameterConfig.SHOW_PLANNED_TREE;
-        if (UserParameterConfig.SHOW_PLANNED_TREE) {
+        StaticInitConfig.SHOW_PLANNED_TREE = !StaticInitConfig.SHOW_PLANNED_TREE;
+        if (StaticInitConfig.SHOW_PLANNED_TREE) {
             this.jButton4.setText("关闭" + this.show_planned_tree_text);
         } else {
             this.jButton4.setText("显示" + this.show_planned_tree_text);
@@ -204,8 +204,8 @@ public class ControlPanel extends javax.swing.JPanel {
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
-        UserParameterConfig.SHOW_PLANNED_PATH = !UserParameterConfig.SHOW_PLANNED_PATH;
-        if (UserParameterConfig.SHOW_PLANNED_PATH) {
+        StaticInitConfig.SHOW_PLANNED_PATH = !StaticInitConfig.SHOW_PLANNED_PATH;
+        if (StaticInitConfig.SHOW_PLANNED_PATH) {
             this.jButton3.setText("关闭" + this.shown_planned_path_text);
         } else {
             this.jButton3.setText("显示" + this.shown_planned_path_text);
@@ -214,8 +214,8 @@ public class ControlPanel extends javax.swing.JPanel {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        UserParameterConfig.SIMULATION_ON = !UserParameterConfig.SIMULATION_ON;
-        if (UserParameterConfig.SIMULATION_ON) {
+        StaticInitConfig.SIMULATION_ON = !StaticInitConfig.SIMULATION_ON;
+        if (StaticInitConfig.SIMULATION_ON) {
             this.jButton1.setText(simulation_stop);
         } else {
             this.jButton1.setText(simulation_start);
@@ -224,8 +224,8 @@ public class ControlPanel extends javax.swing.JPanel {
 
     private void setSimulationDelayWithSpeed(float speed_times) {
         this.jLabel1.setText(this.simulation_speed_text + speed_times);
-        int delay = (int)(UserParameterConfig.INIT_SIMULATION_DELAY /  speed_times);
-        UserParameterConfig.SIMULATION_WITH_UI_TIMER.setDelay(delay);
+        int delay = (int)(StaticInitConfig.INIT_SIMULATION_DELAY /  speed_times);
+        StaticInitConfig.SIMULATION_WITH_UI_TIMER.setDelay(delay);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

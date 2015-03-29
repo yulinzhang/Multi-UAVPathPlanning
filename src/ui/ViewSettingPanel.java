@@ -5,7 +5,7 @@
  */
 package ui;
 
-import config.UserParameterConfig;
+import config.StaticInitConfig;
 import java.awt.event.ActionEvent;
 
 /**
@@ -107,12 +107,10 @@ public class ViewSettingPanel extends javax.swing.JPanel {
     private void jButtonActionCommand(ActionEvent evt) {
         String action_command = evt.getActionCommand();
         System.out.println(action_command);
-        if (action_command.equals(UserParameterConfig.VIEW_OBSTACLE_ACTION_COMMAND)) {
-            UserParameterConfig.VIEW_ENEMY_UAV = !UserParameterConfig.VIEW_ENEMY_UAV;
-        } else if (action_command.equals(UserParameterConfig.VIEW_THREAT_ACTION_COMMAND)) {
-            UserParameterConfig.VIEW_THREAT = !UserParameterConfig.VIEW_THREAT;
-        } else if (action_command.equals(UserParameterConfig.VIEW_TARGET_ACTION_COMMAND)) {
-            UserParameterConfig.VIEW_TARGET = !UserParameterConfig.VIEW_TARGET;
+        if (action_command.equals(StaticInitConfig.VIEW_OBSTACLE_ACTION_COMMAND)) {
+            StaticInitConfig.VIEW_ENEMY_UAV = !StaticInitConfig.VIEW_ENEMY_UAV;
+        } else if (action_command.equals(StaticInitConfig.VIEW_THREAT_ACTION_COMMAND)) {
+            StaticInitConfig.VIEW_THREAT = !StaticInitConfig.VIEW_THREAT;
         }
     }
 

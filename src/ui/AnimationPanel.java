@@ -6,8 +6,8 @@
 package ui;
 
 import config.GraphicConfig;
-import config.InitConfig;
-import config.UserParameterConfig;
+import config.NonStaticInitConfig;
+import config.StaticInitConfig;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -24,8 +24,7 @@ import uav.UAV;
 import uav.UAVBase;
 import util.ImageUtil;
 import world.model.Obstacle;
-import world.model.Target;
-import world.model.Threat;
+import world.model.StaticThreat;
 import world.World;
 
 /**
@@ -70,8 +69,7 @@ public class AnimationPanel extends JPanel {
     private Vector<UAV> enemy_uavs;
     private UAVBase uav_base;
     private Vector<Obstacle> obstacles;
-    private Vector<Threat> threats;
-    private Vector<Target> targets;
+    private Vector<StaticThreat> targets;
 
     private static int uav_base_line_width = 3;
 
@@ -129,22 +127,21 @@ public class AnimationPanel extends JPanel {
             virtualizer = new MyGraphic();
 
             //initiate world
-            InitConfig init_config = new InitConfig();
+            NonStaticInitConfig init_config = new NonStaticInitConfig();
             world = new World(init_config);
             this.scouts = world.getScouts();
             this.attackers = world.getAttackers();
 
             //initiate obstacles in level 2
             this.initObstaclesInObstacleImageInLevel2(world.getObstacles());
-            this.initThreatInObstacleImageLevel2(world.getThreats());
             this.initTargetInObstacleImageLevel2(world.getTargets());
 
             //initiate parameters according to world
             this.initParameterFromInitConfig(world);
 
             //drive the world and ui
-            UserParameterConfig.SIMULATION_WITH_UI_TIMER = new javax.swing.Timer(UserParameterConfig.INIT_SIMULATION_DELAY, new animatorListener(this));
-            UserParameterConfig.SIMULATION_WITH_UI_TIMER.start();
+            StaticInitConfig.SIMULATION_WITH_UI_TIMER = new javax.swing.Timer(StaticInitConfig.INIT_SIMULATION_DELAY, new animatorListener(this));
+            StaticInitConfig.SIMULATION_WITH_UI_TIMER.start();
         } catch (IOException ex) {
             Logger.getLogger(AnimationPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -158,7 +155,6 @@ public class AnimationPanel extends JPanel {
         this.scouts = world.getScouts();
         this.attackers = world.getAttackers();
         this.enemy_uavs = world.getEnemy_uavs();
-        this.threats = world.getThreats();
         this.targets = world.getTargets();
         this.obstacles = world.getObstacles();
         this.uav_base = world.getUav_base();
@@ -171,15 +167,9 @@ public class AnimationPanel extends JPanel {
         }
     }
 
-    private void initThreatInObstacleImageLevel2(Vector<Threat> threats) {
-        for (Threat threat : threats) {
-            virtualizer.drawThreat(obstacle_image_graphics, threat, GraphicConfig.threat_color);
-        }
-    }
-
-    private void initTargetInObstacleImageLevel2(Vector<Target> targets) {
-        for (Target target : targets) {
-            virtualizer.drawTarget(obstacle_image_graphics, target, GraphicConfig.target_color);
+    private void initTargetInObstacleImageLevel2(Vector<StaticThreat> static_threats) {
+        for (StaticThreat static_threat : static_threats) {
+            virtualizer.drawTarget(obstacle_image_graphics, static_threat, GraphicConfig.static_threat_color);
         }
     }
 
@@ -258,16 +248,16 @@ public class AnimationPanel extends JPanel {
         g.drawImage(background_image_level_1, 0, 0, null);
         g.drawImage(obstacle_image_level_2, 0, 0, null);
         g.drawImage(enemy_uav_image_level_3, 0, 0, null);
-        if (UserParameterConfig.SHOW_FOG_OF_WAR) {
+        if (StaticInitConfig.SHOW_FOG_OF_WAR) {
             g.drawImage(fog_of_war_image_level_4, 0, 0, null);
         }
-        if (UserParameterConfig.SHOW_HISTORY_PATH) {
+        if (StaticInitConfig.SHOW_HISTORY_PATH) {
             g.drawImage(uav_history_path_image_level_5, 0, 0, null);
         }
-        if (UserParameterConfig.SHOW_PLANNED_TREE) {
+        if (StaticInitConfig.SHOW_PLANNED_TREE) {
             g.drawImage(uav_planned_tree_image_level_6, 0, 0, null);
         }
-        if (UserParameterConfig.SHOW_PLANNED_PATH) {
+        if (StaticInitConfig.SHOW_PLANNED_PATH) {
             g.drawImage(uav_planned_path_image_level_7, 0, 0, null);
         }
         g.drawImage(uav_image_level_8, 0, 0, null);
@@ -284,7 +274,7 @@ public class AnimationPanel extends JPanel {
 
         public void actionPerformed(ActionEvent e) {
             clearUAVImageBeforeUpdate();
-            if (UserParameterConfig.SIMULATION_ON) {
+            if (StaticInitConfig.SIMULATION_ON) {
                 world.updateAll();
             }
             updateImageCausedByUAVMovement();

@@ -8,14 +8,13 @@ package uav;
 import algorithm.RRT.RRTAlg;
 import algorithm.RRT.RRTNode;
 import algorithm.RRT.RRTTree;
-import config.UserParameterConfig;
+import config.StaticInitConfig;
 import java.util.LinkedList;
 import java.util.Vector;
 import world.Circle;
 import world.model.Obstacle;
-import world.model.Target;
-import world.model.Threat;
 import world.World;
+import world.model.Target;
 
 /**
  *
@@ -25,9 +24,6 @@ public class UAV extends Unit {
 
     private Circle uav_radar;
 
-    //variable for enemy uav
-    private float theta_around_target_for_enemy_uav;
-
     private LinkedList<RRTNode> path_prefound;
     private int current_index = 0;
 
@@ -35,7 +31,6 @@ public class UAV extends Unit {
 
     //variables for path planning
     private Vector<Obstacle> obstacles;
-    private Vector<Threat> threats;
 
     private RRTAlg rrt_alg;
     private RRTTree rrt_tree;
@@ -45,33 +40,28 @@ public class UAV extends Unit {
     /**
      *
      * @param index
-     * @param role_target
+     * @param target
      * @param center_coordinates
      */
-    public UAV(int index, Target role_target, int flag_of_war, float[] center_coordinates, Vector<Obstacle> obstacles, Vector<Threat> threats) {
-        super(index, role_target, flag_of_war, center_coordinates);
+    public UAV(int index, Target target, int flag_of_war, float[] center_coordinates, Vector<Obstacle> obstacles) {
+        super(index, target, flag_of_war, center_coordinates);
         this.uav_radar = new Circle(center_coordinates[0], center_coordinates[1], scout_radar_radius);
         this.path_prefound = new LinkedList<RRTNode>();
         setPreviousWaypoint();
         this.obstacles = new Vector<Obstacle>();
-        this.threats = new Vector<Threat>();
         for(Obstacle obs:obstacles)
         {
             this.obstacles.add(obs);
         }
-        for(Threat threat:threats)
-        {
-            this.threats.add(threat);
-        }
-        if (role_target == null) {
-            rrt_alg = new RRTAlg(super.getCenter_coordinates(), null, UserParameterConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, UserParameterConfig.rrt_iteration_times, speed, this.obstacles, this.threats);
+        if (target == null) {
+            rrt_alg = new RRTAlg(super.getCenter_coordinates(), null, StaticInitConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, StaticInitConfig.rrt_iteration_times, speed, this.obstacles);
         } else {
-            rrt_alg = new RRTAlg(super.getCenter_coordinates(), role_target.getCoordinates(), UserParameterConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, UserParameterConfig.rrt_iteration_times, speed, this.obstacles, this.threats);
+            rrt_alg = new RRTAlg(super.getCenter_coordinates(), target.getCoordinates(), StaticInitConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, StaticInitConfig.rrt_iteration_times, speed, this.obstacles);
         }
     }
 
     public void runRRT() {
-        rrt_alg.setGoal_coordinate(role_target.getCoordinates());
+        rrt_alg.setGoal_coordinate(target_indicated_by_role.getCoordinates());
         rrt_alg.setInit_coordinate(center_coordinates);
         rrt_tree = rrt_alg.buildRRT(center_coordinates,current_angle);
         this.setPath_prefound(rrt_tree.getPath_found());
@@ -79,7 +69,7 @@ public class UAV extends Unit {
     }
     
     public void runRRTStar() {
-        rrt_alg.setGoal_coordinate(role_target.getCoordinates());
+        rrt_alg.setGoal_coordinate(target_indicated_by_role.getCoordinates());
         rrt_alg.setInit_coordinate(center_coordinates);
         rrt_tree = rrt_alg.buildRRTStar1(center_coordinates,current_angle);
         this.setPath_prefound(rrt_tree.getPath_found());
@@ -137,14 +127,6 @@ public class UAV extends Unit {
 
     public void setUav_radar(Circle uav_radar) {
         this.uav_radar = uav_radar;
-    }
-
-    public float getTheta_around_target_for_enemy_uav() {
-        return theta_around_target_for_enemy_uav;
-    }
-
-    public void setTheta_around_target_for_enemy_uav(float theta_around_target_for_enemy_uav) {
-        this.theta_around_target_for_enemy_uav = theta_around_target_for_enemy_uav;
     }
 
     public LinkedList<RRTNode> getPath_prefound() {
