@@ -11,7 +11,7 @@ import uav.UAVBase;
 import util.ConflictCheckUtil;
 import util.ObtacleUtil;
 import world.model.Obstacle;
-import world.model.StaticThreat;
+import world.model.Threat;
 
 /**
  *
@@ -21,12 +21,12 @@ public class NonStaticInitConfig {
 
 
     private int enemy_num;
-    private int static_threat_num;
+    private int threat_num;
     private int attacker_num;
     private int scout_num;
 
     private Vector<Obstacle> obstacles;
-    private Vector<StaticThreat> static_threats;
+    private Vector<Threat> threats;
 
     private UAVBase uav_base;
 
@@ -39,9 +39,9 @@ public class NonStaticInitConfig {
     
 
     
-    public NonStaticInitConfig(int enemy_num, int static_threat_num, int attacker_num, int scout_num, int threat_num, UAVBase uav_base) {
+    public NonStaticInitConfig(int enemy_num, int threat_num, int attacker_num, int scout_num, UAVBase uav_base) {
         this.enemy_num = enemy_num;
-        this.static_threat_num = static_threat_num;
+        this.threat_num = threat_num;
         this.attacker_num = attacker_num;
         this.scout_num = scout_num;
         this.uav_base = uav_base;
@@ -53,7 +53,7 @@ public class NonStaticInitConfig {
     public NonStaticInitConfig()
     {
         this.enemy_num=0;
-        this.static_threat_num=1;
+        this.threat_num=1;
         this.attacker_num=0;
         this.scout_num=1;
         float[] coordinate=new float[]{0,0};
@@ -65,9 +65,9 @@ public class NonStaticInitConfig {
 
     
     private void initThreats() {
-        static_threats = new Vector<StaticThreat>();
+        threats = new Vector<Threat>();
         Random random = new Random(System.currentTimeMillis());
-        for (int i = 0; i < static_threat_num; i++) {
+        for (int i = 0; i < threat_num; i++) {
             float coordinate_x = 0;
             float coordinate_y = 0;
             boolean found = false;
@@ -78,8 +78,8 @@ public class NonStaticInitConfig {
 //                coordinate_y=400;
                 found = !ConflictCheckUtil.checkPointInObstaclesAndThreats(obstacles,coordinate_x, coordinate_y);
             }
-            StaticThreat static_threat = new StaticThreat(i, new float[]{coordinate_x, coordinate_y});
-            static_threats.add(static_threat);
+            Threat threat = new Threat(i, new float[]{coordinate_x, coordinate_y},StaticInitConfig.STATIC_THREAT_TYPE);
+            threats.add(threat);
         }
     }
 
@@ -87,7 +87,7 @@ public class NonStaticInitConfig {
         this.attacker_num = StaticInitConfig.ATTACKER_NUM;
         this.scout_num = StaticInitConfig.SCOUT_NUM;
         this.enemy_num = StaticInitConfig.ENEMY_UAV_NUM;
-        this.static_threat_num = StaticInitConfig.STATIC_THREAT_NUM;
+        this.threat_num = StaticInitConfig.THREAT_NUM;
     }
 
     private void initObstacles() {
@@ -172,21 +172,20 @@ public class NonStaticInitConfig {
         this.bound_height = bound_height;
     }
 
-    public int getStatic_threat_num() {
-        return static_threat_num;
+    public int getThreat_num() {
+        return threat_num;
     }
 
-    public void setStatic_threat_num(int static_threat_num) {
-        this.static_threat_num = static_threat_num;
+    public void setThreat_num(int threat_num) {
+        this.threat_num = threat_num;
     }
 
-    public Vector<StaticThreat> getStatic_threats() {
-        return static_threats;
+    public Vector<Threat> getThreats() {
+        return threats;
     }
 
-    public void setStatic_threats(Vector<StaticThreat> static_threats) {
-        this.static_threats = static_threats;
+    public void setThreats(Vector<Threat> threats) {
+        this.threats = threats;
     }
-    
 
 }

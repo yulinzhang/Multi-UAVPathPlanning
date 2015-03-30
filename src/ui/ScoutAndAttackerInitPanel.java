@@ -73,7 +73,6 @@ public class ScoutAndAttackerInitPanel extends javax.swing.JPanel {
 
         jSpinner2.setMaximumSize(new java.awt.Dimension(82, 32767));
         jSpinner2.setMinimumSize(new java.awt.Dimension(82, 28));
-        jSpinner2.setPreferredSize(new java.awt.Dimension(82, 28));
         jSpinner2.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 jSpinner2StateChanged(evt);
@@ -90,7 +89,6 @@ public class ScoutAndAttackerInitPanel extends javax.swing.JPanel {
 
         jSpinner3.setMaximumSize(new java.awt.Dimension(82, 32767));
         jSpinner3.setMinimumSize(new java.awt.Dimension(82, 28));
-        jSpinner3.setPreferredSize(new java.awt.Dimension(82, 28));
         jSpinner3.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 jSpinner3StateChanged(evt);

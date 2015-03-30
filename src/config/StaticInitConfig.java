@@ -6,7 +6,7 @@
 package config;
 
 import javax.swing.Timer;
-import world.model.StaticThreat;
+import world.model.Threat;
 
 /**
  *
@@ -19,12 +19,11 @@ public class StaticInitConfig {
     public static Integer ATTACKER_NUM = 0;
     public static Integer SCOUT_NUM = 1;
     public static Integer ENEMY_UAV_NUM = 0;
-    public static Integer STATIC_THREAT_NUM = 1;
+    public static Integer THREAT_NUM = 1;
 
     public static boolean VIEW_OBSTACLE = false;
     public static boolean VIEW_THREAT = false;
     public static boolean VIEW_ENEMY_UAV = false;
-    public static boolean VIEW_STATIC_THREAT = false;
 
     public static String VIEW_OBSTACLE_ACTION_COMMAND = "显示障碍";
     public static String VIEW_THREAT_ACTION_COMMAND = "显示威胁";
@@ -39,7 +38,7 @@ public class StaticInitConfig {
     public static int SIDE_A = 0;
     public static int SIDE_B = 1;
 
-    public static StaticThreat NON_ROLE = null;
+    public static Threat NON_ROLE = null;
 
     public static float rrt_goal_toward_probability = 0.3f;
     public static int rrt_iteration_times = 10000;

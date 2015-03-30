@@ -20,26 +20,15 @@ public class EnemyThreatAndTargetInitPanel extends javax.swing.JPanel {
      */
     public EnemyThreatAndTargetInitPanel() {
         initComponents();
-        initSpinnerValue();
+//        initSpinnerValue();
     }
 
-    private void initSpinnerValue() {
-        this.jSpinner1.setModel(new SpinnerNumberModel(StaticInitConfig.ENEMY_UAV_NUM, StaticInitConfig.MIN_SPINNER_VALUE, StaticInitConfig.MAX_SPINNER_VALUE, StaticInitConfig.STEP_SIZE_OF_SPINNER));
-        this.jSpinner4.setModel(new SpinnerNumberModel(StaticInitConfig.STATIC_THREAT_NUM, StaticInitConfig.MIN_SPINNER_VALUE, StaticInitConfig.MAX_SPINNER_VALUE, StaticInitConfig.STEP_SIZE_OF_SPINNER));
-        this.jSpinner5.setModel(new SpinnerNumberModel(StaticInitConfig.STATIC_THREAT_NUM, StaticInitConfig.MIN_SPINNER_VALUE, StaticInitConfig.MAX_SPINNER_VALUE, StaticInitConfig.STEP_SIZE_OF_SPINNER));
-    }
+//    private void initSpinnerValue() {
+//        this.jSpinner1.setModel(new SpinnerNumberModel(StaticInitConfig.ENEMY_UAV_NUM, StaticInitConfig.MIN_SPINNER_VALUE, StaticInitConfig.MAX_SPINNER_VALUE, StaticInitConfig.STEP_SIZE_OF_SPINNER));
+//        this.jSpinner4.setModel(new SpinnerNumberModel(StaticInitConfig.THREAT_NUM, StaticInitConfig.MIN_SPINNER_VALUE, StaticInitConfig.MAX_SPINNER_VALUE, StaticInitConfig.STEP_SIZE_OF_SPINNER));
+//        this.jSpinner5.setModel(new SpinnerNumberModel(StaticInitConfig.THREAT_NUM, StaticInitConfig.MIN_SPINNER_VALUE, StaticInitConfig.MAX_SPINNER_VALUE, StaticInitConfig.STEP_SIZE_OF_SPINNER));
+//    }
 
-    public void diabled() {
-        this.jSpinner1.setEnabled(false);
-        this.jSpinner4.setEnabled(false);
-        this.jSpinner5.setEnabled(false);
-    }
-
-    public void enabled() {
-        this.jSpinner1.setEnabled(true);
-        this.jSpinner4.setEnabled(true);
-        this.jSpinner5.setEnabled(true);
-    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -51,86 +40,42 @@ public class EnemyThreatAndTargetInitPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         jSplitPane1 = new javax.swing.JSplitPane();
-        jSplitPane2 = new javax.swing.JSplitPane();
         jToolBar1 = new javax.swing.JToolBar();
-        jLabel4 = new javax.swing.JLabel();
-        jSpinner4 = new javax.swing.JSpinner();
-        jToolBar3 = new javax.swing.JToolBar();
         jLabel1 = new javax.swing.JLabel();
         jSpinner1 = new javax.swing.JSpinner();
-        jSplitPane3 = new javax.swing.JSplitPane();
         jToolBar2 = new javax.swing.JToolBar();
-        jLabel5 = new javax.swing.JLabel();
-        jSpinner5 = new javax.swing.JSpinner();
-        jToolBar4 = new javax.swing.JToolBar();
+        jLabel2 = new javax.swing.JLabel();
+        jSpinner2 = new javax.swing.JSpinner();
+
+        setPreferredSize(new java.awt.Dimension(180, 100));
 
         jSplitPane1.setDividerLocation(50);
         jSplitPane1.setDividerSize(1);
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
-        jSplitPane2.setDividerLocation(160);
-        jSplitPane2.setDividerSize(1);
-
         jToolBar1.setRollover(true);
 
-        jLabel4.setText("敌方威胁数量");
-        jToolBar1.add(jLabel4);
-
-        jSpinner4.setMaximumSize(new java.awt.Dimension(82, 32767));
-        jSpinner4.setMinimumSize(new java.awt.Dimension(82, 28));
-        jSpinner4.setPreferredSize(new java.awt.Dimension(82, 28));
-        jSpinner4.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jSpinner4StateChanged(evt);
-            }
-        });
-        jToolBar1.add(jSpinner4);
-
-        jSplitPane2.setLeftComponent(jToolBar1);
-
-        jToolBar3.setRollover(true);
-
-        jLabel1.setText("敌方UAV数量");
-        jToolBar3.add(jLabel1);
+        jLabel1.setText("静态威胁数量");
+        jToolBar1.add(jLabel1);
 
         jSpinner1.setMaximumSize(new java.awt.Dimension(82, 32767));
         jSpinner1.setMinimumSize(new java.awt.Dimension(82, 28));
         jSpinner1.setPreferredSize(new java.awt.Dimension(82, 28));
-        jSpinner1.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jSpinner1StateChanged(evt);
-            }
-        });
-        jToolBar3.add(jSpinner1);
+        jToolBar1.add(jSpinner1);
 
-        jSplitPane2.setRightComponent(jToolBar3);
-
-        jSplitPane1.setTopComponent(jSplitPane2);
-
-        jSplitPane3.setDividerLocation(160);
-        jSplitPane3.setDividerSize(1);
+        jSplitPane1.setTopComponent(jToolBar1);
 
         jToolBar2.setRollover(true);
 
-        jLabel5.setText("敌方目标数量");
-        jToolBar2.add(jLabel5);
+        jLabel2.setText("动态威胁数量");
+        jToolBar2.add(jLabel2);
 
-        jSpinner5.setMaximumSize(new java.awt.Dimension(82, 32767));
-        jSpinner5.setMinimumSize(new java.awt.Dimension(82, 28));
-        jSpinner5.setPreferredSize(new java.awt.Dimension(82, 28));
-        jSpinner5.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jSpinner5StateChanged(evt);
-            }
-        });
-        jToolBar2.add(jSpinner5);
+        jSpinner2.setMaximumSize(new java.awt.Dimension(82, 32767));
+        jSpinner2.setMinimumSize(new java.awt.Dimension(82, 28));
+        jSpinner2.setPreferredSize(new java.awt.Dimension(82, 28));
+        jToolBar2.add(jSpinner2);
 
-        jSplitPane3.setLeftComponent(jToolBar2);
-
-        jToolBar4.setRollover(true);
-        jSplitPane3.setRightComponent(jToolBar4);
-
-        jSplitPane1.setRightComponent(jSplitPane3);
+        jSplitPane1.setRightComponent(jToolBar2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -144,38 +89,14 @@ public class EnemyThreatAndTargetInitPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jSpinner4StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner4StateChanged
-        // TODO add your handling code here:
-        JSpinner source = (JSpinner) evt.getSource();
-        StaticInitConfig.STATIC_THREAT_NUM = (Integer) source.getValue();
-    }//GEN-LAST:event_jSpinner4StateChanged
-
-    private void jSpinner5StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner5StateChanged
-        // TODO add your handling code here:
-        JSpinner source = (JSpinner) evt.getSource();
-        StaticInitConfig.STATIC_THREAT_NUM = (Integer) source.getValue();
-    }//GEN-LAST:event_jSpinner5StateChanged
-
-    private void jSpinner1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner1StateChanged
-        // TODO add your handling code here:
-        JSpinner source = (JSpinner) evt.getSource();
-        StaticInitConfig.ENEMY_UAV_NUM = (Integer) source.getValue();
-    }//GEN-LAST:event_jSpinner1StateChanged
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JSpinner jSpinner1;
-    private javax.swing.JSpinner jSpinner4;
-    private javax.swing.JSpinner jSpinner5;
+    private javax.swing.JSpinner jSpinner2;
     private javax.swing.JSplitPane jSplitPane1;
-    private javax.swing.JSplitPane jSplitPane2;
-    private javax.swing.JSplitPane jSplitPane3;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JToolBar jToolBar2;
-    private javax.swing.JToolBar jToolBar3;
-    private javax.swing.JToolBar jToolBar4;
     // End of variables declaration//GEN-END:variables
 }

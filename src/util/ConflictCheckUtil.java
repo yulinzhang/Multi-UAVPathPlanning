@@ -33,10 +33,7 @@ public class ConflictCheckUtil {
                  */
                 Rectangle bound = obstacle.getShape().getBounds();
                 bound.setBounds(bound.x - 2, bound.y - 2, bound.width + 4, bound.height + 4);
-//                if (obstacle.getShape().getBounds().contains(coordinate_x, coordinate_y)) {
-//                    return true;
-//                }
-                
+               
                 if (bound.contains(coordinate_x, coordinate_y)) {
                     return true;
                 }
@@ -50,7 +47,14 @@ public class ConflictCheckUtil {
         return checkPointInObstaclesAndThreats(obstacles, coordinate[0], coordinate[1]);
     }
 
-    public static boolean checkLineInObstaclesAndThreats(Vector<Obstacle> obstacles, float[] start_coord, float[] end_coord) {
+    /** if line is crossed with obstacles return true; otherwise return false;
+     * 
+     * @param obstacles
+     * @param start_coord
+     * @param end_coord
+     * @return 
+     */
+    public static boolean checkLineInObstacles(Vector<Obstacle> obstacles, float[] start_coord, float[] end_coord) {
         if (obstacles != null) {
             for (Obstacle obstacle : obstacles) {
                 if (ShapeUtil.isIntersected(obstacle.getShape().getBounds(), start_coord, end_coord)) {
@@ -59,5 +63,10 @@ public class ConflictCheckUtil {
             }
         }
         return false;
+    }
+    
+    public static void main(String[] args)
+    {
+
     }
 }

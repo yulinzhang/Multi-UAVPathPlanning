@@ -6,7 +6,7 @@
 package util;
 
 import java.awt.Rectangle;
-import world.Circle;
+import world.model.shape.Circle;
 
 /**
  *

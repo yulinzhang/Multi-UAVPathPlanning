@@ -11,7 +11,7 @@ import algorithm.RRT.RRTTree;
 import config.StaticInitConfig;
 import java.util.LinkedList;
 import java.util.Vector;
-import world.Circle;
+import world.model.shape.Circle;
 import world.model.Obstacle;
 import world.World;
 import world.model.Target;

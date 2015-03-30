@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 import uav.UAV;
-import world.Circle;
+import world.model.shape.Circle;
 import world.model.Obstacle;
-import world.model.StaticThreat;
+import world.model.Threat;
 
 /**
  *
@@ -105,11 +105,11 @@ public class MyGraphic {
         graphics.draw(obstacle.getShape());
     }
 
-    public void drawTarget(Graphics2D graphics, StaticThreat target, Color target_color) {
+    public void drawTarget(Graphics2D graphics, Threat target, Color target_color) {
         graphics.setComposite(AlphaComposite.SrcOver);
         graphics.setColor(target_color);
         graphics.setStroke(new BasicStroke(3.0f));
-        graphics.drawRect((int) target.getCoordinates()[0] - GraphicConfig.static_threat_width / 2, (int) target.getCoordinates()[1] - GraphicConfig.static_threat_height / 2, GraphicConfig.static_threat_width, GraphicConfig.static_threat_height);
+        graphics.drawRect((int) target.getCoordinates()[0] - GraphicConfig.threat_width / 2, (int) target.getCoordinates()[1] - GraphicConfig.threat_height / 2, GraphicConfig.threat_width, GraphicConfig.threat_height);
     }
 
 }

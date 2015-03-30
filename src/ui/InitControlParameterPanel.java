@@ -40,22 +40,21 @@ public class InitControlParameterPanel extends javax.swing.JPanel {
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
 
-        setPreferredSize(new java.awt.Dimension(492, 200));
+        setPreferredSize(new java.awt.Dimension(350, 200));
 
         jSplitPane1.setDividerLocation(100);
         jSplitPane1.setDividerSize(1);
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
-        jSplitPane1.setMaximumSize(new java.awt.Dimension(492, 128));
-        jSplitPane1.setMinimumSize(new java.awt.Dimension(492, 128));
-        jSplitPane1.setPreferredSize(new java.awt.Dimension(492, 130));
+        jSplitPane1.setPreferredSize(new java.awt.Dimension(350, 130));
 
         jToolBar1.setRollover(true);
+        jToolBar1.setPreferredSize(new java.awt.Dimension(350, 104));
         jToolBar1.add(scoutAndAttackerInitPanel1);
         jToolBar1.add(enemyThreatAndTargetInitPanel1);
 
         jSplitPane1.setTopComponent(jToolBar1);
 
-        jSplitPane2.setDividerLocation(246);
+        jSplitPane2.setDividerLocation(175);
         jSplitPane2.setDividerSize(1);
 
         jButton1.setText("打开地图(KML)");
@@ -80,9 +79,7 @@ public class InitControlParameterPanel extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

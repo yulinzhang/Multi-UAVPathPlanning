@@ -5,7 +5,7 @@
  */
 package world;
 
-import world.model.StaticThreat;
+import world.model.Threat;
 import world.model.Obstacle;
 import config.NonStaticInitConfig;
 import config.StaticInitConfig;
@@ -31,7 +31,7 @@ public class World {
 
     private int scout_num;
     private int enemy_num;
-    private int static_threat_num;
+    private int threat_num;
     private int attacker_num;
 
     private float threat_radius = 100;
@@ -40,7 +40,7 @@ public class World {
     //robot coordinates, robot_coordinates[1][0], robot_coordinates[1][1] represents the x, y coordinate of robot 1
     private UAVBase uav_base;
     private Vector<Obstacle> obstacles;
-    private Vector<StaticThreat> static_threats;
+    private Vector<Threat> threats;
 
     /**
      * * internal variables
@@ -66,12 +66,12 @@ public class World {
         this.attacker_num = init_config.getAttacker_num();
         this.scout_num = init_config.getScout_num();
         this.enemy_num = init_config.getEnemy_num();
-        this.static_threat_num = init_config.getStatic_threat_num();
+        this.threat_num = init_config.getThreat_num();
 
         this.threat_radius = init_config.getThreat_radius();
         this.attacker_patrol_range = init_config.getAttacker_patrol_range();
 
-        this.static_threats = init_config.getStatic_threats();
+        this.threats = init_config.getThreats();
         this.obstacles = init_config.getObstacles();
         this.uav_base = init_config.getUav_base();
     }
@@ -84,7 +84,7 @@ public class World {
         uav_base_center[0] = uav_base_coordinate[0] + uav_base_width / 2;
         uav_base_center[1] = uav_base_coordinate[1] + uav_base_height / 2;
         for (int i = 0; i < scout_num; i++) {
-            UAV scout = new UAV(i, static_threats.get(0), StaticInitConfig.SIDE_A, uav_base_center, obstacles);
+            UAV scout = new UAV(i, threats.get(0), StaticInitConfig.SIDE_A, uav_base_center, obstacles);
             scouts.add(scout);
         }
         for (int i = 0; i < attacker_num; i++) {
@@ -95,8 +95,8 @@ public class World {
 
     private void initEnemyUAV() {
         for (int i = 0; i < enemy_num; i++) {
-            int target_to_protect = i % static_threat_num;
-            float[] target_coordinates = static_threats.get(target_to_protect).getCoordinates();
+            int target_to_protect = i % threat_num;
+            float[] target_coordinates = threats.get(target_to_protect).getCoordinates();
             float[] attacker_coordinates = new float[2];
             float theta_from_target = (float) (Math.random() * Math.PI * 2);
             for (float dist = attacker_patrol_range; dist > 0; dist = dist / 2f) {
@@ -109,7 +109,7 @@ public class World {
                     }
                 }
             }
-            UAV enemy_uav = new UAV(i, static_threats.get(target_to_protect), StaticInitConfig.SIDE_B, attacker_coordinates, obstacles);
+            UAV enemy_uav = new UAV(i, threats.get(target_to_protect), StaticInitConfig.SIDE_B, attacker_coordinates, obstacles);
             enemy_uavs.add(enemy_uav);
         }
     }
@@ -225,8 +225,8 @@ public class World {
         return uav_base;
     }
 
-    public Vector<StaticThreat> getTargets() {
-        return static_threats;
+    public Vector<Threat> getTargets() {
+        return threats;
     }
 
     public Vector<UAV> getEnemy_uavs() {

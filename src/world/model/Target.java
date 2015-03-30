@@ -11,11 +11,9 @@ package world.model;
  */
 public class Target extends EnvConstraint{
     protected float[] coordinates;
-    protected int target_type=0;
-    public Target(int index,float[] coordinates, int target_type) {
+    public Target(int index,float[] coordinates) {
         super( index, null);
         this.coordinates=coordinates;
-        this.target_type=target_type;
     }
 
     public float[] getCoordinates() {

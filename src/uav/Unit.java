@@ -5,8 +5,8 @@
  */
 package uav;
 
-import world.model.StaticThreat;
-import world.Triangle;
+import world.model.Threat;
+import world.model.shape.Triangle;
 import world.model.Target;
 
 /**
@@ -63,7 +63,7 @@ public class Unit {
         return target_indicated_by_role;
     }
 
-    public void setRole_target(StaticThreat role_target) {
+    public void setRole_target(Threat role_target) {
         this.target_indicated_by_role = role_target;
     }
 

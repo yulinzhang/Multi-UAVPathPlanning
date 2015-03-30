@@ -24,7 +24,7 @@ import uav.UAV;
 import uav.UAVBase;
 import util.ImageUtil;
 import world.model.Obstacle;
-import world.model.StaticThreat;
+import world.model.Threat;
 import world.World;
 
 /**
@@ -69,7 +69,7 @@ public class AnimationPanel extends JPanel {
     private Vector<UAV> enemy_uavs;
     private UAVBase uav_base;
     private Vector<Obstacle> obstacles;
-    private Vector<StaticThreat> targets;
+    private Vector<Threat> targets;
 
     private static int uav_base_line_width = 3;
 
@@ -167,9 +167,9 @@ public class AnimationPanel extends JPanel {
         }
     }
 
-    private void initTargetInObstacleImageLevel2(Vector<StaticThreat> static_threats) {
-        for (StaticThreat static_threat : static_threats) {
-            virtualizer.drawTarget(obstacle_image_graphics, static_threat, GraphicConfig.static_threat_color);
+    private void initTargetInObstacleImageLevel2(Vector<Threat> threats) {
+        for (Threat threat : threats) {
+            virtualizer.drawTarget(obstacle_image_graphics, threat, GraphicConfig.threat_color);
         }
     }
 
