@@ -6,8 +6,6 @@
 package world.model;
 
 import config.StaticInitConfig;
-import world.model.EnvConstraint;
-import java.awt.Image;
 
 /**
  *
@@ -18,5 +16,11 @@ public class Threat extends Target {
     public Threat(int index, float[] coordinates, int target_type) {
         super(index, coordinates);
         this.target_type=target_type;
+    }
+    
+        @Override
+    public String toString()
+    {
+        return StaticInitConfig.THREAT_NAME+this.index;
     }
 }

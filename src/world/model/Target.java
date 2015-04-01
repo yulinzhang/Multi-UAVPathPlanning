@@ -9,10 +9,11 @@ package world.model;
  *
  * @author boluo
  */
-public class Target extends EnvConstraint{
+public class Target{
     protected float[] coordinates;
+    protected int index;
     public Target(int index,float[] coordinates) {
-        super( index, null);
+        this.index=index;
         this.coordinates=coordinates;
     }
 
@@ -23,4 +24,13 @@ public class Target extends EnvConstraint{
     public void setCoordinates(float[] coordinates) {
         this.coordinates = coordinates;
     }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+    
 }

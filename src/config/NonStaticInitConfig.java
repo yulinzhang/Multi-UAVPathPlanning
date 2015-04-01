@@ -54,8 +54,8 @@ public class NonStaticInitConfig {
     {
         this.enemy_num=0;
         this.threat_num=1;
-        this.attacker_num=0;
-        this.scout_num=1;
+        this.attacker_num=1;
+        this.scout_num=0;
         float[] coordinate=new float[]{0,0};
         UAVBase uav_base=new UAVBase(coordinate,100,100);
         this.uav_base=uav_base;
@@ -76,7 +76,7 @@ public class NonStaticInitConfig {
                 coordinate_y = random.nextFloat()*(bound_height-2*attacker_patrol_range)+attacker_patrol_range;
 //                coordinate_x=400;
 //                coordinate_y=400;
-                found = !ConflictCheckUtil.checkPointInObstaclesAndThreats(obstacles,coordinate_x, coordinate_y);
+                found = !ConflictCheckUtil.checkPointInObstacles(obstacles,coordinate_x, coordinate_y);
             }
             Threat threat = new Threat(i, new float[]{coordinate_x, coordinate_y},StaticInitConfig.STATIC_THREAT_TYPE);
             threats.add(threat);

@@ -5,6 +5,7 @@
  */
 package world.model;
 
+import config.StaticInitConfig;
 import java.awt.Polygon;
 
 /**
@@ -28,6 +29,10 @@ public class Obstacle extends EnvConstraint {
         this.shape = shape;
     }
 
-
+    @Override
+    public String toString()
+    {
+        return StaticInitConfig.OBSTACLE_NAME+this.index;
+    }
 
 }

@@ -24,6 +24,8 @@ public class GraphicConfig {
     public static Color fog_of_war_color = transparent_color;//Color.black;;;//Color.black;
     public static Color uav_base_color = new Color(236, 128, 128, 150);
     public static Color uav_planned_path_color = Color.black;
+    
+    public static Color highlight_uav_color=Color.white;
 
     public static int threat_width = 20;
     public static int threat_height = 20;

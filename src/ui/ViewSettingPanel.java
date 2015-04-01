@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
  * @author boluo
  */
 public class ViewSettingPanel extends javax.swing.JPanel {
+    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ViewSettingPanel.class);
 
     /**
      * Creates new form ViewSettingPanel
@@ -106,7 +107,7 @@ public class ViewSettingPanel extends javax.swing.JPanel {
 
     private void jButtonActionCommand(ActionEvent evt) {
         String action_command = evt.getActionCommand();
-        System.out.println(action_command);
+        logger.debug(action_command);
         if (action_command.equals(StaticInitConfig.VIEW_OBSTACLE_ACTION_COMMAND)) {
             StaticInitConfig.VIEW_ENEMY_UAV = !StaticInitConfig.VIEW_ENEMY_UAV;
         } else if (action_command.equals(StaticInitConfig.VIEW_THREAT_ACTION_COMMAND)) {

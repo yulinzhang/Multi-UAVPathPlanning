@@ -40,8 +40,8 @@ public class StaticInitConfig {
 
     public static Threat NON_ROLE = null;
 
-    public static float rrt_goal_toward_probability = 0.3f;
-    public static int rrt_iteration_times = 10000;
+    public static float rrt_goal_toward_probability = 0.8f;
+    public static int rrt_iteration_times = 1000;
 
     //how much time it takes to drive the simulaiton to next time step
     public static int INIT_SIMULATION_DELAY = 300;
@@ -54,4 +54,8 @@ public class StaticInitConfig {
     
     public static int STATIC_THREAT_TYPE = 0;
     public static int DYNAMIC_THREAT_TYPE = 1;
+    
+    public static String THREAT_NAME="威胁";
+    public static String OBSTACLE_NAME="障碍";
+    public static String CONFLICT_NAME="冲突UAV";
 }

@@ -52,6 +52,7 @@ public class World {
     private int time_step = 0;
 
     private float theta_increase_for_enemy_uav = (float) Math.PI / 40;
+    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(World.class);
 
     public World(NonStaticInitConfig init_config) {
         initParameterFromInitConfig(init_config);
@@ -88,7 +89,7 @@ public class World {
             scouts.add(scout);
         }
         for (int i = 0; i < attacker_num; i++) {
-            UAV attacker = new UAV(i, StaticInitConfig.NON_ROLE, StaticInitConfig.SIDE_A, uav_base_center, obstacles);
+            UAV attacker = new UAV(i, threats.get(0), StaticInitConfig.SIDE_A, uav_base_center, obstacles);
             attackers.add(attacker);
         }
     }
@@ -103,7 +104,7 @@ public class World {
                 attacker_coordinates[1] = target_coordinates[1] + dist * (float) Math.sin(theta_from_target);
                 attacker_coordinates[0] = target_coordinates[0] + dist * (float) Math.cos(theta_from_target);
                 if (attacker_coordinates[0] < bound_width) {
-                    boolean available = !ConflictCheckUtil.checkPointInObstaclesAndThreats(obstacles, attacker_coordinates[0], attacker_coordinates[1]);
+                    boolean available = !ConflictCheckUtil.checkPointInObstacles(obstacles, attacker_coordinates[0], attacker_coordinates[1]);
                     if (available) {
                         break;
                     }
@@ -131,10 +132,30 @@ public class World {
                 continue;
             }
             while (!moved) {
-                System.out.println("generate path and previous size=" + scout.getPath_prefound().size());
+                logger.debug("generate path and previous size=" + scout.getPath_prefound().size());
 //                scout.runRRTStar();
                 scout.runRRT();
+//                scout.ignoreEverythingAndTestDubinPath();
                 moved = scout.moveToNextWaypoint();
+            }
+        }
+    }
+    
+    
+    private void updateAttackerCoordinate() {
+        int i = 1;
+        for (UAV attacker : this.attackers) {
+            boolean moved = attacker.moveToNextWaypoint();
+            Target uav_target = attacker.getRole_target();
+            if (moved || uav_target == null) {
+                continue;
+            }
+            while (!moved) {
+                logger.debug("generate path and previous size=" + attacker.getPath_prefound().size());
+//                scout.runRRTStar();
+                attacker.runRRT();
+//                scout.ignoreEverythingAndTestDubinPath();
+                moved = attacker.moveToNextWaypoint();
             }
         }
     }
@@ -176,9 +197,10 @@ public class World {
         registerInfoRequirement();
         shareInfoAfterRegistration();
         updateScoutCoordinate();
+        updateAttackerCoordinate();
 //        updateEnemyUAVCoordinate();
         this.time_step++;
-        System.out.println("timestep=" + this.time_step);
+//        logger.debug("timestep=" + this.time_step);
     }
 
     public Vector<Obstacle> getObstacles() {
@@ -225,8 +247,12 @@ public class World {
         return uav_base;
     }
 
-    public Vector<Threat> getTargets() {
+    public Vector<Threat> getThreats() {
         return threats;
+    }
+
+    public void setThreats(Vector<Threat> threats) {
+        this.threats = threats;
     }
 
     public Vector<UAV> getEnemy_uavs() {

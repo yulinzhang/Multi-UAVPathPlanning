@@ -6,15 +6,18 @@
 package uav;
 
 import algorithm.RRT.RRTAlg;
-import algorithm.RRT.RRTNode;
 import algorithm.RRT.RRTTree;
 import config.StaticInitConfig;
 import java.util.LinkedList;
 import java.util.Vector;
+
 import world.model.shape.Circle;
 import world.model.Obstacle;
 import world.World;
 import world.model.Target;
+import world.model.shape.DubinsCurve;
+import world.model.shape.Point;
+import world.model.shape.Trajectory;
 
 /**
  *
@@ -24,7 +27,7 @@ public class UAV extends Unit {
 
     private Circle uav_radar;
 
-    private LinkedList<RRTNode> path_prefound;
+    private LinkedList<Point> path_prefound;
     private int current_index = 0;
 
     private float[] previous_waypoint = new float[2];
@@ -34,8 +37,9 @@ public class UAV extends Unit {
 
     private RRTAlg rrt_alg;
     private RRTTree rrt_tree;
-    private int speed=5;
-    private float current_angle=-1;
+    private int speed = 10;
+    private float current_angle = -1;
+    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(UAV.class);
 
     /**
      *
@@ -46,11 +50,10 @@ public class UAV extends Unit {
     public UAV(int index, Target target, int flag_of_war, float[] center_coordinates, Vector<Obstacle> obstacles) {
         super(index, target, flag_of_war, center_coordinates);
         this.uav_radar = new Circle(center_coordinates[0], center_coordinates[1], scout_radar_radius);
-        this.path_prefound = new LinkedList<RRTNode>();
+        this.path_prefound = new LinkedList<Point>();
         setPreviousWaypoint();
         this.obstacles = new Vector<Obstacle>();
-        for(Obstacle obs:obstacles)
-        {
+        for (Obstacle obs : obstacles) {
             this.obstacles.add(obs);
         }
         if (target == null) {
@@ -60,18 +63,34 @@ public class UAV extends Unit {
         }
     }
 
+    public void ignoreEverythingAndTestDubinPath() {
+        Point start = new Point(this.getCenter_coordinates()[0], this.getCenter_coordinates()[1], Math.PI*2);
+        Point end = new Point(target_indicated_by_role.getCoordinates()[0],target_indicated_by_role.getCoordinates()[1],  Math.PI*2-Math.PI*7/4);
+        DubinsCurve dc = new DubinsCurve(start, end, 150, false);
+        Trajectory traj = dc.getTrajectory(1, 10);
+        logger.debug("total waypoint num:" +traj.getPoints().length);
+        logger.debug("total traj lenght:"+traj.getCost());
+        logger.debug("end node:"+traj.getEndPoint());
+        logger.debug("goal point:"+end);
+        LinkedList<Point> path = new LinkedList<Point>();
+        for (Point point : traj.getPoints()) {
+            path.add(point);
+        }
+        this.setPath_prefound(path);
+    }
+
     public void runRRT() {
         rrt_alg.setGoal_coordinate(target_indicated_by_role.getCoordinates());
         rrt_alg.setInit_coordinate(center_coordinates);
-        rrt_tree = rrt_alg.buildRRT(center_coordinates,current_angle);
+        rrt_tree = rrt_alg.buildRRT(center_coordinates, current_angle);
         this.setPath_prefound(rrt_tree.getPath_found());
         this.resetCurrentIndexOfPath();
     }
-    
+
     public void runRRTStar() {
         rrt_alg.setGoal_coordinate(target_indicated_by_role.getCoordinates());
         rrt_alg.setInit_coordinate(center_coordinates);
-        rrt_tree = rrt_alg.buildRRTStar1(center_coordinates,current_angle);
+        rrt_tree = rrt_alg.buildRRTStar2FromIRRT(center_coordinates, current_angle);
         this.setPath_prefound(rrt_tree.getPath_found());
         this.resetCurrentIndexOfPath();
     }
@@ -96,16 +115,16 @@ public class UAV extends Unit {
         if (path_prefound.size() == 0 || current_index >= path_prefound.size()) {
             return false;
         }
-        RRTNode current_waypoint=this.path_prefound.get(current_index);
-        float[] coordinate = current_waypoint.getCoordinate();
+        Point current_waypoint = this.path_prefound.get(current_index);
+        float[] coordinate = current_waypoint.toFloatArray();
         setPreviousWaypoint();
         moveTo(coordinate[0], coordinate[1]);
-        this.current_angle=current_waypoint.getCurrent_angle();
+        this.current_angle = (float) current_waypoint.getYaw();
         return true;
     }
 
-    public LinkedList<RRTNode> getFuturePath() {
-        LinkedList<RRTNode> future_path = new LinkedList<RRTNode>();
+    public LinkedList<Point> getFuturePath() {
+        LinkedList<Point> future_path = new LinkedList<Point>();
         for (int i = current_index; i < path_prefound.size(); i++) {
             future_path.add(path_prefound.get(i));
         }
@@ -129,11 +148,11 @@ public class UAV extends Unit {
         this.uav_radar = uav_radar;
     }
 
-    public LinkedList<RRTNode> getPath_prefound() {
+    public LinkedList<Point> getPath_prefound() {
         return path_prefound;
     }
 
-    public void setPath_prefound(LinkedList<RRTNode> path_prefound) {
+    public void setPath_prefound(LinkedList<Point> path_prefound) {
         this.path_prefound = path_prefound;
     }
 

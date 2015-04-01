@@ -224,7 +224,7 @@ public class ControlPanel extends javax.swing.JPanel {
 
     private void setSimulationDelayWithSpeed(float speed_times) {
         this.jLabel1.setText(this.simulation_speed_text + speed_times);
-        int delay = (int)(StaticInitConfig.INIT_SIMULATION_DELAY /  speed_times);
+        int delay = (int) (StaticInitConfig.INIT_SIMULATION_DELAY / speed_times);
         StaticInitConfig.SIMULATION_WITH_UI_TIMER.setDelay(delay);
     }
 

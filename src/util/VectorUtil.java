@@ -11,6 +11,8 @@ package util;
  */
 public class VectorUtil {
 
+    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(VectorUtil.class);
+
     /**
      *
      * @param coordinate_x
@@ -25,7 +27,6 @@ public class VectorUtil {
         }
         return angle;
     }
-    
 
     public static float getAngleOfTwoVector(float[] coordinate_vector_1, float[] coordinate_vector_2) {
         float vector_1_times_vector_2 = coordinate_vector_1[0] * coordinate_vector_2[0] + coordinate_vector_1[1] * coordinate_vector_2[1];
@@ -49,10 +50,10 @@ public class VectorUtil {
     }
 
     /**
-     * 
+     *
      * @param angle1
      * @param angle2
-     * @return  the result from 0 to PI
+     * @return the result from 0 to PI
      */
     public static float getBetweenAngle(float angle1, float angle2) {
         float delta_angle = VectorUtil.getNormalAngle(angle1 - angle2);
@@ -63,7 +64,7 @@ public class VectorUtil {
     }
 
     public static void main(String[] args) {
-        System.out.println(Math.toDegrees(VectorUtil.getAngleOfVectorRelativeToXCoordinate(0, -2)));
-                System.out.println(Math.toDegrees(VectorUtil.getBetweenAngle((float)Math.PI*45/180, (float)(255.0/180.0*Math.PI))));
+        logger.debug(Math.toDegrees(VectorUtil.getAngleOfVectorRelativeToXCoordinate(0, -2)));
+        logger.debug(Math.toDegrees(VectorUtil.getBetweenAngle((float) Math.PI * 45 / 180, (float) (255.0 / 180.0 * Math.PI))));
     }
 }

@@ -20,6 +20,7 @@ import uav.UAV;
 import world.model.shape.Circle;
 import world.model.Obstacle;
 import world.model.Threat;
+import world.model.shape.Point;
 
 /**
  *
@@ -36,13 +37,18 @@ public class MyGraphic {
         graphics.fill(scout.getUav_radar());
     }
 
-    public void drawUAVInUAVImage(Graphics2D graphics, UAV uav, Color uav_radar_color, Color uav_center_color) {
+    public void drawUAVInUAVImage(Graphics2D graphics, UAV uav, Color uav_radar_color, Color uav_center_color,Color uav_highlight_color) {
         graphics.setComposite(AlphaComposite.SrcOver);
         graphics.setColor(uav_radar_color);
         Circle uav_radar = uav.getUav_radar();
         graphics.fill(uav_radar);
         graphics.setColor(uav_center_color);
         graphics.fillPolygon(uav.getUav_center());
+        if(uav_highlight_color!=null)
+        {
+            graphics.setColor(uav_highlight_color);
+            graphics.draw(uav_radar);
+        }
     }
 
     public void drawUAVHistoryPath(Graphics2D graphics, UAV uav, Color uav_history_path_color) {
@@ -59,14 +65,14 @@ public class MyGraphic {
     public void drawUAVPlannedPath(Graphics2D graphics, UAV uav, Color uav_planned_path_color) {
         graphics.setColor(uav_planned_path_color);
         graphics.setStroke(new BasicStroke(2.0f));
-        LinkedList<RRTNode> planned_path = uav.getFuturePath();
+        LinkedList<Point> planned_path = uav.getFuturePath();
         int planned_path_size = planned_path.size();
         float[] current_waypoint;
         float[] next_waypoint;
         for (int i = 0; i < planned_path_size; i++) {
-            current_waypoint = planned_path.get(i).getCoordinate();
+            current_waypoint = planned_path.get(i).toFloatArray();
             if (i + 1 < planned_path_size) {
-                next_waypoint = planned_path.get(i + 1).getCoordinate();
+                next_waypoint = planned_path.get(i + 1).toFloatArray();
                 graphics.drawLine((int) current_waypoint[0], (int) current_waypoint[1], (int) next_waypoint[0], (int) next_waypoint[1]);
             }
         }

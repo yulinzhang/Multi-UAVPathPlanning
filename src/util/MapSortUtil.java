@@ -18,6 +18,7 @@ import java.util.Vector;
  * @author boluo
  */
 public class MapSortUtil<T> {
+    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(MapSortUtil.class);
 
     public  Vector<T> sortMap(Map<T, Double> input) {
         List<Map.Entry<T, Double>> input_entry_list = new ArrayList<Map.Entry<T, Double>>(input.entrySet());
@@ -49,7 +50,7 @@ public class MapSortUtil<T> {
         Vector<String> results=sort_map.sortMap((Map<String, Double>) test_map);
         for(String result:results)
         {
-            System.out.println(result);
+            logger.debug(result);
         }
     }
 }

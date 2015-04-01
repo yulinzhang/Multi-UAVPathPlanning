@@ -7,9 +7,9 @@ package algorithm.RRT;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Queue;
 import util.DistanceUtil;
 import util.VectorUtil;
+import world.model.shape.Point;
 
 /**
  *
@@ -25,7 +25,7 @@ public class RRTTree {
      * variable to store the path
      *
      */
-    private LinkedList<RRTNode> path_found;
+    private LinkedList<Point> path_found;
 
     //static double dist = 0;
     //static Node closestNode = null;        
@@ -33,7 +33,7 @@ public class RRTTree {
         vertices = new ArrayList<RRTNode>();
         children_of_vertices = new ArrayList<ArrayList<RRTNode>>();
         parents_of_vertices = new ArrayList<RRTNode>();
-        path_found = new LinkedList<RRTNode>();
+        path_found = new LinkedList<Point>();
     }
 
     /**
@@ -127,15 +127,17 @@ public class RRTTree {
     }
 
     public void generatePath(RRTNode n) {
-        path_found.addFirst(n);
+        Point point=new Point(n.getCoordinate()[0],n.getCoordinate()[1],n.getCurrent_angle());
+        path_found.addFirst(point);
         RRTNode parent = this.getParent(n);
         while (parent != null) {
-            path_found.addFirst(parent);
+            Point parent_point=new Point(parent.getCoordinate()[0],parent.getCoordinate()[1],parent.getCurrent_angle());
+            path_found.addFirst(parent_point);
             parent = this.getParent(parent);
         }
     }
 
-    public LinkedList<RRTNode> getPath_found() {
+    public LinkedList<Point> getPath_found() {
         return path_found;
     }
 

@@ -9,6 +9,8 @@ import algorithm.RRT.RRTNode;
 import java.awt.Rectangle;
 import java.util.Vector;
 import world.model.Obstacle;
+import world.model.shape.Point;
+import world.model.shape.Trajectory;
 
 /**
  *
@@ -25,7 +27,7 @@ public class ConflictCheckUtil {
      * @param coordinate_y
      * @return
      */
-    public static boolean checkPointInObstaclesAndThreats(Vector<Obstacle> obstacles, float coordinate_x, float coordinate_y) {
+    public static boolean checkPointInObstacles(Vector<Obstacle> obstacles, float coordinate_x, float coordinate_y) {
         if (obstacles != null) {
             for (Obstacle obstacle : obstacles) {
                 /** increase a little bit bound to keep a visible safe distance from obstacle and make it looks less dangerous.
@@ -42,9 +44,28 @@ public class ConflictCheckUtil {
         return false;
     }
 
+    /** return true is the trajectory is in obstacles
+     * 
+     * @param obstacles
+     * @param traj
+     * @return 
+     */
+    public static boolean checkTrajectoryInObstacles(Vector<Obstacle> obstacles, Trajectory traj)
+    {
+        Point[] way_points=traj.getPoints();
+        for(Point point:way_points)
+        {
+            if(checkPointInObstacles(obstacles,(float)point.getX(),(float)point.getY()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public static boolean checkNodeInObstacles(Vector<Obstacle> obstacles,  RRTNode node) {
         float[] coordinate = node.getCoordinate();
-        return checkPointInObstaclesAndThreats(obstacles, coordinate[0], coordinate[1]);
+        return checkPointInObstacles(obstacles, coordinate[0], coordinate[1]);
     }
 
     /** if line is crossed with obstacles return true; otherwise return false;

@@ -9,16 +9,17 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author boluo
  */
 public class Test {
-
+    private static Logger logger=Logger.getLogger(Test.class);  
     public static void main(String[] args) throws IOException {
-        System.out.println("begin to generate");
-        grayImage();
+        logger.debug("begin to generate");
+//        grayImage();
     }
 
     public static void grayImage() throws IOException {

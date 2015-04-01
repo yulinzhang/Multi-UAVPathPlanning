@@ -31,9 +31,7 @@ public class ObtacleUtil {
         int obstacle_index = 0;
         try {
             SAXReader reader = new SAXReader();
-//            File gml_file = new File(resource_kml_file_path);
             Document document = reader.read(kml_input_stream);
-//            System.out.println(document.asXML());
             Element root = document.getRootElement();
             Element folder = root.element("Document").element("Folder");
             Iterator<Element> placemark_iter = folder.elementIterator();
@@ -46,12 +44,9 @@ public class ObtacleUtil {
                 for (String coordinate : coordinates) {
                     String[] coordinate_x_y = coordinate.split(",");
                     obstacle_polygon_shape.addPoint(StringUtil.StringToFloat(coordinate_x_y[0]).intValue(), 600 - Math.abs(StringUtil.StringToFloat(coordinate_x_y[1]).intValue()));
-//                    System.out.print(coordinate+"\t");
                 }
                 Obstacle obstacle = new Obstacle(obstacle_polygon_shape, obstacle_index);
                 obstacle_list.add(obstacle);
-//                System.out.println(obstacle_polygon_shape.npoints);
-//                System.out.println("-------------------------------");
             }
         } catch (DocumentException ex) {
             Logger.getLogger(ObtacleUtil.class.getName()).log(Level.SEVERE, null, ex);

@@ -5,17 +5,32 @@
  */
 package ui;
 
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.TreeSelectionModel;
+import world.model.WorldKnowledge;
+
 /**
  *
  * @author boluo
  */
-public class RightControlPanel extends javax.swing.JPanel {
+public class RightControlPanel extends javax.swing.JPanel implements TreeSelectionListener {
+
+    private static WorldKnowledge kb;
+    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RightControlPanel.class);
 
     /**
      * Creates new form RightControlPanel
      */
     public RightControlPanel() {
         initComponents();
+        RightControlPanel.jTree1.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        RightControlPanel.jTree1.addTreeSelectionListener(this);
+    }
+
+    public static void setWorldKnowledge(WorldKnowledge kb) {
+        RightControlPanel.kb = kb;
+        RightControlPanel.jTree1.setModel(kb);
     }
 
     /**
@@ -58,6 +73,14 @@ public class RightControlPanel extends javax.swing.JPanel {
     private ui.ControlPanel controlPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSplitPane jSplitPane1;
-    private javax.swing.JTree jTree1;
+    public static javax.swing.JTree jTree1;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void valueChanged(TreeSelectionEvent e) {
+        Object select_obj = RightControlPanel.jTree1.getLastSelectedPathComponent();
+        if (RightControlPanel.jTree1.getModel().isLeaf(select_obj)) {
+            logger.debug(select_obj);
+        }
+    }
 }

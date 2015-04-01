@@ -19,6 +19,7 @@ import java.util.TreeSet;
  */
 public class RRTUtil {
 
+    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RRTUtil.class);
 
     /** problem
      * 
@@ -59,7 +60,7 @@ public class RRTUtil {
         input.put(rrt_node_1, 2.0f);
         input=RRTUtil.sortHashMap(input);
         for (RRTNode n : input.keySet()) {
-            System.out.println(n.getCoordinate()[1]);
+            logger.debug(n.getCoordinate()[1]);
         }
     }
 }
