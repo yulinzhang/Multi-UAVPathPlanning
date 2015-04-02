@@ -16,7 +16,7 @@ import java.awt.Stroke;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
-import uav.UAV;
+import world.uav.UAV;
 import world.model.shape.Circle;
 import world.model.Obstacle;
 import world.model.Threat;
@@ -37,15 +37,14 @@ public class MyGraphic {
         graphics.fill(scout.getUav_radar());
     }
 
-    public void drawUAVInUAVImage(Graphics2D graphics, UAV uav, Color uav_radar_color, Color uav_center_color,Color uav_highlight_color) {
+    public void drawUAVInUAVImage(Graphics2D graphics, UAV uav, Color uav_radar_color, Color uav_center_color, Color uav_highlight_color) {
         graphics.setComposite(AlphaComposite.SrcOver);
         graphics.setColor(uav_radar_color);
         Circle uav_radar = uav.getUav_radar();
         graphics.fill(uav_radar);
         graphics.setColor(uav_center_color);
         graphics.fillPolygon(uav.getUav_center());
-        if(uav_highlight_color!=null)
-        {
+        if (uav_highlight_color != null) {
             graphics.setColor(uav_highlight_color);
             graphics.draw(uav_radar);
         }
@@ -102,18 +101,38 @@ public class MyGraphic {
         }
     }
 
-    public void drawObstacle(Graphics2D graphics, Obstacle obstacle, Color obstacle_center_color, Color obstacle_edge_color) {
+    public void drawObstacle(Graphics2D graphics, Obstacle obstacle, Color obstacle_center_color, Color obstacle_edge_color, Color obstacle_hightlight_color) {
         graphics.setComposite(AlphaComposite.SrcOver);
         graphics.setStroke(new BasicStroke(1f));
         graphics.setColor(obstacle_center_color);
         graphics.fill(obstacle.getShape());
-        graphics.setColor(obstacle_edge_color);
+        if (obstacle_hightlight_color != null) {
+            graphics.setColor(obstacle_hightlight_color);
+        } else {
+            graphics.setColor(obstacle_edge_color);
+        }
         graphics.draw(obstacle.getShape());
+
+    }
+    public void highlightObstacle(Graphics2D graphics, Obstacle obstacle, Color obstacle_center_color, Color obstacle_edge_color, Color obstacle_hightlight_color) {
+        graphics.setComposite(AlphaComposite.SrcOver);
+        graphics.setStroke(new BasicStroke(2f));
+        if (obstacle_hightlight_color != null) {
+            graphics.setColor(obstacle_hightlight_color);
+        } else {
+            graphics.setColor(obstacle_edge_color);
+        }
+        graphics.draw(obstacle.getShape());
+
     }
 
-    public void drawTarget(Graphics2D graphics, Threat target, Color target_color) {
+    public void drawTarget(Graphics2D graphics, Threat target, Color target_color, Color target_highlight_color) {
         graphics.setComposite(AlphaComposite.SrcOver);
-        graphics.setColor(target_color);
+        if (target_highlight_color != null) {
+            graphics.setColor(target_highlight_color);
+        } else {
+            graphics.setColor(target_color);
+        }
         graphics.setStroke(new BasicStroke(3.0f));
         graphics.drawRect((int) target.getCoordinates()[0] - GraphicConfig.threat_width / 2, (int) target.getCoordinates()[1] - GraphicConfig.threat_height / 2, GraphicConfig.threat_width, GraphicConfig.threat_height);
     }

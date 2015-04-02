@@ -11,7 +11,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  *
@@ -20,9 +20,9 @@ import java.util.Vector;
 public class MapSortUtil<T> {
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(MapSortUtil.class);
 
-    public  Vector<T> sortMap(Map<T, Double> input) {
+    public  ArrayList<T> sortMap(Map<T, Double> input) {
         List<Map.Entry<T, Double>> input_entry_list = new ArrayList<Map.Entry<T, Double>>(input.entrySet());
-        Vector<T> sorted_obj=new Vector<T>();
+        ArrayList<T> sorted_obj=new ArrayList<T>();
         
         Collections.sort(input_entry_list, new Comparator<Map.Entry<T, Double>>() {
             @Override
@@ -47,7 +47,7 @@ public class MapSortUtil<T> {
         test_map.put("Str2", 2.0);
         test_map.put("Str1", 1.0);
         MapSortUtil sort_map=new MapSortUtil<String>();
-        Vector<String> results=sort_map.sortMap((Map<String, Double>) test_map);
+        ArrayList<String> results=sort_map.sortMap((Map<String, Double>) test_map);
         for(String result:results)
         {
             logger.debug(result);

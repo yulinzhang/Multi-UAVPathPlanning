@@ -7,7 +7,8 @@ package util;
 
 import algorithm.RRT.RRTNode;
 import java.awt.Rectangle;
-import java.util.Vector;
+import java.util.ArrayList;
+import ui.AnimationPanel;
 import world.model.Obstacle;
 import world.model.shape.Point;
 import world.model.shape.Trajectory;
@@ -17,6 +18,7 @@ import world.model.shape.Trajectory;
  * @author Yulin_Zhang
  */
 public class ConflictCheckUtil {
+    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(AnimationPanel.class);
 
     /**
      * if conflicted then return true, otherwise return false;
@@ -27,13 +29,20 @@ public class ConflictCheckUtil {
      * @param coordinate_y
      * @return
      */
-    public static boolean checkPointInObstacles(Vector<Obstacle> obstacles, float coordinate_x, float coordinate_y) {
+    public static boolean checkPointInObstacles(ArrayList<Obstacle> obstacles, float coordinate_x, float coordinate_y) {
         if (obstacles != null) {
             for (Obstacle obstacle : obstacles) {
                 /** increase a little bit bound to keep a visible safe distance from obstacle and make it looks less dangerous.
                  * 
                  */
-                Rectangle bound = obstacle.getShape().getBounds();
+                Rectangle bound=null;
+                try{
+                 bound= obstacle.getShape().getBounds();
+                }catch(Exception e)
+                {
+                    logger.debug("error index"+obstacle.getIndex());
+                    logger.error(e);
+                }
                 bound.setBounds(bound.x - 2, bound.y - 2, bound.width + 4, bound.height + 4);
                
                 if (bound.contains(coordinate_x, coordinate_y)) {
@@ -50,7 +59,7 @@ public class ConflictCheckUtil {
      * @param traj
      * @return 
      */
-    public static boolean checkTrajectoryInObstacles(Vector<Obstacle> obstacles, Trajectory traj)
+    public static boolean checkTrajectoryInObstacles(ArrayList<Obstacle> obstacles, Trajectory traj)
     {
         Point[] way_points=traj.getPoints();
         for(Point point:way_points)
@@ -63,7 +72,7 @@ public class ConflictCheckUtil {
         return false;
     }
     
-    public static boolean checkNodeInObstacles(Vector<Obstacle> obstacles,  RRTNode node) {
+    public static boolean checkNodeInObstacles(ArrayList<Obstacle> obstacles,  RRTNode node) {
         float[] coordinate = node.getCoordinate();
         return checkPointInObstacles(obstacles, coordinate[0], coordinate[1]);
     }
@@ -75,7 +84,7 @@ public class ConflictCheckUtil {
      * @param end_coord
      * @return 
      */
-    public static boolean checkLineInObstacles(Vector<Obstacle> obstacles, float[] start_coord, float[] end_coord) {
+    public static boolean checkLineInObstacles(ArrayList<Obstacle> obstacles, float[] start_coord, float[] end_coord) {
         if (obstacles != null) {
             for (Obstacle obstacle : obstacles) {
                 if (ShapeUtil.isIntersected(obstacle.getShape().getBounds(), start_coord, end_coord)) {

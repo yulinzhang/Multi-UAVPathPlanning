@@ -8,7 +8,7 @@ package ui;
 import config.StaticInitConfig;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Vector;
+import java.util.ArrayList;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import world.World;
@@ -20,15 +20,15 @@ import world.model.Threat;
  */
 public class MyPopupMenu extends JPopupMenu implements ActionListener {
 
-    Vector<JMenuItem> items;
+    ArrayList<JMenuItem> items;
     World world;
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(MyPopupMenu.class);
 
     public MyPopupMenu(World world) {
         super();
         this.world = world;
-        items = new Vector<JMenuItem>();
-        Vector<Threat> threats = world.getThreats();
+        items = new ArrayList<JMenuItem>();
+        ArrayList<Threat> threats = world.getThreats();
         for (Threat threat : threats) {
             JMenuItem threat_item = new JMenuItem(StaticInitConfig.THREAT_NAME+threat.getIndex());
             items.add(threat_item);

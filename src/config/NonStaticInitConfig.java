@@ -5,9 +5,9 @@
  */
 package config;
 
+import java.util.ArrayList;
 import java.util.Random;
-import java.util.Vector;
-import uav.UAVBase;
+import world.uav.UAVBase;
 import util.ConflictCheckUtil;
 import util.ObtacleUtil;
 import world.model.Obstacle;
@@ -25,8 +25,8 @@ public class NonStaticInitConfig {
     private int attacker_num;
     private int scout_num;
 
-    private Vector<Obstacle> obstacles;
-    private Vector<Threat> threats;
+    private ArrayList<Obstacle> obstacles;
+    private ArrayList<Threat> threats;
 
     private UAVBase uav_base;
 
@@ -65,7 +65,7 @@ public class NonStaticInitConfig {
 
     
     private void initThreats() {
-        threats = new Vector<Threat>();
+        threats = new ArrayList<Threat>();
         Random random = new Random(System.currentTimeMillis());
         for (int i = 0; i < threat_num; i++) {
             float coordinate_x = 0;
@@ -123,11 +123,11 @@ public class NonStaticInitConfig {
         this.scout_num = scout_num;
     }
 
-    public Vector<Obstacle> getObstacles() {
+    public ArrayList<Obstacle> getObstacles() {
         return obstacles;
     }
 
-    public void setObstacles(Vector<Obstacle> obstacles) {
+    public void setObstacles(ArrayList<Obstacle> obstacles) {
         this.obstacles = obstacles;
     }
 
@@ -180,11 +180,11 @@ public class NonStaticInitConfig {
         this.threat_num = threat_num;
     }
 
-    public Vector<Threat> getThreats() {
+    public ArrayList<Threat> getThreats() {
         return threats;
     }
 
-    public void setThreats(Vector<Threat> threats) {
+    public void setThreats(ArrayList<Threat> threats) {
         this.threats = threats;
     }
 

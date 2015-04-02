@@ -26,6 +26,8 @@ public class GraphicConfig {
     public static Color uav_planned_path_color = Color.black;
     
     public static Color highlight_uav_color=Color.white;
+    public static Color highlight_obstacle_color=Color.white;
+    public static Color highlight_threat_color=Color.white;
 
     public static int threat_width = 20;
     public static int threat_height = 20;

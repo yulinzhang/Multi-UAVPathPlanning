@@ -7,7 +7,7 @@ package algorithm.RRT;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Vector;
+import java.util.ArrayList;
 import util.BoundUtil;
 import util.ConflictCheckUtil;
 import util.DistanceUtil;
@@ -29,7 +29,7 @@ public class RRTAlg {
      * external variables
      *
      */
-    private Vector<Obstacle> obstacles;
+    private ArrayList<Obstacle> obstacles;
     private int bound_width = 800;
     private int bound_height = 600;
     private float[] init_coordinate;
@@ -64,7 +64,7 @@ public class RRTAlg {
      * @param threats
      * @return
      */
-    public RRTAlg(float[] init_coordinate, float[] goal_coordinate, float goal_probability, int bound_width, int bound_height, int k_step, float max_delta_distance, Vector<Obstacle> obstacles) {
+    public RRTAlg(float[] init_coordinate, float[] goal_coordinate, float goal_probability, int bound_width, int bound_height, int k_step, float max_delta_distance, ArrayList<Obstacle> obstacles) {
         this.init_coordinate = init_coordinate;
         this.k_step = k_step;
         this.max_delta_distance = max_delta_distance;
@@ -140,7 +140,7 @@ public class RRTAlg {
 
             if (!ConflictCheckUtil.checkTrajectoryInObstacles(obstacles, traj)) {
                 RRTNode min_point_toward_z_new = nearest_node;
-                Vector<RRTNode> nearestNodesToNewNodeSet = neareSortedNodesToNode(G, z_new.toFloatArray(), Math.E * 2 * Math.log(G.getNodeCount() + 1));
+                ArrayList<RRTNode> nearestNodesToNewNodeSet = neareSortedNodesToNode(G, z_new.toFloatArray(), Math.E * 2 * Math.log(G.getNodeCount() + 1));
                 float c_min = nearest_node.getPath_lenght_from_root() + (float) traj.getCost();
                 RRTNode z_min = nearest_node;
                 Trajectory traj_min = traj;
@@ -199,7 +199,7 @@ public class RRTAlg {
         G.addNode(start_node, null);
 
         float[] random_goal;
-        Vector<RRTNode> near_node_set;
+        ArrayList<RRTNode> near_node_set;
         RRTNode nearest_node = null;
         RRTNode new_node = null;
         double radius = 9999;
@@ -298,7 +298,7 @@ public class RRTAlg {
                     return G;
                 }
                 int max_num = 200;//(int) (2 * Math.E * Math.log(G.getNodeCount()));
-                Vector<RRTNode> nearestNodesToNewNodeSet = neareSortedNodesToNode(G, new_node.getCoordinate(), radius);
+                ArrayList<RRTNode> nearestNodesToNewNodeSet = neareSortedNodesToNode(G, new_node.getCoordinate(), radius);
                 if (nearestNodesToNewNodeSet.size() > max_num) {
                     radius = DistanceUtil.distanceBetween(new_node.getCoordinate(), nearestNodesToNewNodeSet.get(max_num).getCoordinate());
                 }
@@ -336,7 +336,7 @@ public class RRTAlg {
      * @param radius
      * @return
      */
-    private Vector<RRTNode> neareSortedNodesToNode(RRTTree G, float[] node_coordinate, double radius) {
+    private ArrayList<RRTNode> neareSortedNodesToNode(RRTTree G, float[] node_coordinate, double radius) {
         RRTNode temp_node;
         Map<RRTNode, Double> NeareNodeSet = new HashMap<RRTNode, Double>();
         double temp_dist;
@@ -389,7 +389,7 @@ public class RRTAlg {
      * @param threats
      * @return
      */
-    private float[] randGoal(float[] goal_coordinate, float goal_probability, float width, float height, Vector<Obstacle> obstacles) {
+    private float[] randGoal(float[] goal_coordinate, float goal_probability, float width, float height, ArrayList<Obstacle> obstacles) {
         float probability = (float) Math.random();
         if (probability <= goal_probability) {
             return goal_coordinate;

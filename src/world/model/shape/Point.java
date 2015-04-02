@@ -13,6 +13,9 @@ public class Point {
     protected double x;
     protected double y;
     protected double z=0;
+    
+    protected int decision_time_step;
+    protected int exptected_time_step;
     private static final Point zero = new Point(0, 0,0);
 
     public static Point zero() {
@@ -65,6 +68,22 @@ public class Point {
 
     public void setY(double y) {
         this.y = y;
+    }
+
+    public int getDecision_time_step() {
+        return decision_time_step;
+    }
+
+    public void setDecision_time_step(int decision_time_step) {
+        this.decision_time_step = decision_time_step;
+    }
+
+    public int getExptected_time_step() {
+        return exptected_time_step;
+    }
+
+    public void setExptected_time_step(int exptected_time_step) {
+        this.exptected_time_step = exptected_time_step;
     }
 
 }

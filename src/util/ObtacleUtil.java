@@ -11,7 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Iterator;
-import java.util.Vector;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.dom4j.Document;
@@ -26,8 +26,8 @@ import world.model.Obstacle;
  */
 public class ObtacleUtil {
 
-    private static Vector<Obstacle> readObstacleFromKMLInputStream(InputStream kml_input_stream) {
-        Vector<Obstacle> obstacle_list = new Vector<Obstacle>();
+    private static ArrayList<Obstacle> readObstacleFromKMLInputStream(InputStream kml_input_stream) {
+        ArrayList<Obstacle> obstacle_list = new ArrayList<Obstacle>();
         int obstacle_index = 0;
         try {
             SAXReader reader = new SAXReader();
@@ -47,6 +47,7 @@ public class ObtacleUtil {
                 }
                 Obstacle obstacle = new Obstacle(obstacle_polygon_shape, obstacle_index);
                 obstacle_list.add(obstacle);
+                obstacle_index++;
             }
         } catch (DocumentException ex) {
             Logger.getLogger(ObtacleUtil.class.getName()).log(Level.SEVERE, null, ex);
@@ -54,7 +55,7 @@ public class ObtacleUtil {
         return obstacle_list;
     }
 
-    public static Vector<Obstacle> readObstacleFromExternalKML(String external_kml_file_path) {
+    public static ArrayList<Obstacle> readObstacleFromExternalKML(String external_kml_file_path) {
         File kml_file = new File(external_kml_file_path);
         try {
             FileInputStream kml_input_stream = new FileInputStream(kml_file);
@@ -65,7 +66,7 @@ public class ObtacleUtil {
         return null;
     }
 
-    public static Vector<Obstacle> readObstacleFromResourceKML(String resource_kml_file_path) {
+    public static ArrayList<Obstacle> readObstacleFromResourceKML(String resource_kml_file_path) {
         return readObstacleFromKMLInputStream(ObtacleUtil.class.getResourceAsStream(resource_kml_file_path));
     }
 

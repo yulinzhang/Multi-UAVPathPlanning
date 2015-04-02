@@ -3,18 +3,22 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package uav;
+package world.uav;
 
 import algorithm.RRT.RRTAlg;
 import algorithm.RRT.RRTTree;
 import config.StaticInitConfig;
 import java.util.LinkedList;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import world.model.shape.Circle;
 import world.model.Obstacle;
 import world.World;
+import world.model.Conflict;
+import world.model.KnowledgeAwareInterface;
 import world.model.Target;
+import world.model.Threat;
+import world.model.WorldKnowledge;
 import world.model.shape.DubinsCurve;
 import world.model.shape.Point;
 import world.model.shape.Trajectory;
@@ -23,7 +27,7 @@ import world.model.shape.Trajectory;
  *
  * @author Yulin_Zhang
  */
-public class UAV extends Unit {
+public class UAV extends Unit implements KnowledgeAwareInterface{
 
     private Circle uav_radar;
 
@@ -33,7 +37,7 @@ public class UAV extends Unit {
     private float[] previous_waypoint = new float[2];
 
     //variables for path planning
-    private Vector<Obstacle> obstacles;
+    private WorldKnowledge kb;
 
     private RRTAlg rrt_alg;
     private RRTTree rrt_tree;
@@ -47,19 +51,17 @@ public class UAV extends Unit {
      * @param target
      * @param center_coordinates
      */
-    public UAV(int index, Target target, int flag_of_war, float[] center_coordinates, Vector<Obstacle> obstacles) {
+    public UAV(int index, Target target, int flag_of_war, float[] center_coordinates, ArrayList<Obstacle> obstacles) {
         super(index, target, flag_of_war, center_coordinates);
         this.uav_radar = new Circle(center_coordinates[0], center_coordinates[1], scout_radar_radius);
         this.path_prefound = new LinkedList<Point>();
         setPreviousWaypoint();
-        this.obstacles = new Vector<Obstacle>();
-        for (Obstacle obs : obstacles) {
-            this.obstacles.add(obs);
-        }
+        this.kb=new WorldKnowledge();
+        this.kb.setObstacles(obstacles);
         if (target == null) {
-            rrt_alg = new RRTAlg(super.getCenter_coordinates(), null, StaticInitConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, StaticInitConfig.rrt_iteration_times, speed, this.obstacles);
+            rrt_alg = new RRTAlg(super.getCenter_coordinates(), null, StaticInitConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, StaticInitConfig.rrt_iteration_times, speed, this.getObstacles());
         } else {
-            rrt_alg = new RRTAlg(super.getCenter_coordinates(), target.getCoordinates(), StaticInitConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, StaticInitConfig.rrt_iteration_times, speed, this.obstacles);
+            rrt_alg = new RRTAlg(super.getCenter_coordinates(), target.getCoordinates(), StaticInitConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, StaticInitConfig.rrt_iteration_times, speed, this.getObstacles());
         }
     }
 
@@ -158,6 +160,51 @@ public class UAV extends Unit {
 
     public RRTTree getRrt_tree() {
         return rrt_tree;
+    }
+
+    @Override
+    public ArrayList<Obstacle> getObstacles() {
+        return this.kb.getObstacles();
+    }
+
+    @Override
+    public ArrayList<Conflict> getConflicts() {
+        return this.kb.getConflicts();
+    }
+
+    @Override
+    public ArrayList<Threat> getThreats() {
+        return this.kb.getThreats();
+    }
+
+    @Override
+    public void setObstacles(ArrayList<Obstacle> obstacles) {
+        this.kb.setObstacles(obstacles);
+    }
+
+    @Override
+    public void setConflicts(ArrayList<Conflict> conflicts) {
+        this.kb.setConflicts(conflicts);
+    }
+
+    @Override
+    public void setThreats(ArrayList<Threat> threats) {
+        this.kb.setThreats(threats);
+    }
+
+    @Override
+    public void addObstacle(Obstacle obs) {
+        this.kb.addObstacle(obs);
+    }
+
+    @Override
+    public void addConflict(Conflict conflict) {
+        this.kb.addConflict(conflict);
+    }
+
+    @Override
+    public void addThreat(Threat threat) {
+        this.kb.addThreat(threat);
     }
 
 }

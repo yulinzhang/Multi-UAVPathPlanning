@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package uav;
+package world.uav;
 
 import world.model.Threat;
 import world.model.shape.Triangle;

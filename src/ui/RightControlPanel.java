@@ -5,9 +5,11 @@
  */
 package ui;
 
+import config.StaticInitConfig;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreeSelectionModel;
+import world.World;
 import world.model.WorldKnowledge;
 
 /**
@@ -26,10 +28,7 @@ public class RightControlPanel extends javax.swing.JPanel implements TreeSelecti
         initComponents();
         RightControlPanel.jTree1.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         RightControlPanel.jTree1.addTreeSelectionListener(this);
-    }
-
-    public static void setWorldKnowledge(WorldKnowledge kb) {
-        RightControlPanel.kb = kb;
+        RightControlPanel.kb = World.kb;
         RightControlPanel.jTree1.setModel(kb);
     }
 
@@ -79,8 +78,26 @@ public class RightControlPanel extends javax.swing.JPanel implements TreeSelecti
     @Override
     public void valueChanged(TreeSelectionEvent e) {
         Object select_obj = RightControlPanel.jTree1.getLastSelectedPathComponent();
-        if (RightControlPanel.jTree1.getModel().isLeaf(select_obj)) {
-            logger.debug(select_obj);
+        if (select_obj!=null&&kb.isLeaf(select_obj)) {
+            String node_name = select_obj.toString();
+            int index = -1;
+            if (node_name.contains(StaticInitConfig.OBSTACLE_NAME)) {
+                int index_name_prefix = node_name.indexOf(StaticInitConfig.OBSTACLE_NAME) + StaticInitConfig.OBSTACLE_NAME.length();
+                index = Integer.parseInt(node_name.substring(index_name_prefix));
+                AnimationPanel.highlight_obstacle_index = index;
+            } else if (node_name.contains(StaticInitConfig.THREAT_NAME)) {
+                int index_name_prefix = node_name.indexOf(StaticInitConfig.THREAT_NAME) + StaticInitConfig.THREAT_NAME.length();
+                index = Integer.parseInt(node_name.substring(index_name_prefix));
+                AnimationPanel.highlight_threat_index = index;
+            } else if (node_name.contains(StaticInitConfig.CONFLICT_NAME)) {
+                int index_name_prefix = node_name.indexOf(StaticInitConfig.CONFLICT_NAME) + StaticInitConfig.CONFLICT_NAME.length();
+                index = Integer.parseInt(node_name.substring(index_name_prefix));
+                AnimationPanel.highlight_uav_index = index;
+            }
+        } else if(select_obj!=null){
+            AnimationPanel.highlight_obstacle_index = -1;
+            AnimationPanel.highlight_threat_index = -1;
+            AnimationPanel.highlight_uav_index = -1;
         }
     }
 }

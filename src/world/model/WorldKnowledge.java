@@ -5,14 +5,10 @@
  */
 package world.model;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Vector;
+import java.util.ArrayList;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
-import ui.AnimationPanel;
 
 /**
  *
@@ -25,24 +21,24 @@ public class WorldKnowledge implements TreeModel {
     private String secondChild = "威胁信息";
     private String thirdChild = "冲突信息";
 
-    private Vector<Obstacle> obstacles;
-    private Vector<Threat> threats;
-    private Vector<Conflict> conflicts;
+    private ArrayList<Obstacle> obstacles;
+    private ArrayList<Threat> threats;
+    private ArrayList<Conflict> conflicts;
 
-    private Vector<Object> root_child;
-    private Vector<TreeModelListener> treeModelListeners
-            = new Vector<TreeModelListener>();
+    private ArrayList<Object> root_child;
+    private ArrayList<TreeModelListener> treeModelListeners
+            = new ArrayList<TreeModelListener>();
 
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(WorldKnowledge.class);
 
     public WorldKnowledge() {
-        root_child = new Vector<Object>();
+        root_child = new ArrayList<Object>();
         root_child.add(firstChild);
         root_child.add(secondChild);
         root_child.add(thirdChild);
-        obstacles = new Vector<Obstacle>();
-        threats = new Vector<Threat>();
-        conflicts = new Vector<Conflict>();
+        obstacles = new ArrayList<Obstacle>();
+        threats = new ArrayList<Threat>();
+        conflicts = new ArrayList<Conflict>();
         init();
     }
 
@@ -130,14 +126,62 @@ public class WorldKnowledge implements TreeModel {
         return -1;
     }
 
-    @Override
     public void addTreeModelListener(TreeModelListener l) {
         treeModelListeners.add(l);
     }
 
-    @Override
     public void removeTreeModelListener(TreeModelListener l) {
-        treeModelListeners.removeElement(l);
+        treeModelListeners.remove(l);
     }
 
+    public ArrayList<Obstacle> getObstacles() {
+        return obstacles;
+    }
+
+    public void setObstacles(ArrayList<Obstacle> obstacles) {
+        this.obstacles = obstacles;
+    }
+
+    public ArrayList<Threat> getThreats() {
+        return threats;
+    }
+
+    public void setThreats(ArrayList<Threat> threats) {
+        this.threats = threats;
+    }
+
+    public ArrayList<Object> getRoot_child() {
+        return root_child;
+    }
+
+    public void setRoot_child(ArrayList<Object> root_child) {
+        this.root_child = root_child;
+    }
+
+    public ArrayList<Conflict> getConflicts() {
+        return conflicts;
+    }
+
+    public void setConflicts(ArrayList<Conflict> conflicts) {
+        this.conflicts = conflicts;
+    }
+    
+    public void addConflict(Conflict conflict)
+    {
+        this.conflicts.add(conflict);
+    }
+    
+    public void addThreat(Threat threat)
+    {
+        this.threats.add(threat);
+    }
+    
+    public void addObstacle(Obstacle obstacle)
+    {
+        this.obstacles.add(obstacle);
+    }
+
+
+    
+    
 }
