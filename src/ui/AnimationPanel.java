@@ -305,17 +305,17 @@ public class AnimationPanel extends JPanel implements MouseListener {
 
     private void updateUAVImageInLevel4() {
         for (UAV scout : this.scouts) {
-            virtualizer.drawUAVInUAVImage(uav_image_graphics, scout, GraphicConfig.side_a_radar_color, GraphicConfig.side_a_center_color, null);
+            virtualizer.drawUAVInUAVImage(uav_image_graphics, scout, null);
         }
         for (UAV attacker : this.attackers) {
             if (attacker.getIndex() == this.highlight_uav_index) {
-                virtualizer.drawUAVInUAVImage(uav_image_graphics, attacker, GraphicConfig.side_a_radar_color, GraphicConfig.side_a_center_color, GraphicConfig.highlight_uav_color);
+                virtualizer.drawUAVInUAVImage(uav_image_graphics, attacker, GraphicConfig.highlight_uav_color);
             }
-            virtualizer.drawUAVInUAVImage(uav_image_graphics, attacker, GraphicConfig.side_a_radar_color, GraphicConfig.side_a_center_color, null);
+            virtualizer.drawUAVInUAVImage(uav_image_graphics, attacker, null);
 
         }
         for (UAV enemy_uav : this.enemy_uavs) {
-            virtualizer.drawUAVInUAVImage(enemy_uav_image_graphics, enemy_uav, GraphicConfig.side_b_radar_color, GraphicConfig.side_b_center_color, null);
+            virtualizer.drawUAVInUAVImage(enemy_uav_image_graphics, enemy_uav, null);
         }
     }
 

@@ -7,7 +7,9 @@ package world.uav;
 
 import algorithm.RRT.RRTAlg;
 import algorithm.RRT.RRTTree;
+import config.GraphicConfig;
 import config.StaticInitConfig;
+import java.awt.Color;
 import java.util.LinkedList;
 import java.util.ArrayList;
 
@@ -30,6 +32,8 @@ import world.model.shape.Trajectory;
 public class UAV extends Unit implements KnowledgeAwareInterface{
 
     private Circle uav_radar;
+    private Color center_color=new Color(250, 0, 0);
+    public  Color radar_color = new Color(236, 128, 128, 150);
 
     private LinkedList<Point> path_prefound;
     private int current_index = 0;
@@ -63,6 +67,14 @@ public class UAV extends Unit implements KnowledgeAwareInterface{
         } else {
             rrt_alg = new RRTAlg(super.getCenter_coordinates(), target.getCoordinates(), StaticInitConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, StaticInitConfig.rrt_iteration_times, speed, this.getObstacles());
         }
+        initColor(index);
+    }
+    
+    private void initColor(int uav_index)
+    {
+//        int red_amount=(int)(250*color_proporation);
+        center_color=GraphicConfig.uav_colors.get(uav_index);
+        radar_color = new Color(center_color.getRed(),center_color.getGreen(),center_color.getBlue(),128);
     }
 
     public void ignoreEverythingAndTestDubinPath() {
@@ -213,6 +225,14 @@ public class UAV extends Unit implements KnowledgeAwareInterface{
 
     public void setKb(WorldKnowledge kb) {
         this.kb = kb;
+    }
+
+    public Color getCenter_color() {
+        return center_color;
+    }
+
+    public Color getRadar_color() {
+        return radar_color;
     }
 
 
