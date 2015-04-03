@@ -353,6 +353,8 @@ public class AnimationPanel extends JPanel implements MouseListener {
     public void mousePressed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON3) {
             int chosen_attacker_index = findChosenAttacker(e.getPoint());
+            if(chosen_attacker_index==-1)
+                return;
             AnimationPanel.setHighlightUAV(chosen_attacker_index);
             my_popup_menu.setChoosedAttackerIndex(chosen_attacker_index);
             my_popup_menu.show(this, e.getX(), e.getY());
