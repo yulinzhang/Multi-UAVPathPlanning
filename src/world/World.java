@@ -51,11 +51,15 @@ public class World implements KnowledgeAwareInterface{
     private ArrayList<UAV> attackers;
     private ArrayList<UAV> enemy_uavs;
     private ArrayList<UAV> scouts;
-    private int time_step = 0;
+    private int time_step = 0; //times of simulation
 
     private float theta_increase_for_enemy_uav = (float) Math.PI / 40;
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(World.class);
 
+    /**initiate world,contain paint,number of attacker_num,scout_num,enemy_num...
+    * 
+    * @param init_config 
+    */
     public World(NonStaticInitConfig init_config) {
         this.kb=new WorldKnowledge();
         initParameterFromInitConfig(init_config);
@@ -63,6 +67,10 @@ public class World implements KnowledgeAwareInterface{
     }
 
  
+    /**init the parameter of battleground objects
+     * 
+     * @param init_config 
+     */
     public void initParameterFromInitConfig(NonStaticInitConfig init_config) {
         this.bound_width = init_config.getBound_width();
         this.bound_height = init_config.getBound_height();

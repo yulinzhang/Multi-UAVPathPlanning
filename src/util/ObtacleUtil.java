@@ -26,6 +26,11 @@ import world.model.Obstacle;
  */
 public class ObtacleUtil {
 
+    /**Analyse KML file to extract ends of obstacle 
+     * 
+     * @param kml_input_stream
+     * @return 
+     */
     private static ArrayList<Obstacle> readObstacleFromKMLInputStream(InputStream kml_input_stream) {
         ArrayList<Obstacle> obstacle_list = new ArrayList<Obstacle>();
         int obstacle_index = 0;

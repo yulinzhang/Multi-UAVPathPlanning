@@ -13,7 +13,7 @@ import algorithm.RRT.RRTNode;
  */
 public class BoundUtil {
     /**
-     * 
+     * check whether coordinate of node in world
      * @param node
      * @param bound_width
      * @param bound_height
