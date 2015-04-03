@@ -20,9 +20,8 @@ import world.model.shape.Trajectory;
 public class ConflictCheckUtil {
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(AnimationPanel.class);
 
-    /**
-     * if conflicted then return true, otherwise return false;
-     *
+    /**if conflicted then return true, otherwise return false;
+     * 
      * @param obstacles
      * @param threats
      * @param coordinate_x
@@ -32,9 +31,7 @@ public class ConflictCheckUtil {
     public static boolean checkPointInObstacles(ArrayList<Obstacle> obstacles, float coordinate_x, float coordinate_y) {
         if (obstacles != null) {
             for (Obstacle obstacle : obstacles) {
-                /** increase a little bit bound to keep a visible safe distance from obstacle and make it looks less dangerous.
-                 * 
-                 */
+                
                 Rectangle bound=null;
                 try{
                  bound= obstacle.getShape().getBounds();
@@ -43,6 +40,7 @@ public class ConflictCheckUtil {
                     logger.debug("error index"+obstacle.getIndex());
                     logger.error(e);
                 }
+                //increase a little bit bound to keep a visible safe distance from obstacle and make it looks less dangerous.
                 bound.setBounds(bound.x - 2, bound.y - 2, bound.width + 4, bound.height + 4);
                
                 if (bound.contains(coordinate_x, coordinate_y)) {
@@ -72,6 +70,12 @@ public class ConflictCheckUtil {
         return false;
     }
     
+    /**check whether new_node in the obstacle 
+     * 
+     * @param obstacles
+     * @param node
+     * @return 
+     */
     public static boolean checkNodeInObstacles(ArrayList<Obstacle> obstacles,  RRTNode node) {
         float[] coordinate = node.getCoordinate();
         return checkPointInObstacles(obstacles, coordinate[0], coordinate[1]);

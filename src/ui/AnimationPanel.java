@@ -40,7 +40,7 @@ public class AnimationPanel extends JPanel implements MouseListener {
     /**
      * -------------outside variable---------------
      */
-    private int bound_width = 800;
+    private int bound_width = 800; //The size of paint
     private int bound_height = 600;
 
     /**
@@ -58,6 +58,9 @@ public class AnimationPanel extends JPanel implements MouseListener {
     private BufferedImage uav_image_level_9;
     private BufferedImage highlight_obstacle_image_level_3;
 
+    /**
+     * Draw various shapes in the simulation
+     */
     private Color transparent_color;
     private Graphics2D fog_of_war_graphics;
     private Graphics2D uav_image_graphics;
@@ -178,6 +181,10 @@ public class AnimationPanel extends JPanel implements MouseListener {
                 BufferedImage.TYPE_INT_ARGB);
     }
 
+    /**
+     * Initiate parameter of world
+     * @param world 
+     */
     private void initParameterFromInitConfig(World world) {
         this.bound_width = world.getBound_width();
         this.bound_height = world.getBound_height();
@@ -205,6 +212,10 @@ public class AnimationPanel extends JPanel implements MouseListener {
         }
     }
 
+    /**
+     * Draw Target
+     * @param static_threats 
+     */
     private void initTargetInObstacleImageLevel2(ArrayList<Threat> threats) {
         for (Threat threat : threats) {
             if (threat.getIndex() == AnimationPanel.highlight_threat_index) {
@@ -214,6 +225,10 @@ public class AnimationPanel extends JPanel implements MouseListener {
         }
     }
 
+    /**
+     * Initiate the parameters of UAV
+     * @param uav_image_graphics 
+     */
     private void initUAVBase(Graphics2D uav_image_graphics) {
         uav_image_graphics.setColor(Color.white);
         uav_image_graphics.setStroke(new BasicStroke(uav_base_line_width));
@@ -223,6 +238,9 @@ public class AnimationPanel extends JPanel implements MouseListener {
         uav_image_graphics.drawImage(uav_base.getImage(), (int) uav_base.getCoordinate()[0], (int) uav_base.getCoordinate()[1], uav_base.getBase_width() * 2 / 3, uav_base.getBase_height() * 2 / 3, null);
     }
 
+    /**
+     * each undate will clear history image
+     */
     private void clearImageBeforeUpdate(Graphics2D graphics) {
         graphics.setColor(transparent_color);
         graphics.setBackground(transparent_color);
@@ -377,7 +395,9 @@ public class AnimationPanel extends JPanel implements MouseListener {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    //animation
+    /**
+     * implements ActionListener interface for receiving action events
+     */
     private class animatorListener implements ActionListener {
 
         JPanel panel;
@@ -386,6 +406,10 @@ public class AnimationPanel extends JPanel implements MouseListener {
             this.panel = panel;
         }
 
+        /**
+         * real-time undates of all simulation objects
+         * @param e 
+         */
         public void actionPerformed(ActionEvent e) {
             clearUAVImageBeforeUpdate();
             if (StaticInitConfig.SIMULATION_ON) {

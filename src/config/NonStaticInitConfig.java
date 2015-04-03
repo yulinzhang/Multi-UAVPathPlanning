@@ -89,10 +89,13 @@ public class NonStaticInitConfig {
         this.enemy_num = StaticInitConfig.ENEMY_UAV_NUM;
         this.threat_num = StaticInitConfig.THREAT_NUM;
     }
-
+    
+    /**
+     * Get file path of KML,and that file storages the polygons represented obstacles
+     */
     private void initObstacles() {
         if (StaticInitConfig.EXTERNAL_KML_FILE_PATH == null) {
-            obstacles = ObtacleUtil.readObstacleFromResourceKML("/resources/Obstacle.kml");
+            obstacles = ObtacleUtil.readObstacleFromResourceKML("/resources/Obstacle.kml"); //get obstacle from kml
         } else {
             obstacles = ObtacleUtil.readObstacleFromExternalKML(StaticInitConfig.EXTERNAL_KML_FILE_PATH);
         }

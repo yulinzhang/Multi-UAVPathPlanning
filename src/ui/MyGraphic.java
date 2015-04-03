@@ -64,7 +64,7 @@ public class MyGraphic {
 
     public void drawUAVPlannedPath(Graphics2D graphics, UAV uav, Color uav_planned_path_color) {
         graphics.setColor(uav_planned_path_color);
-        graphics.setStroke(new BasicStroke(2.0f));
+        graphics.setStroke(new BasicStroke(2.0f)); //Set the width of the stroke
         LinkedList<Point> planned_path = uav.getFuturePath();
         int planned_path_size = planned_path.size();
         float[] current_waypoint;
@@ -80,7 +80,7 @@ public class MyGraphic {
 
     public void drawUAVPlannedTree(Graphics2D graphics, UAV uav, Color uav_planned_tree_color) {
         graphics.setColor(uav_planned_tree_color);
-        graphics.setStroke(new BasicStroke(0.5f));
+        graphics.setStroke(new BasicStroke(0.5f)); //Set the width of the stroke
         float[] current_waypoint;
         float[] next_waypoint;
         RRTTree rrt_tree = uav.getRrt_tree();
@@ -104,7 +104,7 @@ public class MyGraphic {
 
     public void drawObstacle(Graphics2D graphics, Obstacle obstacle, Color obstacle_center_color, Color obstacle_edge_color, Color obstacle_hightlight_color) {
         graphics.setComposite(AlphaComposite.SrcOver);
-        graphics.setStroke(new BasicStroke(1f));
+        graphics.setStroke(new BasicStroke(1f)); //Set the width of the stroke
         graphics.setColor(obstacle_center_color);
         graphics.fill(obstacle.getShape());
         if (obstacle_hightlight_color != null) {
@@ -133,7 +133,7 @@ public class MyGraphic {
         } else {
             graphics.setColor(target_color);
         }
-        graphics.setStroke(new BasicStroke(3.0f));
+        graphics.setStroke(new BasicStroke(3.0f));//Set the width of the stroke
         graphics.drawString(StaticInitConfig.THREAT_NAME+target.getIndex(), target.getCoordinates()[0]-10, target.getCoordinates()[1]-15);
         graphics.drawRect((int) target.getCoordinates()[0] - GraphicConfig.threat_width / 2, (int) target.getCoordinates()[1] - GraphicConfig.threat_height / 2, GraphicConfig.threat_width, GraphicConfig.threat_height);
     }

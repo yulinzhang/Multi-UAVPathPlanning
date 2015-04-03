@@ -194,7 +194,7 @@ public class ControlPanel extends javax.swing.JPanel {
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
-        StaticInitConfig.SHOW_PLANNED_TREE = !StaticInitConfig.SHOW_PLANNED_TREE;
+        StaticInitConfig.SHOW_PLANNED_TREE = !StaticInitConfig.SHOW_PLANNED_TREE; //per click take non-operation
         if (StaticInitConfig.SHOW_PLANNED_TREE) {
             this.jButton4.setText("关闭" + this.show_planned_tree_text);
         } else {
@@ -204,7 +204,7 @@ public class ControlPanel extends javax.swing.JPanel {
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
-        StaticInitConfig.SHOW_PLANNED_PATH = !StaticInitConfig.SHOW_PLANNED_PATH;
+        StaticInitConfig.SHOW_PLANNED_PATH = !StaticInitConfig.SHOW_PLANNED_PATH; //per click take non-operation
         if (StaticInitConfig.SHOW_PLANNED_PATH) {
             this.jButton3.setText("关闭" + this.shown_planned_path_text);
         } else {
@@ -214,7 +214,7 @@ public class ControlPanel extends javax.swing.JPanel {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        StaticInitConfig.SIMULATION_ON = !StaticInitConfig.SIMULATION_ON;
+        StaticInitConfig.SIMULATION_ON = !StaticInitConfig.SIMULATION_ON; //per click take non-operation
         if (StaticInitConfig.SIMULATION_ON) {
             this.jButton1.setText(simulation_stop);
         } else {
@@ -224,7 +224,7 @@ public class ControlPanel extends javax.swing.JPanel {
 
     private void setSimulationDelayWithSpeed(float speed_times) {
         this.jLabel1.setText(this.simulation_speed_text + speed_times);
-        int delay = (int) (StaticInitConfig.INIT_SIMULATION_DELAY / speed_times);
+        int delay = (int) (StaticInitConfig.INIT_SIMULATION_DELAY / speed_times); //unpdate sychronously simulation delay 
         StaticInitConfig.SIMULATION_WITH_UI_TIMER.setDelay(delay);
     }
 

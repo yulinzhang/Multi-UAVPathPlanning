@@ -29,11 +29,11 @@ public class StaticInitConfig {
     public static String VIEW_THREAT_ACTION_COMMAND = "显示威胁";
     public static String VIEW_ENEMY_UAV_ACTION_COMMAND = "显示敌方UAV";
 
-    public static Integer MIN_SPINNER_VALUE = 0;
+    public static Integer MIN_SPINNER_VALUE = 0; //range of spinner,0-100
     public static Integer MAX_SPINNER_VALUE = 100;
     public static Integer STEP_SIZE_OF_SPINNER = 1;
 
-    public static String EXTERNAL_KML_FILE_PATH = null;
+    public static String EXTERNAL_KML_FILE_PATH = null; //KML file path stored static obstacle
 
     public static int SIDE_A = 0;
     public static int SIDE_B = 1;
@@ -44,8 +44,8 @@ public class StaticInitConfig {
     public static int rrt_iteration_times = 1000;
 
     //how much time it takes to drive the simulaiton to next time step
-    public static int INIT_SIMULATION_DELAY = 300;
-    public static Timer SIMULATION_WITH_UI_TIMER;
+    public static int INIT_SIMULATION_DELAY = 300; //milliseconds,this value will be set according to the user's simulation speed
+    public static Timer SIMULATION_WITH_UI_TIMER; //simulation Timer
 
     public static boolean SHOW_PLANNED_PATH = true;
     public static boolean SHOW_PLANNED_TREE = true;
