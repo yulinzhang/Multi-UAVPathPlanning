@@ -57,20 +57,22 @@ public class World implements KnowledgeAwareInterface {
     private float theta_increase_for_enemy_uav = (float) Math.PI / 40;
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(World.class);
 
-    /**initiate world,contain paint,number of attacker_num,scout_num,enemy_num...
-    * 
-    * @param init_config 
-    */
+    /**
+     * initiate world,contain paint,number of
+     * attacker_num,scout_num,enemy_num...
+     *
+     * @param init_config
+     */
     public World(NonStaticInitConfig init_config) {
         this.kb = new WorldKnowledge();
         initParameterFromInitConfig(init_config);
         initUAVs();
     }
 
- 
-    /**init the parameter of battleground objects
-     * 
-     * @param init_config 
+    /**
+     * init the parameter of battleground objects
+     *
+     * @param init_config
      */
     public void initParameterFromInitConfig(NonStaticInitConfig init_config) {
         this.bound_width = init_config.getBound_width();
@@ -139,8 +141,7 @@ public class World implements KnowledgeAwareInterface {
             Threat threat = this.kb.getThreats().get(i);
             if (i == uav_assigned_role_index) {
                 for (int j = 0; j < this.attacker_num; j++) {
-                    if(attacker_index==j)
-                    {
+                    if (attacker_index == j) {
                         this.attackers.get(j).setTarget_indicated_by_role(threat);
                         break;
                     }
@@ -168,7 +169,6 @@ public class World implements KnowledgeAwareInterface {
                 attacker_to_assign.setTarget_indicated_by_role(threat);
             }
         }
-        planPathForAllAttacker();
     }
 
     private void updateScoutCoordinate() {
@@ -181,7 +181,7 @@ public class World implements KnowledgeAwareInterface {
             }
             while (!moved) {
                 logger.debug("generate path and previous size=" + scout.getPath_prefound().size());
-                scout.runRRT();
+                scout.pathPlan();
                 moved = scout.moveToNextWaypoint();
             }
         }
@@ -189,7 +189,7 @@ public class World implements KnowledgeAwareInterface {
 
     private void planPathForAllAttacker() {
         for (UAV attacker : this.attackers) {
-            attacker.runRRT();
+            attacker.pathPlan();
         }
     }
 
@@ -201,13 +201,11 @@ public class World implements KnowledgeAwareInterface {
             if (moved || uav_target == null) {
                 continue;
             }
-            while (!moved) {
-                logger.debug("generate path and previous size=" + attacker.getPath_prefound().size());
-//                scout.runRRTStar();
-                attacker.runRRT();
-//                scout.ignoreEverythingAndTestDubinPath();
-                moved = attacker.moveToNextWaypoint();
-            }
+//            while (!moved) {
+//                logger.debug("generate path and previous size=" + attacker.getPath_prefound().size());
+//                attacker.pathPlan();
+//                moved = attacker.moveToNextWaypoint();
+//            }
         }
     }
 
@@ -220,13 +218,19 @@ public class World implements KnowledgeAwareInterface {
     private void shareInfoAfterRegistration() {
     }
 
+    private void resetDecisionParameter() {
+        for (UAV attacker : this.attackers) {
+            attacker.setNeed_to_replan(false);
+        }
+    }
+
     public void updateAll() {
         detectEvent();
         registerInfoRequirement();
         shareInfoAfterRegistration();
-        updateScoutCoordinate();
+        planPathForAllAttacker();
         updateAttackerCoordinate();
-//        updateEnemyUAVCoordinate();
+        resetDecisionParameter();
         this.time_step++;
 //        logger.debug("timestep=" + this.time_step);
     }

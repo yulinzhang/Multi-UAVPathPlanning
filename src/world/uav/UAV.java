@@ -12,6 +12,7 @@ import config.StaticInitConfig;
 import java.awt.Color;
 import java.util.LinkedList;
 import java.util.ArrayList;
+import util.DistanceUtil;
 
 import world.model.shape.Circle;
 import world.model.Obstacle;
@@ -29,16 +30,17 @@ import world.model.shape.Trajectory;
  *
  * @author Yulin_Zhang
  */
-public class UAV extends Unit implements KnowledgeAwareInterface{
+public class UAV extends Unit implements KnowledgeAwareInterface {
 
     private Circle uav_radar;
-    private Color center_color=new Color(250, 0, 0);
-    public  Color radar_color = new Color(236, 128, 128, 150);
+    private Color center_color;
+    public Color radar_color;
 
-    private LinkedList<Point> path_prefound;
-    private int current_index = 0;
-
-    private float[] previous_waypoint = new float[2];
+    private LinkedList<Point> path_planned_at_current_time_step;
+    private int current_index_of_planned_path = 0;
+    private LinkedList<Point> path_planned_at_last_time_step;
+    private LinkedList<Point> history_path;
+    private boolean need_to_replan = true;
 
     //variables for path planning
     private WorldKnowledge kb;
@@ -58,9 +60,10 @@ public class UAV extends Unit implements KnowledgeAwareInterface{
     public UAV(int index, Target target, int flag_of_war, float[] center_coordinates, ArrayList<Obstacle> obstacles) {
         super(index, target, flag_of_war, center_coordinates);
         this.uav_radar = new Circle(center_coordinates[0], center_coordinates[1], scout_radar_radius);
-        this.path_prefound = new LinkedList<Point>();
+        this.path_planned_at_current_time_step = new LinkedList<Point>();
+        this.history_path = new LinkedList<Point>();
         setPreviousWaypoint();
-        this.kb=new WorldKnowledge();
+        this.kb = new WorldKnowledge();
         this.kb.setObstacles(obstacles);
         if (target == null) {
             rrt_alg = new RRTAlg(super.getCenter_coordinates(), null, StaticInitConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, StaticInitConfig.rrt_iteration_times, speed, this.getObstacles());
@@ -69,23 +72,21 @@ public class UAV extends Unit implements KnowledgeAwareInterface{
         }
         initColor(index);
     }
-    
-    private void initColor(int uav_index)
-    {
-//        int red_amount=(int)(250*color_proporation);
-        center_color=GraphicConfig.uav_colors.get(uav_index);
-        radar_color = new Color(center_color.getRed(),center_color.getGreen(),center_color.getBlue(),128);
+
+    private void initColor(int uav_index) {
+        center_color = GraphicConfig.uav_colors.get(uav_index);
+        radar_color = new Color(center_color.getRed(), center_color.getGreen(), center_color.getBlue(), 128);
     }
 
     public void ignoreEverythingAndTestDubinPath() {
-        Point start = new Point(this.getCenter_coordinates()[0], this.getCenter_coordinates()[1], Math.PI*2);
-        Point end = new Point(target_indicated_by_role.getCoordinates()[0],target_indicated_by_role.getCoordinates()[1],  Math.PI*2-Math.PI*7/4);
+        Point start = new Point(this.getCenter_coordinates()[0], this.getCenter_coordinates()[1], Math.PI * 2);
+        Point end = new Point(target_indicated_by_role.getCoordinates()[0], target_indicated_by_role.getCoordinates()[1], Math.PI * 2 - Math.PI * 7 / 4);
         DubinsCurve dc = new DubinsCurve(start, end, 150, false);
         Trajectory traj = dc.getTrajectory(1, 10);
-        logger.debug("total waypoint num:" +traj.getPoints().length);
-        logger.debug("total traj lenght:"+traj.getCost());
-        logger.debug("end node:"+traj.getEndPoint());
-        logger.debug("goal point:"+end);
+        logger.debug("total waypoint num:" + traj.getPoints().length);
+        logger.debug("total traj lenght:" + traj.getCost());
+        logger.debug("end node:" + traj.getEndPoint());
+        logger.debug("goal point:" + end);
         LinkedList<Point> path = new LinkedList<Point>();
         for (Point point : traj.getPoints()) {
             path.add(point);
@@ -93,7 +94,14 @@ public class UAV extends Unit implements KnowledgeAwareInterface{
         this.setPath_prefound(path);
     }
 
-    public void runRRT() {
+    public void pathPlan() {
+        if (this.need_to_replan) {
+            this.path_planned_at_last_time_step=this.path_planned_at_current_time_step;
+            this.runRRT();
+        }
+    }
+
+    private void runRRT() {
         rrt_alg.setGoal_coordinate(target_indicated_by_role.getCoordinates());
         rrt_alg.setInit_coordinate(center_coordinates);
         rrt_tree = rrt_alg.buildRRT(center_coordinates, current_angle);
@@ -121,37 +129,54 @@ public class UAV extends Unit implements KnowledgeAwareInterface{
     }
 
     public void resetCurrentIndexOfPath() {
-        this.current_index = -1;
+        this.current_index_of_planned_path = -1;
     }
 
     public boolean moveToNextWaypoint() {
-        current_index++;
-        if (path_prefound.size() == 0 || current_index >= path_prefound.size()) {
+        current_index_of_planned_path++;
+        if (path_planned_at_current_time_step.size() == 0 || current_index_of_planned_path >= path_planned_at_current_time_step.size()) {
             return false;
         }
-        Point current_waypoint = this.path_prefound.get(current_index);
+        Point current_waypoint = this.path_planned_at_current_time_step.get(current_index_of_planned_path);
         float[] coordinate = current_waypoint.toFloatArray();
         setPreviousWaypoint();
         moveTo(coordinate[0], coordinate[1]);
         this.current_angle = (float) current_waypoint.getYaw();
+
         return true;
+    }
+
+    public LinkedList<Point> getPath_planned_at_last_time_step() {
+        return path_planned_at_last_time_step;
     }
 
     public LinkedList<Point> getFuturePath() {
         LinkedList<Point> future_path = new LinkedList<Point>();
-        for (int i = current_index; i < path_prefound.size(); i++) {
-            future_path.add(path_prefound.get(i));
+        for (int i = current_index_of_planned_path; i < path_planned_at_current_time_step.size(); i++) {
+            future_path.add(path_planned_at_current_time_step.get(i));
         }
         return future_path;
     }
 
+    public void setTarget_indicated_by_role(Target target_indicated_by_role) {
+        if (this.target_indicated_by_role == target_indicated_by_role) {
+            return;
+        }
+        this.target_indicated_by_role = target_indicated_by_role;
+        this.setNeed_to_replan(true);
+    }
+
     private void setPreviousWaypoint() {
-        this.previous_waypoint[0] = this.getCenter_coordinates()[0];
-        this.previous_waypoint[1] = this.getCenter_coordinates()[1];
+        Point previous_waypoint = new Point(this.getCenter_coordinates()[0], this.getCenter_coordinates()[1], this.current_angle);
+        this.history_path.add(previous_waypoint);
+    }
+
+    public void setNeed_to_replan(boolean need_to_replan) {
+        this.need_to_replan = need_to_replan;
     }
 
     public float[] getPrevious_waypoint() {
-        return previous_waypoint;
+        return this.history_path.getLast().toFloatArray();
     }
 
     public Circle getUav_radar() {
@@ -163,11 +188,11 @@ public class UAV extends Unit implements KnowledgeAwareInterface{
     }
 
     public LinkedList<Point> getPath_prefound() {
-        return path_prefound;
+        return path_planned_at_current_time_step;
     }
 
     public void setPath_prefound(LinkedList<Point> path_prefound) {
-        this.path_prefound = path_prefound;
+        this.path_planned_at_current_time_step = path_prefound;
     }
 
     public RRTTree getRrt_tree() {
@@ -234,7 +259,5 @@ public class UAV extends Unit implements KnowledgeAwareInterface{
     public Color getRadar_color() {
         return radar_color;
     }
-
-
 
 }

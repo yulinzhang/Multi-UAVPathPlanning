@@ -20,7 +20,7 @@ public class Unit {
      *
      */
     protected int index;
-    protected Target target_indicated_by_role;
+    protected Target target_indicated_by_role=null;
     //which side the unit belongs to 
     protected int flag_of_war;
     protected float[] center_coordinates = new float[2];
@@ -79,8 +79,6 @@ public class Unit {
         return target_indicated_by_role;
     }
 
-    public void setTarget_indicated_by_role(Target target_indicated_by_role) {
-        this.target_indicated_by_role = target_indicated_by_role;
-    }
+
 
 }

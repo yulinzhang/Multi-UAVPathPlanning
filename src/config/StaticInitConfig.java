@@ -49,7 +49,7 @@ public class StaticInitConfig {
 
     public static boolean SHOW_PLANNED_PATH = true;
     public static boolean SHOW_PLANNED_TREE = true;
-    public static boolean SHOW_HISTORY_PATH = true;
+    public static boolean SHOW_HISTORY_PATH = false;
     public static boolean SHOW_FOG_OF_WAR = true;
     
     public static int STATIC_THREAT_TYPE = 0;

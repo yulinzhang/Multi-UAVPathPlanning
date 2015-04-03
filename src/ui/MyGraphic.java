@@ -74,6 +74,21 @@ public class MyGraphic {
             if (i + 1 < planned_path_size) {
                 next_waypoint = planned_path.get(i + 1).toFloatArray();
                 graphics.drawLine((int) current_waypoint[0], (int) current_waypoint[1], (int) next_waypoint[0], (int) next_waypoint[1]);
+
+            }
+        }
+        
+        Stroke bs = new BasicStroke(2.0f, BasicStroke.CAP_BUTT,
+                BasicStroke.JOIN_BEVEL, 0,
+                new float[]{0.5f, 2}, 0);
+        graphics.setStroke(bs);
+        planned_path = uav.getPath_planned_at_last_time_step();
+        planned_path_size = planned_path.size();
+        for (int i = 0; i < planned_path_size; i++) {
+            current_waypoint = planned_path.get(i).toFloatArray();
+            if (i + 1 < planned_path_size) {
+                next_waypoint = planned_path.get(i + 1).toFloatArray();
+                graphics.drawLine((int) current_waypoint[0], (int) current_waypoint[1], (int) next_waypoint[0], (int) next_waypoint[1]);
             }
         }
     }
@@ -114,7 +129,7 @@ public class MyGraphic {
         }
         graphics.draw(obstacle.getShape());
     }
-    
+
     public void highlightObstacle(Graphics2D graphics, Obstacle obstacle, Color obstacle_center_color, Color obstacle_edge_color, Color obstacle_hightlight_color) {
         graphics.setComposite(AlphaComposite.SrcOver);
         graphics.setStroke(new BasicStroke(2f));
@@ -134,7 +149,7 @@ public class MyGraphic {
             graphics.setColor(target_color);
         }
         graphics.setStroke(new BasicStroke(3.0f));//Set the width of the stroke
-        graphics.drawString(StaticInitConfig.THREAT_NAME+target.getIndex(), target.getCoordinates()[0]-10, target.getCoordinates()[1]-15);
+        graphics.drawString(StaticInitConfig.THREAT_NAME + target.getIndex(), target.getCoordinates()[0] - 10, target.getCoordinates()[1] - 15);
         graphics.drawRect((int) target.getCoordinates()[0] - GraphicConfig.threat_width / 2, (int) target.getCoordinates()[1] - GraphicConfig.threat_height / 2, GraphicConfig.threat_width, GraphicConfig.threat_height);
     }
 }
