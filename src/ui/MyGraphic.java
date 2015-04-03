@@ -8,6 +8,7 @@ package ui;
 import algorithm.RRT.RRTNode;
 import algorithm.RRT.RRTTree;
 import config.GraphicConfig;
+import config.StaticInitConfig;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -112,8 +113,8 @@ public class MyGraphic {
             graphics.setColor(obstacle_edge_color);
         }
         graphics.draw(obstacle.getShape());
-
     }
+    
     public void highlightObstacle(Graphics2D graphics, Obstacle obstacle, Color obstacle_center_color, Color obstacle_edge_color, Color obstacle_hightlight_color) {
         graphics.setComposite(AlphaComposite.SrcOver);
         graphics.setStroke(new BasicStroke(2f));
@@ -123,7 +124,6 @@ public class MyGraphic {
             graphics.setColor(obstacle_edge_color);
         }
         graphics.draw(obstacle.getShape());
-
     }
 
     public void drawTarget(Graphics2D graphics, Threat target, Color target_color, Color target_highlight_color) {
@@ -134,7 +134,7 @@ public class MyGraphic {
             graphics.setColor(target_color);
         }
         graphics.setStroke(new BasicStroke(3.0f));
+        graphics.drawString(StaticInitConfig.THREAT_NAME+target.getIndex(), target.getCoordinates()[0]-10, target.getCoordinates()[1]-15);
         graphics.drawRect((int) target.getCoordinates()[0] - GraphicConfig.threat_width / 2, (int) target.getCoordinates()[1] - GraphicConfig.threat_height / 2, GraphicConfig.threat_width, GraphicConfig.threat_height);
     }
-
 }

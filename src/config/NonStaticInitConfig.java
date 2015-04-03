@@ -53,8 +53,8 @@ public class NonStaticInitConfig {
     public NonStaticInitConfig()
     {
         this.enemy_num=0;
-        this.threat_num=1;
-        this.attacker_num=1;
+        this.threat_num=3;
+        this.attacker_num=3;
         this.scout_num=0;
         float[] coordinate=new float[]{0,0};
         UAVBase uav_base=new UAVBase(coordinate,100,100);

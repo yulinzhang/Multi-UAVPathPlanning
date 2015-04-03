@@ -207,4 +207,14 @@ public class UAV extends Unit implements KnowledgeAwareInterface{
         this.kb.addThreat(threat);
     }
 
+    public WorldKnowledge getKb() {
+        return kb;
+    }
+
+    public void setKb(WorldKnowledge kb) {
+        this.kb = kb;
+    }
+
+
+
 }

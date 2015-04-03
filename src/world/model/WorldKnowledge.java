@@ -5,6 +5,7 @@
  */
 package world.model;
 
+import config.StaticInitConfig;
 import java.util.ArrayList;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
@@ -16,10 +17,10 @@ import javax.swing.tree.TreePath;
  */
 public class WorldKnowledge implements TreeModel {
 
-    private String rootNode = "机器人知识";
-    private String firstChild = "障碍信息";
-    private String secondChild = "威胁信息";
-    private String thirdChild = "冲突信息";
+    private String rootNode = StaticInitConfig.UAV_KNOWLEDGE;
+    private String firstChild = StaticInitConfig.OBSTACLE_INFO;
+    private String secondChild = StaticInitConfig.THREAT_INFO;
+    private String thirdChild = StaticInitConfig.CONFLICT_INFO;
 
     private ArrayList<Obstacle> obstacles;
     private ArrayList<Threat> threats;

@@ -16,10 +16,10 @@ public class StaticInitConfig {
 
     public static boolean SIMULATION_ON = true;
 
-    public static Integer ATTACKER_NUM = 0;
+    public static Integer ATTACKER_NUM =3;
     public static Integer SCOUT_NUM = 1;
     public static Integer ENEMY_UAV_NUM = 0;
-    public static Integer THREAT_NUM = 1;
+    public static Integer THREAT_NUM = 3;
 
     public static boolean VIEW_OBSTACLE = false;
     public static boolean VIEW_THREAT = false;
@@ -54,6 +54,11 @@ public class StaticInitConfig {
     
     public static int STATIC_THREAT_TYPE = 0;
     public static int DYNAMIC_THREAT_TYPE = 1;
+    
+    public static String UAV_KNOWLEDGE="UAV知识";
+    public static String THREAT_INFO="威胁信息";
+    public static String CONFLICT_INFO="冲突信息";
+    public static String OBSTACLE_INFO="障碍信息";
     
     public static String THREAT_NAME="威胁";
     public static String OBSTACLE_NAME="障碍";

@@ -10,10 +10,11 @@ import world.model.Obstacle;
 import config.NonStaticInitConfig;
 import config.StaticInitConfig;
 import java.util.ArrayList;
-import java.util.Vector;
+import java.util.TreeSet;
 import world.uav.UAV;
 import world.uav.UAVBase;
 import util.ConflictCheckUtil;
+import util.DistanceUtil;
 import world.model.Conflict;
 import world.model.KnowledgeAwareInterface;
 import world.model.Target;
@@ -23,7 +24,7 @@ import world.model.WorldKnowledge;
  *
  * @author Yulin_Zhang
  */
-public class World implements KnowledgeAwareInterface{
+public class World implements KnowledgeAwareInterface {
 
     /**
      * *
@@ -57,12 +58,11 @@ public class World implements KnowledgeAwareInterface{
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(World.class);
 
     public World(NonStaticInitConfig init_config) {
-        this.kb=new WorldKnowledge();
+        this.kb = new WorldKnowledge();
         initParameterFromInitConfig(init_config);
         initUAVs();
     }
 
- 
     public void initParameterFromInitConfig(NonStaticInitConfig init_config) {
         this.bound_width = init_config.getBound_width();
         this.bound_height = init_config.getBound_height();
@@ -87,14 +87,11 @@ public class World implements KnowledgeAwareInterface{
         float[] uav_base_center = new float[2];
         uav_base_center[0] = uav_base_coordinate[0] + uav_base_width / 2;
         uav_base_center[1] = uav_base_coordinate[1] + uav_base_height / 2;
-        for (int i = 0; i < scout_num; i++) {
-            UAV scout = new UAV(i, this.getThreats().get(0), StaticInitConfig.SIDE_A, uav_base_center, this.getObstacles());
-            scouts.add(scout);
-        }
         for (int i = 0; i < attacker_num; i++) {
-            UAV attacker = new UAV(i, this.getThreats().get(0), StaticInitConfig.SIDE_A, uav_base_center, this.getObstacles());
+            UAV attacker = new UAV(i, this.getThreats().get(i), StaticInitConfig.SIDE_A, uav_base_center, this.getObstacles());
             attackers.add(attacker);
         }
+        roleAssign(-1, -1);
     }
 
     private void initEnemyUAV() {
@@ -126,6 +123,45 @@ public class World implements KnowledgeAwareInterface{
         initEnemyUAV();
     }
 
+    public void roleAssign(int attacker_index, int uav_assigned_role_index) {
+        TreeSet<Integer> assigned_attacker = new TreeSet<Integer>();
+        assigned_attacker.add(attacker_index);
+        for (int i = 0; i < this.threat_num; i++) {
+            Threat threat = this.kb.getThreats().get(i);
+            if (i == uav_assigned_role_index) {
+                for (int j = 0; j < this.attacker_num; j++) {
+                    if(attacker_index==j)
+                    {
+                        this.attackers.get(j).setTarget_indicated_by_role(threat);
+                        break;
+                    }
+                }
+                continue;
+            }
+            float min_dist = Float.MAX_VALUE;
+            int attacker_index_to_assign = -1;
+            UAV attacker_to_assign = null;
+            for (int j = 0; j < this.attacker_num; j++) {
+                UAV current_attacker = this.attackers.get(j);
+                if (assigned_attacker.contains(j)) {
+                    continue;
+                }
+
+                float dist_between_uav_and_role = DistanceUtil.distanceBetween(current_attacker.getCenter_coordinates(), threat.getCoordinates());
+                if (dist_between_uav_and_role < min_dist) {
+                    min_dist = dist_between_uav_and_role;
+                    attacker_index_to_assign = j;
+                    attacker_to_assign = current_attacker;
+                }
+            }
+            if (attacker_index_to_assign != -1) {
+                assigned_attacker.add(attacker_index_to_assign);
+                attacker_to_assign.setTarget_indicated_by_role(threat);
+            }
+        }
+        planPathForAllAttacker();
+    }
+
     private void updateScoutCoordinate() {
         int i = 1;
         for (UAV scout : this.scouts) {
@@ -136,15 +172,18 @@ public class World implements KnowledgeAwareInterface{
             }
             while (!moved) {
                 logger.debug("generate path and previous size=" + scout.getPath_prefound().size());
-//                scout.runRRTStar();
                 scout.runRRT();
-//                scout.ignoreEverythingAndTestDubinPath();
                 moved = scout.moveToNextWaypoint();
             }
         }
     }
-    
-    
+
+    private void planPathForAllAttacker() {
+        for (UAV attacker : this.attackers) {
+            attacker.runRRT();
+        }
+    }
+
     private void updateAttackerCoordinate() {
         int i = 1;
         for (UAV attacker : this.attackers) {
@@ -228,7 +267,6 @@ public class World implements KnowledgeAwareInterface{
     public ArrayList<Threat> getThreats() {
         return this.kb.getThreats();
     }
-
 
     public ArrayList<UAV> getEnemy_uavs() {
         return enemy_uavs;

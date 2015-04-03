@@ -24,6 +24,11 @@ public class MyPopupMenu extends JPopupMenu implements ActionListener {
     World world;
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(MyPopupMenu.class);
 
+    /** internal variable
+     * 
+     */
+    private int choosen_attacker_index=-1;
+    
     public MyPopupMenu(World world) {
         super();
         this.world = world;
@@ -37,11 +42,16 @@ public class MyPopupMenu extends JPopupMenu implements ActionListener {
         }
 
     }
+    
+    public void setChoosedAttackerIndex(int attacker_index)
+    {
+        this.choosen_attacker_index=attacker_index;
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         int index = items.indexOf(e.getSource());
-        logger.debug("choose:" + index);
+        world.roleAssign(choosen_attacker_index, index);
         StaticInitConfig.SIMULATION_ON = true;
     }
 

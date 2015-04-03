@@ -75,6 +75,12 @@ public class Unit {
         this.index = index;
     }
 
+    public Target getTarget_indicated_by_role() {
+        return target_indicated_by_role;
+    }
 
+    public void setTarget_indicated_by_role(Target target_indicated_by_role) {
+        this.target_indicated_by_role = target_indicated_by_role;
+    }
 
 }

@@ -20,7 +20,6 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import world.uav.UAV;
 import world.uav.UAVBase;
@@ -71,7 +70,7 @@ public class AnimationPanel extends JPanel implements MouseListener {
 
     private MyGraphic virtualizer;
 
-    private ArrayList<UAV> attackers;
+    private static ArrayList<UAV> attackers;
     private ArrayList<UAV> scouts;
     private ArrayList<UAV> enemy_uavs;
     private UAVBase uav_base;
@@ -102,7 +101,7 @@ public class AnimationPanel extends JPanel implements MouseListener {
             highlight_obstacle_image_graphics = highlight_obstacle_image_level_3.createGraphics();
 
             //initiate enemy_uav_image
-            enemy_uav_image_level_4 =createBufferedImage();
+            enemy_uav_image_level_4 = createBufferedImage();
             enemy_uav_image_graphics = enemy_uav_image_level_4.createGraphics();
 
             //initiate fog_of_war image
@@ -160,11 +159,23 @@ public class AnimationPanel extends JPanel implements MouseListener {
         }
 
     }
-    
-    private BufferedImage createBufferedImage()
-    {
+
+    public static void setHighlightUAV(int uav_index) {
+        AnimationPanel.highlight_uav_index = uav_index;
+        UAV highlight_uav = null;
+        for (UAV attacker : attackers) {
+            if (attacker.getIndex() == uav_index) {
+                highlight_uav = attacker;
+            }
+        }
+        if (highlight_uav != null) {
+            RightControlPanel.setWorldKnowledge(highlight_uav.getKb());
+        }
+    }
+
+    private BufferedImage createBufferedImage() {
         return new BufferedImage(bound_width, bound_height,
-                    BufferedImage.TYPE_INT_ARGB);
+                BufferedImage.TYPE_INT_ARGB);
     }
 
     private void initParameterFromInitConfig(World world) {
@@ -321,22 +332,29 @@ public class AnimationPanel extends JPanel implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        logger.debug("clicked");
         StaticInitConfig.SIMULATION_ON = true;
-        Point mouse_point = e.getPoint();
+        int chosen_attacker_index = findChosenAttacker(e.getPoint());
+        AnimationPanel.setHighlightUAV(chosen_attacker_index);
+    }
+
+    private int findChosenAttacker(Point mouse_point) {
         float[] mouse_point_coord = new float[]{(float) mouse_point.getX(), (float) mouse_point.getY()};
         for (UAV attacker : attackers) {
             float[] center_coord = attacker.getCenter_coordinates();
             float dist = DistanceUtil.distanceBetween(center_coord, mouse_point_coord);
-            if (dist < attacker.getUav_radar().getRadius() * 1.5) {
-                highlight_uav_index = attacker.getIndex();
+            if (dist < attacker.getUav_radar().getRadius()) {
+                return attacker.getIndex();
             }
         }
+        return -1;
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON3) {
+            int chosen_attacker_index = findChosenAttacker(e.getPoint());
+            AnimationPanel.setHighlightUAV(chosen_attacker_index);
+            my_popup_menu.setChoosedAttackerIndex(chosen_attacker_index);
             my_popup_menu.show(this, e.getX(), e.getY());
             StaticInitConfig.SIMULATION_ON = false;
         }
