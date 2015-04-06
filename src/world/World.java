@@ -171,22 +171,6 @@ public class World implements KnowledgeAwareInterface {
         }
     }
 
-    private void updateScoutCoordinate() {
-        int i = 1;
-        for (UAV scout : this.scouts) {
-            boolean moved = scout.moveToNextWaypoint();
-            Target uav_target = scout.getRole_target();
-            if (moved || uav_target == null) {
-                continue;
-            }
-            while (!moved) {
-                logger.debug("generate path and previous size=" + scout.getPath_prefound().size());
-                scout.pathPlan();
-                moved = scout.moveToNextWaypoint();
-            }
-        }
-    }
-
     private void planPathForAllAttacker() {
         for (UAV attacker : this.attackers) {
             attacker.pathPlan();
@@ -194,18 +178,12 @@ public class World implements KnowledgeAwareInterface {
     }
 
     private void updateAttackerCoordinate() {
-        int i = 1;
         for (UAV attacker : this.attackers) {
             boolean moved = attacker.moveToNextWaypoint();
             Target uav_target = attacker.getRole_target();
             if (moved || uav_target == null) {
                 continue;
             }
-//            while (!moved) {
-//                logger.debug("generate path and previous size=" + attacker.getPath_prefound().size());
-//                attacker.pathPlan();
-//                moved = attacker.moveToNextWaypoint();
-//            }
         }
     }
 
@@ -232,9 +210,18 @@ public class World implements KnowledgeAwareInterface {
         updateAttackerCoordinate();
         resetDecisionParameter();
         this.time_step++;
-//        logger.debug("timestep=" + this.time_step);
     }
 
+    public float getTotalHistoryPathLen()
+    {
+        float total_path_len=0;
+        for(UAV attacker:attackers)
+        {
+            total_path_len+=attacker.getHistory_path().getPath_length();
+        }
+        return total_path_len;
+    }
+    
     @Override
     public ArrayList<Obstacle> getObstacles() {
         return this.kb.getObstacles();

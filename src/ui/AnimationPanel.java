@@ -19,7 +19,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import javax.swing.JPanel;
 import world.uav.UAV;
 import world.uav.UAVBase;
@@ -84,11 +86,17 @@ public class AnimationPanel extends JPanel implements MouseListener {
     public static int highlight_obstacle_index = -1;
     public static int highlight_threat_index = -1;
 
+    private long simulation_time_in_milli_seconds = 0;
+
     private MyPopupMenu my_popup_menu;
 
     private static int uav_base_line_width = 3;
 
     public AnimationPanel() {
+        initComponents();
+    }
+
+    public void initComponents() {
         try {
             transparent_color = GraphicConfig.transparent_color;
             Color fog_of_war_color = GraphicConfig.fog_of_war_color;//Color.black;
@@ -150,10 +158,6 @@ public class AnimationPanel extends JPanel implements MouseListener {
             //initiate parameters according to world
             this.initParameterFromInitConfig(world);
 
-            //drive the world and ui
-            StaticInitConfig.SIMULATION_WITH_UI_TIMER = new javax.swing.Timer(StaticInitConfig.INIT_SIMULATION_DELAY, new animatorListener(this));
-            StaticInitConfig.SIMULATION_WITH_UI_TIMER.start();
-
             my_popup_menu = new MyPopupMenu(world);
             this.addMouseListener(this);
 
@@ -161,6 +165,12 @@ public class AnimationPanel extends JPanel implements MouseListener {
             logger.error(ex);
         }
 
+    }
+
+    public void start() {
+        //drive the world and ui
+        StaticInitConfig.SIMULATION_WITH_UI_TIMER = new javax.swing.Timer(StaticInitConfig.INIT_SIMULATION_DELAY, new animatorListener(this));
+        StaticInitConfig.SIMULATION_WITH_UI_TIMER.start();
     }
 
     public static void setHighlightUAV(int uav_index) {
@@ -183,7 +193,8 @@ public class AnimationPanel extends JPanel implements MouseListener {
 
     /**
      * Initiate parameter of world
-     * @param world 
+     *
+     * @param world
      */
     private void initParameterFromInitConfig(World world) {
         this.bound_width = world.getBound_width();
@@ -214,7 +225,8 @@ public class AnimationPanel extends JPanel implements MouseListener {
 
     /**
      * Draw Target
-     * @param static_threats 
+     *
+     * @param static_threats
      */
     private void initTargetInObstacleImageLevel2(ArrayList<Threat> threats) {
         for (Threat threat : threats) {
@@ -227,7 +239,8 @@ public class AnimationPanel extends JPanel implements MouseListener {
 
     /**
      * Initiate the parameters of UAV
-     * @param uav_image_graphics 
+     *
+     * @param uav_image_graphics
      */
     private void initUAVBase(Graphics2D uav_image_graphics) {
         uav_image_graphics.setColor(Color.white);
@@ -371,8 +384,9 @@ public class AnimationPanel extends JPanel implements MouseListener {
     public void mousePressed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON3) {
             int chosen_attacker_index = findChosenAttacker(e.getPoint());
-            if(chosen_attacker_index==-1)
+            if (chosen_attacker_index == -1) {
                 return;
+            }
             AnimationPanel.setHighlightUAV(chosen_attacker_index);
             my_popup_menu.setChoosedAttackerIndex(chosen_attacker_index);
             my_popup_menu.show(this, e.getX(), e.getY());
@@ -408,15 +422,25 @@ public class AnimationPanel extends JPanel implements MouseListener {
 
         /**
          * real-time undates of all simulation objects
-         * @param e 
+         *
+         * @param e
          */
         public void actionPerformed(ActionEvent e) {
             clearUAVImageBeforeUpdate();
             if (StaticInitConfig.SIMULATION_ON) {
                 world.updateAll();
+                simulation_time_in_milli_seconds += StaticInitConfig.INIT_SIMULATION_DELAY;
+                long seconds=simulation_time_in_milli_seconds/1000;
+                long hours=seconds/3600;
+                long minimutes=(seconds-hours*3600)/60;
+                seconds=seconds-hours*3600-minimutes*60;
+                String simulated_time_str=String.format("%1$02d:%2$02d:%3$02d", hours,minimutes,seconds);
+                ControlPanel.jFormattedTextField1.setText(simulated_time_str);
+                ControlPanel.setTotalHistoryPathLen(world.getTotalHistoryPathLen());
             }
             updateImageCausedByUAVMovement();
             repaint();
+
 //            logger.debug(panel.getSize().width + "-" + panel.getSize().height);
         }
     }
