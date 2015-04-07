@@ -16,7 +16,7 @@ import javax.swing.tree.TreePath;
  *
  * @author boluo
  */
-public class WorldKnowledge implements TreeModel {
+public class WorldKnowledge extends KnowledgeInterface {
 
     private String rootNode = StaticInitConfig.UAV_KNOWLEDGE;
     private String firstChild = StaticInitConfig.OBSTACLE_INFO;
@@ -129,20 +129,7 @@ public class WorldKnowledge implements TreeModel {
     }
 // Misc methods
 
-    /**
-     * Notifies the listener that the structure below a given node has been
-     * completely changed.
-     *
-     * @param path the sequence of nodes that lead up the tree to the root node.
-     */
-    private void fireStructureChanged(TreePath path) {
-        TreeModelEvent event = new TreeModelEvent(this, path);
-        for (int i=0;i<treeModelListeners.size();i++) {
-            TreeModelListener lis=treeModelListeners.get(i);
-            lis.treeStructureChanged(event);
-        }
-    }
-
+    @Override
     public boolean deleteComponent(TreePath path, Object leaf_node) {
         boolean result = false;
         if (obstacles.contains(leaf_node)) {
@@ -156,18 +143,12 @@ public class WorldKnowledge implements TreeModel {
         return result;
     }
 
-    public void addTreeModelListener(TreeModelListener l) {
-        treeModelListeners.add(l);
-    }
-
-    public void removeTreeModelListener(TreeModelListener l) {
-        treeModelListeners.remove(l);
-    }
-
+    @Override
     public ArrayList<Obstacle> getObstacles() {
         return obstacles;
     }
 
+    @Override
     public void setObstacles(ArrayList<Obstacle> obstacles) {
         if (obstacles == null) {
             return;
@@ -175,10 +156,12 @@ public class WorldKnowledge implements TreeModel {
         this.obstacles = obstacles;
     }
 
+    @Override
     public ArrayList<Threat> getThreats() {
         return threats;
     }
 
+    @Override
     public void setThreats(ArrayList<Threat> threats) {
         if (threats == null) {
             return;
@@ -186,18 +169,12 @@ public class WorldKnowledge implements TreeModel {
         this.threats = threats;
     }
 
-    public ArrayList<Object> getRoot_child() {
-        return root_child;
-    }
-
-    public void setRoot_child(ArrayList<Object> root_child) {
-        this.root_child = root_child;
-    }
-
+    @Override
     public ArrayList<Conflict> getConflicts() {
         return conflicts;
     }
 
+    @Override
     public void setConflicts(ArrayList<Conflict> conflicts) {
         if (conflicts == null) {
             return;
@@ -205,27 +182,33 @@ public class WorldKnowledge implements TreeModel {
         this.conflicts = conflicts;
     }
 
+    @Override
     public void addConflict(Conflict conflict) {
         this.conflicts.add(conflict);
     }
 
+    @Override
     public void addThreat(Threat threat) {
         this.threats.add(threat);
     }
 
+    @Override
     public boolean containsObstacle(Obstacle obstacle) {
         return this.obstacles.contains(obstacle);
     }
 
+    @Override
     public boolean containsThreat(Threat threat) {
         return this.threats.contains(threat);
     }
 
+    @Override
     public boolean containsConflict(Conflict conflict)
     {
         return this.conflicts.contains(conflict);
     }
     
+    @Override
     public void addObstacle(Obstacle obstacle) {
         if (this.obstacles == null) {
             this.obstacles = new ArrayList<Obstacle>();

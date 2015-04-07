@@ -17,6 +17,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import world.World;
+import world.model.KnowledgeInterface;
 import world.model.WorldKnowledge;
 
 /**
@@ -25,7 +26,7 @@ import world.model.WorldKnowledge;
  */
 public class RightControlPanel extends javax.swing.JPanel implements TreeSelectionListener,MouseListener,ActionListener {
 
-    private static WorldKnowledge kb;
+    private static KnowledgeInterface kb;
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RightControlPanel.class);
     private JPopupMenu popMenu;
     /**
@@ -80,7 +81,7 @@ public class RightControlPanel extends javax.swing.JPanel implements TreeSelecti
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    public static void setWorldKnowledge(WorldKnowledge kb)
+    public static void setWorldKnowledge(KnowledgeInterface kb)
     {
         RightControlPanel.kb=kb;
         RightControlPanel.jTree1.setModel(kb);

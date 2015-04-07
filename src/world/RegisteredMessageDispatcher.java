@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import world.model.Conflict;
+import world.model.KnowledgeInterface;
 import world.model.Obstacle;
 import world.model.Target;
 import world.model.Threat;
@@ -58,7 +59,7 @@ public class RegisteredMessageDispatcher extends MessageDispatcher {
         int attacker_num = attackers.size();
         for (int i = 0; i < attacker_num; i++) {
             UAV attacker = attackers.get(i);
-            WorldKnowledge kb = attacker.getKb();
+            KnowledgeInterface kb = attacker.getKb();
             int attacker_index = attacker.getIndex();
             int threat_index = this.target_registered.get(attacker_index);
             Rectangle gis_rect = this.gis_rect_registered.get(attacker_index);

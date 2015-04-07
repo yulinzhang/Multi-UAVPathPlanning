@@ -20,6 +20,7 @@ import world.model.Obstacle;
 import world.World;
 import world.model.Conflict;
 import world.model.KnowledgeAwareInterface;
+import world.model.KnowledgeInterface;
 import world.model.Target;
 import world.model.Threat;
 import world.model.WorldKnowledge;
@@ -44,7 +45,7 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
     private boolean need_to_replan = true;
 
     //variables for path planning
-    private WorldKnowledge kb;
+    private KnowledgeInterface kb;
 
     private RRTAlg rrt_alg;
     private RRTTree rrt_tree;
@@ -300,7 +301,7 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
         }
     }
 
-    public WorldKnowledge getKb() {
+    public KnowledgeInterface getKb() {
         return kb;
     }
 

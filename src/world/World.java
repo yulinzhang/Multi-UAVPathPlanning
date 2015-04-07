@@ -13,10 +13,10 @@ import java.util.ArrayList;
 import java.util.TreeSet;
 import world.uav.UAV;
 import world.uav.UAVBase;
-import util.ConflictCheckUtil;
 import util.DistanceUtil;
 import world.model.Conflict;
 import world.model.KnowledgeAwareInterface;
+import world.model.KnowledgeInterface;
 import world.model.Target;
 import world.model.WorldKnowledge;
 
@@ -46,7 +46,7 @@ public class World implements KnowledgeAwareInterface {
 
     //robot coordinates, robot_coordinates[1][0], robot_coordinates[1][1] represents the x, y coordinate of robot 1
     private UAVBase uav_base;
-    public static WorldKnowledge kb;
+    public static KnowledgeInterface kb;
     /**
      * * internal variables
      *
