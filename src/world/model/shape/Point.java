@@ -5,11 +5,13 @@
  */
 package world.model.shape;
 
+import world.Message;
+
 /**
  *
  * @author boluo
  */
-public class Point {
+public class Point extends Message{
     protected double x;
     protected double y;
     protected double z=0;

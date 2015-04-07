@@ -99,39 +99,38 @@ public class World implements KnowledgeAwareInterface {
         uav_base_center[0] = uav_base_coordinate[0] + uav_base_width / 2;
         uav_base_center[1] = uav_base_coordinate[1] + uav_base_height / 2;
         for (int i = 0; i < attacker_num; i++) {
-            UAV attacker = new UAV(i, this.getThreats().get(i), StaticInitConfig.SIDE_A, uav_base_center, this.getObstacles());
+            UAV attacker = new UAV(i, this.getThreats().get(i), StaticInitConfig.SIDE_A, uav_base_center, null);
             attackers.add(attacker);
         }
         roleAssign(-1, -1);
     }
 
-    private void initEnemyUAV() {
-        for (int i = 0; i < enemy_num; i++) {
-            int target_to_protect = i % threat_num;
-            float[] target_coordinates = this.getThreats().get(target_to_protect).getCoordinates();
-            float[] attacker_coordinates = new float[2];
-            float theta_from_target = (float) (Math.random() * Math.PI * 2);
-            for (float dist = attacker_patrol_range; dist > 0; dist = dist / 2f) {
-                attacker_coordinates[1] = target_coordinates[1] + dist * (float) Math.sin(theta_from_target);
-                attacker_coordinates[0] = target_coordinates[0] + dist * (float) Math.cos(theta_from_target);
-                if (attacker_coordinates[0] < bound_width) {
-                    boolean available = !ConflictCheckUtil.checkPointInObstacles(this.getObstacles(), attacker_coordinates[0], attacker_coordinates[1]);
-                    if (available) {
-                        break;
-                    }
-                }
-            }
-            UAV enemy_uav = new UAV(i, this.getThreats().get(target_to_protect), StaticInitConfig.SIDE_B, attacker_coordinates, this.getObstacles());
-            enemy_uavs.add(enemy_uav);
-        }
-    }
-
+//    private void initEnemyUAV() {
+//        for (int i = 0; i < enemy_num; i++) {
+//            int target_to_protect = i % threat_num;
+//            float[] target_coordinates = this.getThreats().get(target_to_protect).getCoordinates();
+//            float[] attacker_coordinates = new float[2];
+//            float theta_from_target = (float) (Math.random() * Math.PI * 2);
+//            for (float dist = attacker_patrol_range; dist > 0; dist = dist / 2f) {
+//                attacker_coordinates[1] = target_coordinates[1] + dist * (float) Math.sin(theta_from_target);
+//                attacker_coordinates[0] = target_coordinates[0] + dist * (float) Math.cos(theta_from_target);
+//                if (attacker_coordinates[0] < bound_width) {
+//                    boolean available = !ConflictCheckUtil.checkPointInObstacles(this.getObstacles(), attacker_coordinates[0], attacker_coordinates[1]);
+//                    if (available) {
+//                        break;
+//                    }
+//                }
+//            }
+//            UAV enemy_uav = new UAV(i, this.getThreats().get(target_to_protect), StaticInitConfig.SIDE_B, attacker_coordinates, this.getObstacles());
+//            enemy_uavs.add(enemy_uav);
+//        }
+//    }
     private void initUAVs() {
         this.scouts = new ArrayList<UAV>();
         this.attackers = new ArrayList<UAV>();
         this.enemy_uavs = new ArrayList<UAV>();
         initScoutsAndAttackers();
-        initEnemyUAV();
+//        initEnemyUAV();
     }
 
     public void roleAssign(int attacker_index, int uav_assigned_role_index) {
@@ -171,22 +170,6 @@ public class World implements KnowledgeAwareInterface {
         }
     }
 
-    private void updateScoutCoordinate() {
-        int i = 1;
-        for (UAV scout : this.scouts) {
-            boolean moved = scout.moveToNextWaypoint();
-            Target uav_target = scout.getRole_target();
-            if (moved || uav_target == null) {
-                continue;
-            }
-            while (!moved) {
-                logger.debug("generate path and previous size=" + scout.getPath_prefound().size());
-                scout.pathPlan();
-                moved = scout.moveToNextWaypoint();
-            }
-        }
-    }
-
     private void planPathForAllAttacker() {
         for (UAV attacker : this.attackers) {
             attacker.pathPlan();
@@ -194,22 +177,34 @@ public class World implements KnowledgeAwareInterface {
     }
 
     private void updateAttackerCoordinate() {
-        int i = 1;
         for (UAV attacker : this.attackers) {
             boolean moved = attacker.moveToNextWaypoint();
             Target uav_target = attacker.getRole_target();
             if (moved || uav_target == null) {
                 continue;
             }
-//            while (!moved) {
-//                logger.debug("generate path and previous size=" + attacker.getPath_prefound().size());
-//                attacker.pathPlan();
-//                moved = attacker.moveToNextWaypoint();
-//            }
         }
     }
 
     private void detectEvent() {
+        for (UAV attacker : this.attackers) {
+            int obs_list_size = this.getObstacles().size();
+            for (int i = 0; i < obs_list_size; i++) {
+                Obstacle obs = this.getObstacles().get(i);
+                if (!attacker.containsObstacle(obs) && obs.getMbr().intersects(attacker.getUav_radar().getBounds())) {
+                    attacker.addObstacle(obs);
+                    attacker.setNeed_to_replan(true);
+                }
+            }
+            int threat_list_size = this.getThreats().size();
+            for (int i = 0; i < threat_list_size; i++) {
+                Threat threat = this.getThreats().get(i);
+                if (!attacker.containsThreat(threat) && DistanceUtil.distanceBetween(attacker.getCenter_coordinates(), threat.getCoordinates()) < attacker.getUav_radar().getRadius()) {
+                    attacker.addThreat(threat);
+                    attacker.setNeed_to_replan(true);
+                }
+            }
+        }
     }
 
     private void registerInfoRequirement() {
@@ -232,7 +227,14 @@ public class World implements KnowledgeAwareInterface {
         updateAttackerCoordinate();
         resetDecisionParameter();
         this.time_step++;
-//        logger.debug("timestep=" + this.time_step);
+    }
+
+    public float getTotalHistoryPathLen() {
+        float total_path_len = 0;
+        for (UAV attacker : attackers) {
+            total_path_len += attacker.getHistory_path().getPath_length();
+        }
+        return total_path_len;
     }
 
     @Override
@@ -318,6 +320,16 @@ public class World implements KnowledgeAwareInterface {
     @Override
     public void addThreat(Threat threat) {
         this.kb.addThreat(threat);
+    }
+
+    @Override
+    public boolean containsThreat(Threat threat) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean containsObstacle(Obstacle obstacle) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

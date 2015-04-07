@@ -70,6 +70,7 @@ public class RightControlPanel extends javax.swing.JPanel implements TreeSelecti
     public static void setWorldKnowledge(WorldKnowledge kb)
     {
         RightControlPanel.kb=kb;
+        RightControlPanel.jTree1.setModel(kb);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

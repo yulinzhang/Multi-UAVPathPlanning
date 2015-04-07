@@ -31,4 +31,8 @@ public interface KnowledgeAwareInterface {
     public void addConflict(Conflict conflict);
     
     public void addThreat(Threat threat);
+    
+    public boolean containsThreat(Threat threat);
+    
+    public boolean containsObstacle(Obstacle obstacle);
 }

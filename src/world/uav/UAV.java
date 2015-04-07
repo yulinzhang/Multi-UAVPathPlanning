@@ -13,6 +13,7 @@ import java.awt.Color;
 import java.util.LinkedList;
 import java.util.ArrayList;
 import util.DistanceUtil;
+import world.Message;
 
 import world.model.shape.Circle;
 import world.model.Obstacle;
@@ -36,10 +37,10 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
     private Color center_color;
     public Color radar_color;
 
-    private LinkedList<Point> path_planned_at_current_time_step;
+    private UAVPath path_planned_at_current_time_step;
     private int current_index_of_planned_path = 0;
-    private LinkedList<Point> path_planned_at_last_time_step;
-    private LinkedList<Point> history_path;
+    private UAVPath path_planned_at_last_time_step;
+    private UAVPath history_path;
     private boolean need_to_replan = true;
 
     //variables for path planning
@@ -47,7 +48,7 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
 
     private RRTAlg rrt_alg;
     private RRTTree rrt_tree;
-    private int speed = 10;
+    private int speed = 5;
     private float current_angle = -1;
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(UAV.class);
 
@@ -60,8 +61,8 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
     public UAV(int index, Target target, int flag_of_war, float[] center_coordinates, ArrayList<Obstacle> obstacles) {
         super(index, target, flag_of_war, center_coordinates);
         this.uav_radar = new Circle(center_coordinates[0], center_coordinates[1], scout_radar_radius);
-        this.path_planned_at_current_time_step = new LinkedList<Point>();
-        this.history_path = new LinkedList<Point>();
+        this.path_planned_at_current_time_step = new UAVPath();
+        this.history_path = new UAVPath();
         setPreviousWaypoint();
         this.kb = new WorldKnowledge();
         this.kb.setObstacles(obstacles);
@@ -87,16 +88,16 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
         logger.debug("total traj lenght:" + traj.getCost());
         logger.debug("end node:" + traj.getEndPoint());
         logger.debug("goal point:" + end);
-        LinkedList<Point> path = new LinkedList<Point>();
+        UAVPath path = new UAVPath();
         for (Point point : traj.getPoints()) {
-            path.add(point);
+            path.addWaypointToEnd(point);
         }
         this.setPath_prefound(path);
     }
 
     public void pathPlan() {
         if (this.need_to_replan) {
-            this.path_planned_at_last_time_step=this.path_planned_at_current_time_step;
+            this.path_planned_at_last_time_step = this.path_planned_at_current_time_step;
             this.runRRT();
         }
     }
@@ -132,28 +133,39 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
         this.current_index_of_planned_path = -1;
     }
 
-    public boolean moveToNextWaypoint() {
-        current_index_of_planned_path++;
-        if (path_planned_at_current_time_step.size() == 0 || current_index_of_planned_path >= path_planned_at_current_time_step.size()) {
+    private boolean targetReached() {
+        if (this.target_indicated_by_role == null) {
+            return true;
+        } else if (DistanceUtil.distanceBetween(this.center_coordinates, this.target_indicated_by_role.getCoordinates()) < StaticInitConfig.SAFE_DISTANCE_FOR_TARGET) {
+            this.target_indicated_by_role = null;
+            return true;
+        } else {
             return false;
         }
-        Point current_waypoint = this.path_planned_at_current_time_step.get(current_index_of_planned_path);
+
+    }
+
+    public boolean moveToNextWaypoint() {
+        current_index_of_planned_path++;
+        if (path_planned_at_current_time_step.getWaypointNum() == 0 || current_index_of_planned_path >= path_planned_at_current_time_step.getWaypointNum()) {
+            return false;
+        }
+        Point current_waypoint = this.path_planned_at_current_time_step.getWaypoint(current_index_of_planned_path);
         float[] coordinate = current_waypoint.toFloatArray();
         setPreviousWaypoint();
         moveTo(coordinate[0], coordinate[1]);
         this.current_angle = (float) current_waypoint.getYaw();
-
         return true;
     }
 
-    public LinkedList<Point> getPath_planned_at_last_time_step() {
+    public UAVPath getPath_planned_at_last_time_step() {
         return path_planned_at_last_time_step;
     }
 
-    public LinkedList<Point> getFuturePath() {
-        LinkedList<Point> future_path = new LinkedList<Point>();
-        for (int i = current_index_of_planned_path; i < path_planned_at_current_time_step.size(); i++) {
-            future_path.add(path_planned_at_current_time_step.get(i));
+    public UAVPath getFuturePath() {
+        UAVPath future_path = new UAVPath();
+        for (int i = current_index_of_planned_path; i < path_planned_at_current_time_step.getWaypointNum(); i++) {
+            future_path.addWaypointToEnd(path_planned_at_current_time_step.getWaypoint(i));
         }
         return future_path;
     }
@@ -168,7 +180,28 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
 
     private void setPreviousWaypoint() {
         Point previous_waypoint = new Point(this.getCenter_coordinates()[0], this.getCenter_coordinates()[1], this.current_angle);
-        this.history_path.add(previous_waypoint);
+        this.history_path.addWaypointToEnd(previous_waypoint);
+    }
+
+    private void parseMessage(Message msg) {
+        int msg_type = msg.getMsg_type();
+        if (msg_type == Message.CONFLICT_MSG) {
+            Point point = (Point) msg;
+            //TODO:
+        } else if (msg_type == Message.OBSTACLE_MSG) {
+            Obstacle obstacle = (Obstacle) msg;
+            //TODO:
+        } else if (msg_type == Message.THREAT_MSG) {
+            Target threat = (Target) msg;
+            //TODO:
+
+        }
+    }
+
+    public void receiveMesage(LinkedList<Message> msg_list) {
+        for (Message msg : msg_list) {
+            parseMessage(msg);
+        }
     }
 
     public void setNeed_to_replan(boolean need_to_replan) {
@@ -176,7 +209,7 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
     }
 
     public float[] getPrevious_waypoint() {
-        return this.history_path.getLast().toFloatArray();
+        return this.history_path.getLastWaypoint().toFloatArray();
     }
 
     public Circle getUav_radar() {
@@ -188,10 +221,13 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
     }
 
     public LinkedList<Point> getPath_prefound() {
-        return path_planned_at_current_time_step;
+        return path_planned_at_current_time_step.getWaypointsAsLinkedList();
     }
 
-    public void setPath_prefound(LinkedList<Point> path_prefound) {
+//    public void setPath_prefound(LinkedList<Point> path_prefound) {
+//        this.path_planned_at_current_time_step.setWaypoints(path_prefound);
+//    }
+    public void setPath_prefound(UAVPath path_prefound) {
         this.path_planned_at_current_time_step = path_prefound;
     }
 
@@ -231,7 +267,9 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
 
     @Override
     public void addObstacle(Obstacle obs) {
-        this.kb.addObstacle(obs);
+        if (!this.kb.containsObstacle(obs)) {
+            this.kb.addObstacle(obs);
+        }
     }
 
     @Override
@@ -241,7 +279,9 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
 
     @Override
     public void addThreat(Threat threat) {
-        this.kb.addThreat(threat);
+        if (!this.kb.containsThreat(threat)) {
+            this.kb.addThreat(threat);
+        }
     }
 
     public WorldKnowledge getKb() {
@@ -258,6 +298,20 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
 
     public Color getRadar_color() {
         return radar_color;
+    }
+
+    public UAVPath getHistory_path() {
+        return history_path;
+    }
+
+    @Override
+    public boolean containsThreat(Threat threat) {
+        return this.kb.containsThreat(threat);
+    }
+
+    @Override
+    public boolean containsObstacle(Obstacle obstacle) {
+        return this.kb.containsObstacle(obstacle);
     }
 
 }

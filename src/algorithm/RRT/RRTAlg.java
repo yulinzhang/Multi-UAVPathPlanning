@@ -5,6 +5,7 @@
  */
 package algorithm.RRT;
 
+import config.StaticInitConfig;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
@@ -48,7 +49,7 @@ public class RRTAlg {
      * less than goal_range_for_delta means goal reached
      *
      */
-    private float goal_range_for_delta = max_delta_distance;
+    private float goal_range_for_delta = StaticInitConfig.SAFE_DISTANCE_FOR_TARGET;
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RRTAlg.class);
 
     /**

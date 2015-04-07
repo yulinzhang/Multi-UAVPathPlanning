@@ -40,7 +40,7 @@ public class WorldKnowledge implements TreeModel {
         obstacles = new ArrayList<Obstacle>();
         threats = new ArrayList<Threat>();
         conflicts = new ArrayList<Conflict>();
-        init();
+//        init();
     }
 
     private void init() {
@@ -58,7 +58,7 @@ public class WorldKnowledge implements TreeModel {
         Conflict conflict2 = new Conflict(1, null, 1);
         conflicts.add(conflict1);
         conflicts.add(conflict2);
-        
+
     }
 
     @Override
@@ -70,7 +70,7 @@ public class WorldKnowledge implements TreeModel {
     public Object getChild(Object parent, int index) {
         if (parent == rootNode) {
             return root_child.get(index);
-        } else if (root_child.contains(parent)){//parent is in second level
+        } else if (root_child.contains(parent)) {//parent is in second level
             if (parent == firstChild) {
                 return obstacles.get(index);
             } else if (parent == secondChild) {
@@ -140,6 +140,9 @@ public class WorldKnowledge implements TreeModel {
     }
 
     public void setObstacles(ArrayList<Obstacle> obstacles) {
+        if (obstacles == null) {
+            return;
+        }
         this.obstacles = obstacles;
     }
 
@@ -148,6 +151,9 @@ public class WorldKnowledge implements TreeModel {
     }
 
     public void setThreats(ArrayList<Threat> threats) {
+        if (threats == null) {
+            return;
+        }
         this.threats = threats;
     }
 
@@ -164,25 +170,34 @@ public class WorldKnowledge implements TreeModel {
     }
 
     public void setConflicts(ArrayList<Conflict> conflicts) {
+        if (conflicts == null) {
+            return;
+        }
         this.conflicts = conflicts;
     }
-    
-    public void addConflict(Conflict conflict)
-    {
+
+    public void addConflict(Conflict conflict) {
         this.conflicts.add(conflict);
     }
-    
-    public void addThreat(Threat threat)
-    {
+
+    public void addThreat(Threat threat) {
         this.threats.add(threat);
     }
-    
-    public void addObstacle(Obstacle obstacle)
+
+    public boolean containsObstacle(Obstacle obstacle)
     {
+        return this.obstacles.contains(obstacle);
+    }
+    public boolean containsThreat(Threat threat)
+    {
+        return this.threats.contains(threat);
+    }
+    
+    public void addObstacle(Obstacle obstacle) {
+        if (this.obstacles == null) {
+            this.obstacles = new ArrayList<Obstacle>();
+        }
         this.obstacles.add(obstacle);
     }
 
-
-    
-    
 }

@@ -99,6 +99,17 @@ public class ConflictCheckUtil {
         return false;
     }
     
+    /** return true if two rectangle intersects
+     * 
+     * @param rect1
+     * @param rect2
+     * @return 
+     */
+    public static boolean checkMBRIntersected(Rectangle rect1,Rectangle rect2)
+    {
+        return rect1.intersects(rect2);
+    }
+    
     public static void main(String[] args)
     {
 

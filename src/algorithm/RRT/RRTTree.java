@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import util.DistanceUtil;
 import util.VectorUtil;
 import world.model.shape.Point;
+import world.uav.UAVPath;
 
 /**
  *
@@ -25,7 +26,7 @@ public class RRTTree {
      * variable to store the path
      *
      */
-    private LinkedList<Point> path_found;
+    private UAVPath path_found;
 
     //static double dist = 0;
     //static Node closestNode = null;        
@@ -33,7 +34,7 @@ public class RRTTree {
         vertices = new ArrayList<RRTNode>();
         children_of_vertices = new ArrayList<ArrayList<RRTNode>>();
         parents_of_vertices = new ArrayList<RRTNode>();
-        path_found = new LinkedList<Point>();
+        path_found = new UAVPath();
     }
 
     /**
@@ -128,16 +129,16 @@ public class RRTTree {
 
     public void generatePath(RRTNode n) {
         Point point=new Point(n.getCoordinate()[0],n.getCoordinate()[1],n.getCurrent_angle());
-        path_found.addFirst(point);
+        path_found.addWaypointToBeginning(point);
         RRTNode parent = this.getParent(n);
         while (parent != null) {
             Point parent_point=new Point(parent.getCoordinate()[0],parent.getCoordinate()[1],parent.getCurrent_angle());
-            path_found.addFirst(parent_point);
+            path_found.addWaypointToBeginning(parent_point);
             parent = this.getParent(parent);
         }
     }
 
-    public LinkedList<Point> getPath_found() {
+    public UAVPath getPath_found() {
         return path_found;
     }
 

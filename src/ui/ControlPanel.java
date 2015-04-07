@@ -27,6 +27,11 @@ public class ControlPanel extends javax.swing.JPanel {
     public ControlPanel() {
         initComponents();
     }
+    
+    public static void setTotalHistoryPathLen(float path_len)
+    {
+        ControlPanel.jLabel2.setText("总路径:"+(int)path_len);
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -53,6 +58,7 @@ public class ControlPanel extends javax.swing.JPanel {
         jButton7 = new javax.swing.JButton();
         jSplitPane8 = new javax.swing.JSplitPane();
         jButton4 = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
 
         jSplitPane1.setDividerLocation(100);
         jSplitPane1.setDividerSize(1);
@@ -79,8 +85,13 @@ public class ControlPanel extends javax.swing.JPanel {
         jFormattedTextField1.setEditable(false);
         jFormattedTextField1.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(java.text.DateFormat.getTimeInstance())));
         jFormattedTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jFormattedTextField1.setText("20:52:58");
+        jFormattedTextField1.setText("00:00:00");
         jFormattedTextField1.setFont(new java.awt.Font("Times New Roman", 1, 18)); // NOI18N
+        jFormattedTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jFormattedTextField1ActionPerformed(evt);
+            }
+        });
         jSplitPane4.setLeftComponent(jFormattedTextField1);
 
         jSplitPane2.setLeftComponent(jSplitPane4);
@@ -152,6 +163,9 @@ public class ControlPanel extends javax.swing.JPanel {
         });
         jSplitPane8.setTopComponent(jButton4);
 
+        jLabel2.setText("总路径:");
+        jSplitPane8.setRightComponent(jLabel2);
+
         jSplitPane3.setRightComponent(jSplitPane8);
 
         jSplitPane1.setRightComponent(jSplitPane3);
@@ -222,6 +236,10 @@ public class ControlPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jFormattedTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFormattedTextField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jFormattedTextField1ActionPerformed
+
     private void setSimulationDelayWithSpeed(float speed_times) {
         this.jLabel1.setText(this.simulation_speed_text + speed_times);
         int delay = (int) (StaticInitConfig.INIT_SIMULATION_DELAY / speed_times); //unpdate sychronously simulation delay 
@@ -235,8 +253,9 @@ public class ControlPanel extends javax.swing.JPanel {
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
-    private javax.swing.JFormattedTextField jFormattedTextField1;
+    public static javax.swing.JFormattedTextField jFormattedTextField1;
     private javax.swing.JLabel jLabel1;
+    private static javax.swing.JLabel jLabel2;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JSplitPane jSplitPane3;

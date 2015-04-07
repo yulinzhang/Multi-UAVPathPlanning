@@ -21,7 +21,7 @@ import world.uav.UAV;
 import world.model.shape.Circle;
 import world.model.Obstacle;
 import world.model.Threat;
-import world.model.shape.Point;
+import world.uav.UAVPath;
 
 /**
  *
@@ -65,14 +65,14 @@ public class MyGraphic {
     public void drawUAVPlannedPath(Graphics2D graphics, UAV uav, Color uav_planned_path_color) {
         graphics.setColor(uav.getCenter_color());
         graphics.setStroke(new BasicStroke(2.0f)); //Set the width of the stroke
-        LinkedList<Point> planned_path = uav.getFuturePath();
-        int planned_path_size = planned_path.size();
+        UAVPath planned_path = uav.getFuturePath();
+        int planned_path_size = planned_path.getWaypointNum();
         float[] current_waypoint;
         float[] next_waypoint;
         for (int i = 0; i < planned_path_size; i++) {
-            current_waypoint = planned_path.get(i).toFloatArray();
+            current_waypoint = planned_path.getWaypoint(i).toFloatArray();
             if (i + 1 < planned_path_size) {
-                next_waypoint = planned_path.get(i + 1).toFloatArray();
+                next_waypoint = planned_path.getWaypoint(i + 1).toFloatArray();
                 graphics.drawLine((int) current_waypoint[0], (int) current_waypoint[1], (int) next_waypoint[0], (int) next_waypoint[1]);
 
             }
@@ -83,11 +83,11 @@ public class MyGraphic {
                 new float[]{0.5f, 2}, 0);
         graphics.setStroke(bs);
         planned_path = uav.getPath_planned_at_last_time_step();
-        planned_path_size = planned_path.size();
+        planned_path_size = planned_path.getWaypointNum();
         for (int i = 0; i < planned_path_size; i++) {
-            current_waypoint = planned_path.get(i).toFloatArray();
+            current_waypoint = planned_path.getWaypoint(i).toFloatArray();
             if (i + 1 < planned_path_size) {
-                next_waypoint = planned_path.get(i + 1).toFloatArray();
+                next_waypoint = planned_path.getWaypoint(i + 1).toFloatArray();
                 graphics.drawLine((int) current_waypoint[0], (int) current_waypoint[1], (int) next_waypoint[0], (int) next_waypoint[1]);
             }
         }

@@ -5,11 +5,13 @@
  */
 package world.model;
 
+import world.Message;
+
 /**
  *
  * @author boluo
  */
-public class Target{
+public class Target extends Message{
     protected float[] coordinates;
     protected int index;
     public Target(int index,float[] coordinates) {
