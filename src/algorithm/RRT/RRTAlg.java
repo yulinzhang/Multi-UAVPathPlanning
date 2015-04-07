@@ -110,6 +110,7 @@ public class RRTAlg {
             }
         }
         G.generatePath(new_node);
+//        G.setPath_found(null);
         return G;
     }
 

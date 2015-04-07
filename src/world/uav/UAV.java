@@ -98,7 +98,24 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
     public void pathPlan() {
         if (this.need_to_replan) {
             this.path_planned_at_last_time_step = this.path_planned_at_current_time_step;
-            this.runRRT();
+            UAVPath shortest_path = null;
+            float shotest_path_length = Float.MAX_VALUE;
+            for (int i = 0; i <= 4; i++) {
+                this.runRRT();
+                if (!this.path_planned_at_current_time_step.pathReachEndPoint(this.target_indicated_by_role.getCoordinates())) {
+                    i--;
+                    continue;
+                }
+                if (this.path_planned_at_current_time_step.getPath_length() < shotest_path_length) {
+                    shotest_path_length = this.path_planned_at_current_time_step.getPath_length();
+                    shortest_path = this.path_planned_at_current_time_step;
+                }
+            }
+            if (shortest_path != null) {
+                this.path_planned_at_current_time_step = shortest_path;
+            }else{
+                logger.error("null path");
+            }
         }
     }
 

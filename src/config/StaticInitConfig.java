@@ -42,10 +42,10 @@ public class StaticInitConfig {
 
     public static float rrt_goal_toward_probability = 0.8f;
     public static int rrt_iteration_times = 1000;
-    public static int SAFE_DISTANCE_FOR_TARGET=3;
+    public static int SAFE_DISTANCE_FOR_TARGET=5;
 
     //how much time it takes to drive the simulaiton to next time step
-    public static int INIT_SIMULATION_DELAY = 500; //milliseconds,this value will be set according to the user's simulation speed
+    public static int INIT_SIMULATION_DELAY = 100; //milliseconds,this value will be set according to the user's simulation speed
     public static Timer SIMULATION_WITH_UI_TIMER; //simulation Timer
 
     public static boolean SHOW_PLANNED_PATH = true;

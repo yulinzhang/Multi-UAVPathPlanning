@@ -141,5 +141,10 @@ public class RRTTree {
     public UAVPath getPath_found() {
         return path_found;
     }
+    
+    public void setPath_found(UAVPath path)
+    {
+        this.path_found=path;
+    }
 
 }

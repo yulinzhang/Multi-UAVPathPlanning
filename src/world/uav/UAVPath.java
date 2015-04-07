@@ -5,6 +5,7 @@
  */
 package world.uav;
 
+import config.StaticInitConfig;
 import java.util.LinkedList;
 import util.DistanceUtil;
 import world.model.shape.Point;
@@ -68,6 +69,17 @@ public class UAVPath {
 
     public void setPath_length(float path_length) {
         this.path_length = path_length;
+    }
+    
+    public boolean pathReachEndPoint(float[] target_coord)
+    {
+        float dist_to_target=DistanceUtil.distanceBetween(this.waypoints.getLast().toFloatArray(), target_coord);
+        if(dist_to_target<StaticInitConfig.SAFE_DISTANCE_FOR_TARGET)
+        {
+            return true;
+        }else{
+            return false;
+        }
     }
 
 }
