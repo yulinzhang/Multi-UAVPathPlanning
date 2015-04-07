@@ -11,7 +11,7 @@ import world.Message;
  *
  * @author boluo
  */
-public class Point extends Message{
+public class Point{
     protected double x;
     protected double y;
     protected double z=0;

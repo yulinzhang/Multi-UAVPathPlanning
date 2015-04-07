@@ -6,8 +6,15 @@
 package ui;
 
 import config.StaticInitConfig;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import world.World;
 import world.model.WorldKnowledge;
@@ -16,20 +23,26 @@ import world.model.WorldKnowledge;
  *
  * @author boluo
  */
-public class RightControlPanel extends javax.swing.JPanel implements TreeSelectionListener {
+public class RightControlPanel extends javax.swing.JPanel implements TreeSelectionListener,MouseListener,ActionListener {
 
     private static WorldKnowledge kb;
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RightControlPanel.class);
-
+    private JPopupMenu popMenu;
     /**
      * Creates new form RightControlPanel
      */
     public RightControlPanel() {
         initComponents();
+        RightControlPanel.jTree1.addMouseListener(this);
         RightControlPanel.jTree1.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         RightControlPanel.jTree1.addTreeSelectionListener(this);
         RightControlPanel.kb = World.kb;
         RightControlPanel.jTree1.setModel(kb);
+        
+        popMenu=new JPopupMenu();
+        JMenuItem dellItem=new JMenuItem("删除");
+        popMenu.add(dellItem);
+        dellItem.addActionListener(this);
     }
 
     /**
@@ -104,5 +117,42 @@ public class RightControlPanel extends javax.swing.JPanel implements TreeSelecti
             AnimationPanel.highlight_threat_index = -1;
             AnimationPanel.highlight_uav_index = -1;
         }
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        TreePath path=RightControlPanel.jTree1.getPathForLocation(e.getX(), e.getY());
+        if(path==null)
+            return;
+        RightControlPanel.jTree1.setSelectionPath(path);
+        boolean is_leaf_selected= RightControlPanel.kb.isLeaf(path.getLastPathComponent());
+        if(e.getButton()==MouseEvent.BUTTON3 && is_leaf_selected)
+        {
+            popMenu.show(jTree1, e.getX(), e.getY());
+        }
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        TreePath path=RightControlPanel.jTree1.getSelectionPath();
+        RightControlPanel.kb.deleteComponent(path,RightControlPanel.jTree1.getLastSelectedPathComponent());
+        RightControlPanel.jTree1.setModel(RightControlPanel.kb);
+        RightControlPanel.jTree1.removeSelectionPath(path);
     }
 }

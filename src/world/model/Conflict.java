@@ -7,13 +7,14 @@ package world.model;
 
 import config.StaticInitConfig;
 import java.util.LinkedList;
+import world.Message;
 import world.model.shape.Point;
 
 /**
  *
  * @author boluo
  */
-public class Conflict {
+public class Conflict extends Message{
 
     private int uav_index;
     private LinkedList<Point> path_prefound;
@@ -24,6 +25,7 @@ public class Conflict {
         this.uav_index=uav_index;
         this.path_prefound=path_prefound;
         this.decision_time_step=decision_time_step;
+        this.msg_type=Message.CONFLICT_MSG;
     }
     public int getUav_index() {
         return uav_index;
@@ -54,6 +56,11 @@ public class Conflict {
     public String toString()
     {
         return StaticInitConfig.CONFLICT_NAME+this.uav_index;
+    }
+
+    @Override
+    public int getMsgSize() {
+        return this.path_prefound.size();
     }
     
 }

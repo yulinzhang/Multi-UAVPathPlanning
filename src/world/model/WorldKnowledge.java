@@ -7,6 +7,7 @@ package world.model;
 
 import config.StaticInitConfig;
 import java.util.ArrayList;
+import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -126,6 +127,34 @@ public class WorldKnowledge implements TreeModel {
         }
         return -1;
     }
+// Misc methods
+
+    /**
+     * Notifies the listener that the structure below a given node has been
+     * completely changed.
+     *
+     * @param path the sequence of nodes that lead up the tree to the root node.
+     */
+    private void fireStructureChanged(TreePath path) {
+        TreeModelEvent event = new TreeModelEvent(this, path);
+        for (int i=0;i<treeModelListeners.size();i++) {
+            TreeModelListener lis=treeModelListeners.get(i);
+            lis.treeStructureChanged(event);
+        }
+    }
+
+    public boolean deleteComponent(TreePath path, Object leaf_node) {
+        boolean result = false;
+        if (obstacles.contains(leaf_node)) {
+            result = obstacles.remove(leaf_node);
+        } else if (threats.contains(leaf_node)) {
+            result = threats.remove(leaf_node);
+        } else if (conflicts.contains(leaf_node)) {
+            result = conflicts.remove(leaf_node);
+        }
+        this.fireStructureChanged(path);
+        return result;
+    }
 
     public void addTreeModelListener(TreeModelListener l) {
         treeModelListeners.add(l);
@@ -184,13 +213,17 @@ public class WorldKnowledge implements TreeModel {
         this.threats.add(threat);
     }
 
-    public boolean containsObstacle(Obstacle obstacle)
-    {
+    public boolean containsObstacle(Obstacle obstacle) {
         return this.obstacles.contains(obstacle);
     }
-    public boolean containsThreat(Threat threat)
-    {
+
+    public boolean containsThreat(Threat threat) {
         return this.threats.contains(threat);
+    }
+
+    public boolean containsConflict(Conflict conflict)
+    {
+        return this.conflicts.contains(conflict);
     }
     
     public void addObstacle(Obstacle obstacle) {

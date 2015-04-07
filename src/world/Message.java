@@ -9,15 +9,16 @@ package world;
  *
  * @author Yulin_Zhang
  */
-public class Message {
-    private int msg_id=-1;
-    private int msg_type=-1;
-    private String content=null;
+public abstract class Message {
+    public int msg_id=-1;
+    public int msg_type=-1;
+    public String content=null;
     
     public static int CONFLICT_MSG=1;
     public static int OBSTACLE_MSG=2;
     public static int THREAT_MSG=3;
 
+    public abstract int getMsgSize();
     
     public int getMsg_type() {
         return msg_type;

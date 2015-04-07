@@ -95,8 +95,9 @@ public class RRTAlg {
             nearest_node = nearestVertex(random_goal, G);
             //extend the child node and validate its confliction 
             new_node = extendTowardGoalWithDynamics(nearest_node, random_goal, this.max_delta_distance, max_angle);
-
-            boolean conflicted = ConflictCheckUtil.checkNodeInObstacles(obstacles, new_node);
+            new_node.setExpected_time_step(nearest_node.getExpected_time_step()+1);
+            
+            boolean conflicted = ConflictCheckUtil.checkNodeInObstacles(obstacles, new_node)||ConflictCheckUtil.checkUAVConflict(new_node,null,StaticInitConfig.SAFE_DISTANCE_FOR_CONFLICT);
 //            boolean within_bound = BoundUtil.withinBound(new_node, bound_width, bound_height);
             //if not conflicted,add the child to the tree
             if (!conflicted && true) {

@@ -34,5 +34,10 @@ public class Target extends Message{
     public void setIndex(int index) {
         this.index = index;
     }
+
+    @Override
+    public int getMsgSize() {
+        return 1;
+    }
     
 }

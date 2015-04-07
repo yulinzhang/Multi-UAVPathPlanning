@@ -6,12 +6,15 @@
 package util;
 
 import algorithm.RRT.RRTNode;
+import config.StaticInitConfig;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import ui.AnimationPanel;
+import world.model.Conflict;
 import world.model.Obstacle;
 import world.model.shape.Point;
 import world.model.shape.Trajectory;
+import world.uav.UAVPath;
 
 /**
  *
@@ -51,6 +54,37 @@ public class ConflictCheckUtil {
         return false;
     }
 
+    /** returns true if conflicted
+     * 
+     * @param uav_future_path
+     * @param uav_conflict
+     * @param uav_safe_conflict_dist
+     * @return 
+     */
+    public static boolean checkUAVConflict(RRTNode new_node,Conflict uav_conflict, float uav_safe_conflict_dist)
+    {
+        if(uav_conflict==null)
+        {
+            return false;
+        }
+        int uav_conflict_size=uav_conflict.getPath_prefound().size();
+        int new_node_exptected_time_step=new_node.getExpected_time_step();
+        for(int i=0;i<uav_conflict_size;i++)
+        {
+            Point conflict_point=uav_conflict.getPath_prefound().get(i);
+            int conflict_time=conflict_point.getExptected_time_step();
+            
+            if(conflict_time==new_node_exptected_time_step&& DistanceUtil.distanceBetween(conflict_point.toFloatArray(), new_node.getCoordinate())<StaticInitConfig.SAFE_DISTANCE_FOR_CONFLICT)
+            {
+                return true;
+            }else if(conflict_time>new_node_exptected_time_step)
+            {
+                return false;
+            }
+        }
+        return false;
+    }
+    
     /** return true is the trajectory is in obstacles
      * 
      * @param obstacles

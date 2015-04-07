@@ -42,6 +42,8 @@ public class World implements KnowledgeAwareInterface {
     private float threat_radius = 100;
     private float attacker_patrol_range;
 
+    private int inforshare_algorithm = 0;
+
     //robot coordinates, robot_coordinates[1][0], robot_coordinates[1][1] represents the x, y coordinate of robot 1
     private UAVBase uav_base;
     public static WorldKnowledge kb;
@@ -54,6 +56,10 @@ public class World implements KnowledgeAwareInterface {
     private ArrayList<UAV> scouts;
     private int time_step = 0; //times of simulation
 
+    private MessageDispatcher msg_dispatcher;
+
+    private int conflict_times = 0;
+
     private float theta_increase_for_enemy_uav = (float) Math.PI / 40;
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(World.class);
 
@@ -64,7 +70,7 @@ public class World implements KnowledgeAwareInterface {
      * @param init_config
      */
     public World(NonStaticInitConfig init_config) {
-        this.kb = new WorldKnowledge();
+        World.kb = new WorldKnowledge();
         initParameterFromInitConfig(init_config);
         initUAVs();
     }
@@ -75,8 +81,9 @@ public class World implements KnowledgeAwareInterface {
      * @param init_config
      */
     public void initParameterFromInitConfig(NonStaticInitConfig init_config) {
-        this.bound_width = init_config.getBound_width();
-        this.bound_height = init_config.getBound_height();
+        World.bound_width = init_config.getBound_width();
+        World.bound_height = init_config.getBound_height();
+        this.inforshare_algorithm = init_config.getInforshare_algorithm();
 
         this.attacker_num = init_config.getAttacker_num();
         this.scout_num = init_config.getScout_num();
@@ -89,6 +96,14 @@ public class World implements KnowledgeAwareInterface {
         this.setThreats(init_config.getThreats());
         this.setObstacles(init_config.getObstacles());
         this.uav_base = init_config.getUav_base();
+
+        if (this.inforshare_algorithm == StaticInitConfig.BROADCAST_INFOSHARE) {
+            this.msg_dispatcher=new BroadcastMessageDispatcher(this);
+        } else if (this.inforshare_algorithm == StaticInitConfig.REGISTER_BASED_INFORSHARE) {
+            this.msg_dispatcher = new RegisteredMessageDispatcher(this);
+        } else if (this.inforshare_algorithm == StaticInitConfig.NONE_INFORSHARE) {
+            this.msg_dispatcher=new DummyMessageDispatcher(this);
+        }
     }
 
     private void initScoutsAndAttackers() {
@@ -176,8 +191,24 @@ public class World implements KnowledgeAwareInterface {
         }
     }
 
+    private void checkConflict() {
+        for (int i = 0; i < this.attacker_num; i++) {
+            UAV attacker1 = this.attackers.get(i);
+            float[] attacker1_coord = attacker1.getCenter_coordinates();
+            for (int j = i + 1; j < this.attacker_num; j++) {
+                UAV attacker2 = this.attackers.get(j);
+                float[] attacker2_coord = attacker2.getCenter_coordinates();
+                if (DistanceUtil.distanceBetween(attacker1_coord, attacker2_coord) < StaticInitConfig.SAFE_DISTANCE_FOR_CONFLICT) {
+                    conflict_times++;
+                    logger.debug("conflict:" + conflict_times);
+                }
+            }
+        }
+    }
+
     private void updateAttackerCoordinate() {
-        for (UAV attacker : this.attackers) {
+        for (int i = 0; i < this.attacker_num; i++) {
+            UAV attacker = this.attackers.get(i);
             boolean moved = attacker.moveToNextWaypoint();
             Target uav_target = attacker.getRole_target();
             if (moved || uav_target == null) {
@@ -208,13 +239,22 @@ public class World implements KnowledgeAwareInterface {
     }
 
     private void registerInfoRequirement() {
+        for (int i = 0; i < this.attacker_num; i++) {
+            UAV attacker = this.attackers.get(i);
+            Target target = attacker.getTarget_indicated_by_role();
+            float[] attacker_coord = attacker.getCenter_coordinates();
+            this.msg_dispatcher.register(attacker.getIndex(), attacker_coord, target);
+        }
     }
 
     private void shareInfoAfterRegistration() {
+        this.msg_dispatcher.decideAndSumitMsgToSend();
+        this.msg_dispatcher.dispatch();
     }
 
     private void resetDecisionParameter() {
-        for (UAV attacker : this.attackers) {
+        for (int i = 0; i < this.attacker_num; i++) {
+            UAV attacker = this.attackers.get(i);
             attacker.setNeed_to_replan(false);
         }
     }
@@ -225,6 +265,7 @@ public class World implements KnowledgeAwareInterface {
         shareInfoAfterRegistration();
         planPathForAllAttacker();
         updateAttackerCoordinate();
+        checkConflict();
         resetDecisionParameter();
         this.time_step++;
     }

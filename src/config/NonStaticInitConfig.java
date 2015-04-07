@@ -29,6 +29,8 @@ public class NonStaticInitConfig {
     private ArrayList<Threat> threats;
 
     private UAVBase uav_base;
+    private int inforshare_algorithm=0;
+    
 
     //robot coordinates, robot_coordinates[1][0], robot_coordinates[1][1] represents the x, y coordinate of robot 1
     private float attacker_patrol_range = 100;
@@ -39,12 +41,13 @@ public class NonStaticInitConfig {
     
 
     
-    public NonStaticInitConfig(int enemy_num, int threat_num, int attacker_num, int scout_num, UAVBase uav_base) {
+    public NonStaticInitConfig(int enemy_num, int threat_num, int attacker_num, int scout_num, UAVBase uav_base,int inforshare_algorithm) {
         this.enemy_num = enemy_num;
         this.threat_num = threat_num;
         this.attacker_num = attacker_num;
         this.scout_num = scout_num;
         this.uav_base = uav_base;
+        this.inforshare_algorithm=inforshare_algorithm;
         
         initObstacles();
         initThreats();
@@ -56,6 +59,7 @@ public class NonStaticInitConfig {
         this.threat_num=3;
         this.attacker_num=3;
         this.scout_num=0;
+        this.inforshare_algorithm=StaticInitConfig.BROADCAST_INFOSHARE;
         float[] coordinate=new float[]{0,0};
         UAVBase uav_base=new UAVBase(coordinate,100,100);
         this.uav_base=uav_base;
@@ -189,6 +193,14 @@ public class NonStaticInitConfig {
 
     public void setThreats(ArrayList<Threat> threats) {
         this.threats = threats;
+    }
+
+    public int getInforshare_algorithm() {
+        return inforshare_algorithm;
+    }
+
+    public void setInforshare_algorithm(int inforshare_algorithm) {
+        this.inforshare_algorithm = inforshare_algorithm;
     }
 
 }

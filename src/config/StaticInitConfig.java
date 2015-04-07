@@ -43,6 +43,8 @@ public class StaticInitConfig {
     public static float rrt_goal_toward_probability = 0.8f;
     public static int rrt_iteration_times = 1000;
     public static int SAFE_DISTANCE_FOR_TARGET=5;
+    public static int SAFE_DISTANCE_FOR_CONFLICT=1;
+    public static int rrt_planning_times_for_each_uav=4;
 
     //how much time it takes to drive the simulaiton to next time step
     public static int INIT_SIMULATION_DELAY = 100; //milliseconds,this value will be set according to the user's simulation speed
@@ -64,4 +66,8 @@ public class StaticInitConfig {
     public static String THREAT_NAME="威胁";
     public static String OBSTACLE_NAME="障碍";
     public static String CONFLICT_NAME="冲突UAV";
+    
+    public static int BROADCAST_INFOSHARE=0;
+    public static int NONE_INFORSHARE=1;
+    public static int REGISTER_BASED_INFORSHARE=2;
 }

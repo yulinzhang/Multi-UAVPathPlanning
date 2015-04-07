@@ -26,6 +26,7 @@ public class Obstacle extends Message {
         if (shape != null) {
             this.mbr = shape.getBounds();
         }
+        this.msg_type=Message.OBSTACLE_MSG;
     }
 
     public Polygon getShape() {
@@ -55,6 +56,11 @@ public class Obstacle extends Message {
     @Override
     public String toString() {
         return StaticInitConfig.OBSTACLE_NAME + this.index;
+    }
+
+    @Override
+    public int getMsgSize() {
+        return 1;
     }
 
 }

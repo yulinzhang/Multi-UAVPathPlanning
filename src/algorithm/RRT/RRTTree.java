@@ -57,8 +57,10 @@ public class RRTTree {
             addChild(parent, child);
             child.setCurrent_angle(VectorUtil.getAngleOfVectorRelativeToXCoordinate(child.getCoordinate()[0] - parent.getCoordinate()[0], child.getCoordinate()[1] - parent.getCoordinate()[1]));
             child.setPath_lenght_from_root(parent.getPath_lenght_from_root() + DistanceUtil.distanceBetween(parent.getCoordinate(), child.getCoordinate()));
+            child.setExpected_time_step(parent.getExpected_time_step() + 1);
         } else {//root node
             child.setPath_lenght_from_root(0);
+            child.setExpected_time_step(0);
         }
     }
 
@@ -128,11 +130,11 @@ public class RRTTree {
     }
 
     public void generatePath(RRTNode n) {
-        Point point=new Point(n.getCoordinate()[0],n.getCoordinate()[1],n.getCurrent_angle());
+        Point point = new Point(n.getCoordinate()[0], n.getCoordinate()[1], n.getCurrent_angle());
         path_found.addWaypointToBeginning(point);
         RRTNode parent = this.getParent(n);
         while (parent != null) {
-            Point parent_point=new Point(parent.getCoordinate()[0],parent.getCoordinate()[1],parent.getCurrent_angle());
+            Point parent_point = new Point(parent.getCoordinate()[0], parent.getCoordinate()[1], parent.getCurrent_angle());
             path_found.addWaypointToBeginning(parent_point);
             parent = this.getParent(parent);
         }
@@ -141,10 +143,9 @@ public class RRTTree {
     public UAVPath getPath_found() {
         return path_found;
     }
-    
-    public void setPath_found(UAVPath path)
-    {
-        this.path_found=path;
+
+    public void setPath_found(UAVPath path) {
+        this.path_found = path;
     }
 
 }
