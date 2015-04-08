@@ -301,7 +301,7 @@ public class World implements KnowledgeAwareInterface {
         }
         return total_path_len;
     }
-
+    
     @Override
     public ArrayList<Obstacle> getObstacles() {
         return this.kb.getObstacles();
