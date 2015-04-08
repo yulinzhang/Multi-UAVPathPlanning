@@ -294,7 +294,6 @@ public class World implements KnowledgeAwareInterface {
         this.time_step++;
     }
 
-
     public float getTotalHistoryPathLen()
     {
         float total_path_len=0;
