@@ -294,10 +294,13 @@ public class World implements KnowledgeAwareInterface {
         this.time_step++;
     }
 
-    public float getTotalHistoryPathLen() {
-        float total_path_len = 0;
-        for (UAV attacker : attackers) {
-            total_path_len += attacker.getHistory_path().getPath_length();
+
+    public float getTotalHistoryPathLen()
+    {
+        float total_path_len=0;
+        for(UAV attacker:attackers)
+        {
+            total_path_len+=attacker.getHistory_path().getPath_length();
         }
         return total_path_len;
     }
