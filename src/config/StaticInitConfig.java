@@ -34,6 +34,7 @@ public class StaticInitConfig {
     public static Integer STEP_SIZE_OF_SPINNER = 1;
 
     public static String EXTERNAL_KML_FILE_PATH = null; //KML file path stored static obstacle
+    public static String ROBOT_ONTOLOGY_TEMPLATE_FILE_PATH="D:\\KingSoft\\Dissertation\\Simulator\\ontology-owl\\robot_ontology_template.owl";
 
     public static int SIDE_A = 0;
     public static int SIDE_B = 1;
@@ -43,7 +44,7 @@ public class StaticInitConfig {
     public static float rrt_goal_toward_probability = 0.8f;
     public static int rrt_iteration_times = 1000;
     public static int SAFE_DISTANCE_FOR_TARGET=5;
-    public static int SAFE_DISTANCE_FOR_CONFLICT=1;
+    public static int SAFE_DISTANCE_FOR_CONFLICT=5;
     public static int rrt_planning_times_for_each_uav=4;
 
     //how much time it takes to drive the simulaiton to next time step

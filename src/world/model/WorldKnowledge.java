@@ -55,8 +55,8 @@ public class WorldKnowledge extends KnowledgeInterface {
         threats.add(threat1);
         threats.add(threat2);
 
-        Conflict conflict1 = new Conflict(0, null, 1);
-        Conflict conflict2 = new Conflict(1, null, 1);
+        Conflict conflict1 = new Conflict(0, null, 1,2);
+        Conflict conflict2 = new Conflict(1, null, 1,2);
         conflicts.add(conflict1);
         conflicts.add(conflict2);
 
@@ -134,10 +134,13 @@ public class WorldKnowledge extends KnowledgeInterface {
         boolean result = false;
         if (obstacles.contains(leaf_node)) {
             result = obstacles.remove(leaf_node);
+            obstacle_num--;
         } else if (threats.contains(leaf_node)) {
             result = threats.remove(leaf_node);
+            threat_num--;
         } else if (conflicts.contains(leaf_node)) {
             result = conflicts.remove(leaf_node);
+            conflict_num--;
         }
         this.fireStructureChanged(path);
         return result;
@@ -154,6 +157,7 @@ public class WorldKnowledge extends KnowledgeInterface {
             return;
         }
         this.obstacles = obstacles;
+        obstacle_num=obstacles.size();
     }
 
     @Override
@@ -167,6 +171,7 @@ public class WorldKnowledge extends KnowledgeInterface {
             return;
         }
         this.threats = threats;
+        threat_num=threats.size();
     }
 
     @Override
@@ -180,16 +185,34 @@ public class WorldKnowledge extends KnowledgeInterface {
             return;
         }
         this.conflicts = conflicts;
+        conflict_num=conflicts.size();
     }
 
     @Override
     public void addConflict(Conflict conflict) {
+        if(conflict_num==0)
+        {
+            this.conflicts.add(conflict);
+            return;
+        }
+        for(int i=0;i<conflict_num;i++)
+        {
+            Conflict temp_conflict=this.conflicts.get(i);
+            if(temp_conflict.getUav_index()==conflict.getUav_index())
+            {
+                this.conflicts.remove(i);
+                this.conflicts.add(i, conflict);
+                return;
+            }
+        }
         this.conflicts.add(conflict);
+        conflict_num++;
     }
 
     @Override
     public void addThreat(Threat threat) {
         this.threats.add(threat);
+        threat_num++;
     }
 
     @Override
@@ -214,6 +237,7 @@ public class WorldKnowledge extends KnowledgeInterface {
             this.obstacles = new ArrayList<Obstacle>();
         }
         this.obstacles.add(obstacle);
+        obstacle_num++;
     }
 
 }

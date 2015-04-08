@@ -15,6 +15,7 @@ import util.DistanceUtil;
 import static util.DistanceUtil.distanceBetween;
 import util.MapSortUtil;
 import util.VectorUtil;
+import world.model.Conflict;
 import world.model.Obstacle;
 import world.model.shape.DubinsCurve;
 import world.model.shape.Point;
@@ -37,6 +38,8 @@ public class RRTAlg {
     private float[] goal_coordinate;
     private float current_angle;
     private float goal_probability = 0.6f;
+    private ArrayList<Conflict> conflicts;
+    private int uav_index;
 
     /**
      * internal variables
@@ -65,7 +68,7 @@ public class RRTAlg {
      * @param threats
      * @return
      */
-    public RRTAlg(float[] init_coordinate, float[] goal_coordinate, float goal_probability, int bound_width, int bound_height, int k_step, float max_delta_distance, ArrayList<Obstacle> obstacles) {
+    public RRTAlg(float[] init_coordinate, float[] goal_coordinate, float goal_probability, int bound_width, int bound_height, int k_step, float max_delta_distance, ArrayList<Obstacle> obstacles, ArrayList<Conflict> conflicts, int uav_index) {
         this.init_coordinate = init_coordinate;
         this.k_step = k_step;
         this.max_delta_distance = max_delta_distance;
@@ -74,6 +77,8 @@ public class RRTAlg {
         this.bound_width = bound_width;
         this.goal_probability = goal_probability;
         this.goal_coordinate = goal_coordinate;
+        this.conflicts=conflicts;
+        this.uav_index=uav_index;
     }
 
     public RRTTree buildRRT(float[] init_coordinate, float current_angle) {
@@ -96,8 +101,22 @@ public class RRTAlg {
             //extend the child node and validate its confliction 
             new_node = extendTowardGoalWithDynamics(nearest_node, random_goal, this.max_delta_distance, max_angle);
             new_node.setExpected_time_step(nearest_node.getExpected_time_step()+1);
-            
-            boolean conflicted = ConflictCheckUtil.checkNodeInObstacles(obstacles, new_node)||ConflictCheckUtil.checkUAVConflict(new_node,null,StaticInitConfig.SAFE_DISTANCE_FOR_CONFLICT);
+            boolean conflict_with_other_uavs=false;
+            int conflict_num=this.conflicts.size();
+            for(int i=0;i<conflict_num;i++)
+            {
+                Conflict conflict=this.conflicts.get(i);
+                if(conflict.getUav_index()>this.uav_index)
+                {
+                    conflict_with_other_uavs=ConflictCheckUtil.checkUAVConflict(new_node,conflict);
+                }
+                if(conflict_with_other_uavs)
+                {
+                    break;
+                }
+            }
+//            conflict_with_other_uavs=false;
+            boolean conflicted = ConflictCheckUtil.checkNodeInObstacles(obstacles, new_node)||conflict_with_other_uavs;
 //            boolean within_bound = BoundUtil.withinBound(new_node, bound_width, bound_height);
             //if not conflicted,add the child to the tree
             if (!conflicted && true) {

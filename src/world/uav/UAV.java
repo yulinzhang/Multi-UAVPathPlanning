@@ -43,8 +43,9 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
     private UAVPath path_planned_at_last_time_step;
     private UAVPath history_path;
     private boolean need_to_replan = true;
-
-    //variables for path planning
+    private boolean replanned_at_current_time_step=false;
+    
+    //variables for conflict planning
     private KnowledgeInterface kb;
 
     private RRTAlg rrt_alg;
@@ -68,9 +69,9 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
         this.kb = new WorldKnowledge();
         this.kb.setObstacles(obstacles);
         if (target == null) {
-            rrt_alg = new RRTAlg(super.getCenter_coordinates(), null, StaticInitConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, StaticInitConfig.rrt_iteration_times, speed, this.getObstacles());
+            rrt_alg = new RRTAlg(super.getCenter_coordinates(), null, StaticInitConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, StaticInitConfig.rrt_iteration_times, speed, this.getObstacles(),this.getConflicts(),this.index);
         } else {
-            rrt_alg = new RRTAlg(super.getCenter_coordinates(), target.getCoordinates(), StaticInitConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, StaticInitConfig.rrt_iteration_times, speed, this.getObstacles());
+            rrt_alg = new RRTAlg(super.getCenter_coordinates(), target.getCoordinates(), StaticInitConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, StaticInitConfig.rrt_iteration_times, speed, this.getObstacles(),this.getConflicts(),this.index);
         }
         initColor(index);
     }
@@ -117,6 +118,7 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
             } else {
                 logger.error("null path");
             }
+        this.setReplanned_at_current_time_step(true);
         }
     }
 
@@ -204,8 +206,9 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
     private void parseMessage(Message msg) {
         int msg_type = msg.getMsg_type();
         if (msg_type == Message.CONFLICT_MSG) {
-            Conflict path = (Conflict) msg;
+            Conflict conflict = (Conflict) msg;
             //TODO:
+            this.addConflict(conflict);
         } else if (msg_type == Message.OBSTACLE_MSG) {
             Obstacle obstacle = (Obstacle) msg;
             this.addObstacle(obstacle);
@@ -225,6 +228,14 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
         this.need_to_replan = need_to_replan;
     }
 
+    public boolean isReplanned_at_current_time_step() {
+        return replanned_at_current_time_step;
+    }
+
+    public void setReplanned_at_current_time_step(boolean replanned_at_current_time_step) {
+        this.replanned_at_current_time_step = replanned_at_current_time_step;
+    }
+
     public float[] getPrevious_waypoint() {
         return this.history_path.getLastWaypoint().toFloatArray();
     }
@@ -241,9 +252,6 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
         return path_planned_at_current_time_step.getWaypointsAsLinkedList();
     }
 
-//    public void setPath_prefound(LinkedList<Point> path_prefound) {
-//        this.path_planned_at_current_time_step.setWaypoints(path_prefound);
-//    }
     public void setPath_prefound(UAVPath path_prefound) {
         this.path_planned_at_current_time_step = path_prefound;
     }

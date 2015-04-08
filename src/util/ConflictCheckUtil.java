@@ -61,20 +61,20 @@ public class ConflictCheckUtil {
      * @param uav_safe_conflict_dist
      * @return 
      */
-    public static boolean checkUAVConflict(RRTNode new_node,Conflict uav_conflict, float uav_safe_conflict_dist)
+    public static boolean checkUAVConflict(RRTNode new_node,Conflict uav_conflict)
     {
+         float uav_safe_conflict_dist=uav_conflict.getConflict_range();
         if(uav_conflict==null)
         {
             return false;
         }
         int uav_conflict_size=uav_conflict.getPath_prefound().size();
         int new_node_exptected_time_step=new_node.getExpected_time_step();
-        for(int i=0;i<uav_conflict_size;i++)
+        if(new_node_exptected_time_step<uav_conflict_size)
         {
-            Point conflict_point=uav_conflict.getPath_prefound().get(i);
+            Point conflict_point=uav_conflict.getPath_prefound().get(new_node_exptected_time_step);
             int conflict_time=conflict_point.getExptected_time_step();
-            
-            if(conflict_time==new_node_exptected_time_step&& DistanceUtil.distanceBetween(conflict_point.toFloatArray(), new_node.getCoordinate())<StaticInitConfig.SAFE_DISTANCE_FOR_CONFLICT)
+            if(conflict_time==new_node_exptected_time_step&& DistanceUtil.distanceBetween(conflict_point.toFloatArray(), new_node.getCoordinate())<uav_safe_conflict_dist)
             {
                 return true;
             }else if(conflict_time>new_node_exptected_time_step)
@@ -82,6 +82,19 @@ public class ConflictCheckUtil {
                 return false;
             }
         }
+//        for(int i=0;i<uav_conflict_size;i++)
+//        {
+//            Point conflict_point=uav_conflict.getPath_prefound().get(i);
+//            int conflict_time=conflict_point.getExptected_time_step();
+//            
+//            if(conflict_time==new_node_exptected_time_step&& DistanceUtil.distanceBetween(conflict_point.toFloatArray(), new_node.getCoordinate())<StaticInitConfig.SAFE_DISTANCE_FOR_CONFLICT)
+//            {
+//                return true;
+//            }else if(conflict_time>new_node_exptected_time_step)
+//            {
+//                return false;
+//            }
+//        }
         return false;
     }
     

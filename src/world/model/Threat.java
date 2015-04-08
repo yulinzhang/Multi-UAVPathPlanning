@@ -14,6 +14,8 @@ import world.Message;
  */
 public class Threat extends Target {
     protected int target_type = 0;
+    protected float threat_range=0;
+    protected String threat_cap="";
     public Threat(int index, float[] coordinates, int target_type) {
         super(index, coordinates);
         this.target_type=target_type;
@@ -25,4 +27,30 @@ public class Threat extends Target {
     {
         return StaticInitConfig.THREAT_NAME+this.index;
     }
+
+    public int getTarget_type() {
+        return target_type;
+    }
+
+    public void setTarget_type(int target_type) {
+        this.target_type = target_type;
+    }
+
+    public float getThreat_range() {
+        return threat_range;
+    }
+
+    public void setThreat_range(float threat_range) {
+        this.threat_range = threat_range;
+    }
+
+    public String getThreat_cap() {
+        return threat_cap;
+    }
+
+    public void setThreat_cap(String threat_cap) {
+        this.threat_cap = threat_cap;
+    }
+    
+    
 }

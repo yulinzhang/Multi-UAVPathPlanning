@@ -13,6 +13,7 @@ import world.Message;
  */
 public class Target extends Message{
     protected float[] coordinates;
+    protected float speed;
     protected int index;
     public Target(int index,float[] coordinates) {
         this.index=index;
@@ -38,6 +39,14 @@ public class Target extends Message{
     @Override
     public int getMsgSize() {
         return 1;
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
     }
     
 }

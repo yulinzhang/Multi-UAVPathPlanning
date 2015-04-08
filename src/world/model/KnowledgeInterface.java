@@ -18,13 +18,24 @@ import javax.swing.tree.TreePath;
  */
 public abstract class KnowledgeInterface implements TreeModel {
 
-    private final String rootNode = StaticInitConfig.UAV_KNOWLEDGE;
-    private final String firstChild = StaticInitConfig.OBSTACLE_INFO;
-    private final String secondChild = StaticInitConfig.THREAT_INFO;
-    private final String thirdChild = StaticInitConfig.CONFLICT_INFO;
+    protected final String rootNode = StaticInitConfig.UAV_KNOWLEDGE;
+    protected final String firstChild = StaticInitConfig.OBSTACLE_INFO;
+    protected final String secondChild = StaticInitConfig.THREAT_INFO;
+    protected final String thirdChild = StaticInitConfig.CONFLICT_INFO;
 
-    private ArrayList<Object> root_child;
-    private final ArrayList<TreeModelListener> treeModelListeners = new ArrayList<TreeModelListener>();
+    protected int obstacle_num;
+    protected int threat_num;
+    protected int conflict_num;
+    
+    protected ArrayList<Object> root_child;
+    protected final ArrayList<TreeModelListener> treeModelListeners = new ArrayList<TreeModelListener>();
+
+    public KnowledgeInterface() {
+        root_child = new ArrayList<Object>();
+        root_child.add(firstChild);
+        root_child.add(secondChild);
+        root_child.add(thirdChild);
+    }
 
     /**
      * Notifies the listener that the structure below a given node has been
@@ -50,6 +61,11 @@ public abstract class KnowledgeInterface implements TreeModel {
     @Override
     public void removeTreeModelListener(TreeModelListener l) {
         treeModelListeners.remove(l);
+    }
+
+    @Override
+    public Object getRoot() {
+        return rootNode;
     }
 
     public abstract ArrayList<Obstacle> getObstacles();

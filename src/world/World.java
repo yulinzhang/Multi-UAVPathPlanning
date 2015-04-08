@@ -98,11 +98,11 @@ public class World implements KnowledgeAwareInterface {
         this.uav_base = init_config.getUav_base();
 
         if (this.inforshare_algorithm == StaticInitConfig.BROADCAST_INFOSHARE) {
-            this.msg_dispatcher=new BroadcastMessageDispatcher(this);
+            this.msg_dispatcher = new BroadcastMessageDispatcher(this);
         } else if (this.inforshare_algorithm == StaticInitConfig.REGISTER_BASED_INFORSHARE) {
             this.msg_dispatcher = new RegisteredMessageDispatcher(this);
         } else if (this.inforshare_algorithm == StaticInitConfig.NONE_INFORSHARE) {
-            this.msg_dispatcher=new DummyMessageDispatcher(this);
+            this.msg_dispatcher = new DummyMessageDispatcher(this);
         }
     }
 
@@ -200,6 +200,7 @@ public class World implements KnowledgeAwareInterface {
                 float[] attacker2_coord = attacker2.getCenter_coordinates();
                 if (DistanceUtil.distanceBetween(attacker1_coord, attacker2_coord) < StaticInitConfig.SAFE_DISTANCE_FOR_CONFLICT) {
                     conflict_times++;
+                    attacker1.setNeed_to_replan(true);
                     logger.debug("conflict:" + conflict_times);
                 }
             }
@@ -238,6 +239,14 @@ public class World implements KnowledgeAwareInterface {
         }
     }
 
+    private void mandatoryReplan() {
+        for (int i = 0; i < this.attacker_num; i++) {
+            UAV attacker = this.attackers.get(i);
+            attacker.setNeed_to_replan(true);
+            attacker.setReplanned_at_current_time_step(true);
+        }
+    }
+
     private void registerInfoRequirement() {
         for (int i = 0; i < this.attacker_num; i++) {
             UAV attacker = this.attackers.get(i);
@@ -256,17 +265,32 @@ public class World implements KnowledgeAwareInterface {
         for (int i = 0; i < this.attacker_num; i++) {
             UAV attacker = this.attackers.get(i);
             attacker.setNeed_to_replan(false);
+            attacker.setReplanned_at_current_time_step(false);
+        }
+    }
+
+    private void updateConflict() {
+        for (int i = 0; i < this.attacker_num; i++) {
+            UAV attacker = this.attackers.get(i);
+            if (attacker.isReplanned_at_current_time_step()) {
+                Conflict conflict = new Conflict(attacker.getIndex(), attacker.getFuturePath().getWaypointsAsLinkedList(), this.time_step, StaticInitConfig.SAFE_DISTANCE_FOR_CONFLICT);
+                this.addConflict(conflict);
+            }
         }
     }
 
     public void updateAll() {
+        if (this.time_step <= 1) {
+            mandatoryReplan();
+        }
+        updateConflict();
         detectEvent();
         registerInfoRequirement();
         shareInfoAfterRegistration();
         planPathForAllAttacker();
         updateAttackerCoordinate();
-        checkConflict();
         resetDecisionParameter();
+        checkConflict();
         this.time_step++;
     }
 

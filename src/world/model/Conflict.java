@@ -17,15 +17,36 @@ import world.model.shape.Point;
 public class Conflict extends Message{
 
     private int uav_index;
+    private float conflict_range;
     private LinkedList<Point> path_prefound;
     private int decision_time_step;
     
-    public Conflict(int uav_index,LinkedList<Point> path_prefound,int decision_time_step)
+    public Conflict(int uav_index,LinkedList<Point> path_prefound,int decision_time_step,float conflict_range)
     {
         this.uav_index=uav_index;
         this.path_prefound=path_prefound;
         this.decision_time_step=decision_time_step;
         this.msg_type=Message.CONFLICT_MSG;
+        this.conflict_range=conflict_range;
+    }
+    
+    public void sort()
+    {
+        int path_len=path_prefound.size();
+        Point temp;
+        for(int i=0;i<path_len;i++)
+        {
+            Point point1=path_prefound.get(i);
+            for(int j=i+1;j<path_len;j++)
+            {
+                Point point2=path_prefound.get(j);
+                if(point1.getExptected_time_step()>=point2.getExptected_time_step())
+                {
+                    path_prefound.set(i, point2);
+                    path_prefound.set(j, point1);
+                }
+            }
+        }
     }
     public int getUav_index() {
         return uav_index;
@@ -49,6 +70,14 @@ public class Conflict extends Message{
 
     public void setDecision_time_step(int decision_time_step) {
         this.decision_time_step = decision_time_step;
+    }
+
+    public float getConflict_range() {
+        return conflict_range;
+    }
+
+    public void setConflict_range(float conflict_range) {
+        this.conflict_range = conflict_range;
     }
     
     

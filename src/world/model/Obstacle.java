@@ -57,6 +57,19 @@ public class Obstacle extends Message {
     public String toString() {
         return StaticInitConfig.OBSTACLE_NAME + this.index;
     }
+    
+    public String getPointsStr()
+    {
+        int[] xpoints=shape.xpoints;
+        int[] ypoints=shape.ypoints;
+        int point_num=shape.npoints;
+        String result="";
+        for(int i=0;i<point_num;i++)
+        {
+            result+=xpoints[i]+","+ypoints[i]+" ";
+        }
+        return result.trim();
+    }
 
     @Override
     public int getMsgSize() {
