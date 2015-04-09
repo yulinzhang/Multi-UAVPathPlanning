@@ -22,6 +22,7 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Selector;
 import com.hp.hpl.jena.rdf.model.SimpleSelector;
@@ -38,7 +39,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
-import javax.swing.tree.TreePath;
 import util.StringUtil;
 import world.model.shape.Point;
 
@@ -48,21 +48,33 @@ import world.model.shape.Point;
  */
 public class OntologyBasedKnowledge extends KnowledgeInterface {
 
-    private OntModel ontology_based_knowledge;
+    public OntModel ontology_based_knowledge;
     private static String base_ns = "http://www.multiagent.com.cn/robotontology/";
     private static String rdf_ns = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(OntologyBasedKnowledge.class);
     private String prefix = "PREFIX mars:<http://www.multiagent.com.cn/robotontology/>" + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>";
+
     /**
      * internal variables
+     *
      *
      */
     private OntClass Obstacle_Class, Region_Class, Polygon_Class, LowerBoundOfRegion_Class, UpperBoundOfRegion_Class, Threat_Class;
     private OntClass Conflict_Class;
     private DatatypeProperty hasExpectedConflictTime, hasDecidedConflictTime, conflictFromRobot;
     private ObjectProperty has_region, has_polygon, has_lowerbound, has_upperbound, rdf_type;
-    private DatatypeProperty hasCenter, hasSpeed, hasRange, hasThreatCapability;
+    private DatatypeProperty hasConflictCenter, hasConflictRange;
+    private DatatypeProperty hasThreatCenter, hasThreatSpeed, hasThreatRange, hasThreatCapability;
     private DatatypeProperty has_points, hasMaxXCoordinate, hasMaxYCoordinate, hasMinXCoordinate, hasMinYCoordinate;
+
+    /**
+     * cache to speed the information retrieve process.
+     *
+     */
+    private boolean obstacle_updated = false, threat_updated = false, conflict_updated = false;
+    private ArrayList<Obstacle> obstacles_cache = new ArrayList<Obstacle>();
+    private ArrayList<Threat> threats_cache = new ArrayList<Threat>();
+    private ArrayList<Conflict> conflicts_cache = new ArrayList<Conflict>();
 
     public OntologyBasedKnowledge() {
         super();
@@ -98,13 +110,15 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
         //class and property for threat
         Threat_Class = ontology_based_knowledge.createClass(base_ns + "Threat");
 
-        hasCenter = ontology_based_knowledge.createDatatypeProperty(base_ns + "hasCenter");
-        hasSpeed = ontology_based_knowledge.createDatatypeProperty(base_ns + "hasSpeed");
-        hasRange = ontology_based_knowledge.createDatatypeProperty(base_ns + "hasRange");
+        hasThreatCenter = ontology_based_knowledge.createDatatypeProperty(base_ns + "hasThreatCenter");
+        hasThreatSpeed = ontology_based_knowledge.createDatatypeProperty(base_ns + "hasThreatSpeed");
+        hasThreatRange = ontology_based_knowledge.createDatatypeProperty(base_ns + "hasThreatRange");
         hasThreatCapability = ontology_based_knowledge.createDatatypeProperty(base_ns + "hasThreatCapability");
 
         //class and property for conflict
         Conflict_Class = ontology_based_knowledge.createClass(base_ns + "Conflict");
+        hasConflictCenter = ontology_based_knowledge.createDatatypeProperty(base_ns + "hasConflictCenter");
+        hasConflictRange = ontology_based_knowledge.createDatatypeProperty(base_ns + "hasConflictRange");
         hasExpectedConflictTime = ontology_based_knowledge.createDatatypeProperty(base_ns + "hasExpectedConflictTime");
         hasDecidedConflictTime = ontology_based_knowledge.createDatatypeProperty(base_ns + "hasDecidedConflictTime");
         conflictFromRobot = ontology_based_knowledge.createDatatypeProperty(base_ns + "conflictFromRobot");
@@ -124,11 +138,13 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
         threat.setThreat_cap("aaa");
         threat.setThreat_range(2);
         kb.addThreat(threat);
-        OntologyBasedKnowledge.printStatements(kb.ontology_based_knowledge);
+//        OntologyBasedKnowledge.printStatements(kb.ontology_based_knowledge);
         kb.addObstacle(obs);
+//        kb.addObstacle(obs);
+        kb.removeObstacle(obs);
         kb.addObstacle(obs);
         logger.debug("size=" + kb.getObstacles().size());
-        OntologyBasedKnowledge.printStatements(kb.ontology_based_knowledge);
+//        OntologyBasedKnowledge.printStatements(kb.ontology_based_knowledge);
 //        kb.getObstacles();
 //        kb.getThreats();
 //        boolean result = kb.containsObstacle(obs);
@@ -136,7 +152,7 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
         kb.setObstacles(null);
 //         kb.setThreats(null);
         logger.debug("size=" + kb.getObstacles().size());
-        OntologyBasedKnowledge.printStatements(kb.ontology_based_knowledge);
+//        OntologyBasedKnowledge.printStatements(kb.ontology_based_knowledge);
 //        logger.debug(OntologyBasedKnowledge.printOntology(kb.ontology_based_knowledge));
 //        OntologyBasedKnowledge.printStatements(kb.ontology_based_knowledge);
         LinkedList<Point> path = new LinkedList<Point>();
@@ -230,6 +246,9 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
 
     @Override
     public ArrayList<Obstacle> getObstacles() {
+        if (!this.obstacle_updated) {
+            return this.obstacles_cache;
+        }
         ArrayList<Obstacle> obstacles = new ArrayList<Obstacle>();
         String sparql = "SELECT ?points "
                 + "{"
@@ -256,18 +275,23 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
             Obstacle obstacle = new Obstacle(polygon, 0);
             obstacles.add(obstacle);
         }
+        this.obstacles_cache=obstacles;
+        this.obstacle_updated=false;
         return obstacles;
     }
 
     @Override
     public ArrayList<Conflict> getConflicts() {
+        if (!this.conflict_updated) {
+            return this.conflicts_cache;
+        }
         ArrayList<Conflict> conflicts = new ArrayList<Conflict>();
         Map<Integer, Conflict> conflict_map = new HashMap<Integer, Conflict>();
         String sparql = "SELECT ?conflict_center ?conflict_range ?exptected_conflict_time ?decided_conflict_time ?uav_index"
                 + "{"
                 + "?conflict_ind rdf:type mars:Conflict ."
-                + "?conflict_ind mars:hasCenter ?conflict_center ."
-                + "?conflict_ind mars:hasRange ?conflict_range ."
+                + "?conflict_ind mars:hasConflictCenter ?conflict_center ."
+                + "?conflict_ind mars:hasConflictRange ?conflict_range ."
                 + "?conflict_ind mars:hasExpectedConflictTime ?exptected_conflict_time ."
                 + "?conflict_ind mars:hasDecidedConflictTime ?decided_conflict_time ."
                 + "?conflict_ind mars:conflictFromRobot ?uav_index"
@@ -315,17 +339,22 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
             conflict.sort();
             conflicts.add(conflict);
         }
+        this.conflicts_cache=conflicts;
+        this.conflict_updated=false;
         return conflicts;
     }
 
     @Override
     public ArrayList<Threat> getThreats() {
+        if (!this.threat_updated) {
+            return this.threats_cache;
+        }
         ArrayList<Threat> threats = new ArrayList<Threat>();
         String sparql = "SELECT ?center ?speed ?range ?threatCap"
                 + "{"
-                + "?threat_ind mars:hasCenter ?center ."
-                + "?threat_ind mars:hasSpeed ?speed ."
-                + "?threat_ind mars:hasRange ?range ."
+                + "?threat_ind mars:hasThreatCenter ?center ."
+                + "?threat_ind mars:hasThreatSpeed ?speed ."
+                + "?threat_ind mars:hasThreatRange ?range ."
                 + "?threat_ind mars:hasThreatCapability ?threatCap"
                 + "}";
         Query query = QueryFactory.create(prefix + sparql);
@@ -353,32 +382,40 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
             threat.setSpeed(speed);
             threats.add(threat);
         }
+        this.threats_cache=threats;
+        this.threat_updated=false;
         return threats;
     }
 
     private Model deleteAllObstacles() {
         Model m = ontology_based_knowledge.removeAll(null, has_region, null).removeAll(null, has_polygon, null)
-                .removeAll(null, hasRange, null).removeAll(null, has_upperbound, null).removeAll(null, has_points, null)
+                .removeAll(null, has_points, null).removeAll(null, has_lowerbound, null).removeAll(null, has_upperbound, null)
                 .removeAll(null, hasMaxXCoordinate, null).removeAll(null, hasMaxYCoordinate, null).removeAll(null, hasMinXCoordinate, null)
                 .removeAll(null, hasMinYCoordinate, null)
                 .removeAll(Obstacle_Class, rdf_type, null).removeAll(Region_Class, rdf_type, null)
                 .removeAll(Polygon_Class, rdf_type, null).removeAll(LowerBoundOfRegion_Class, rdf_type, null).removeAll(UpperBoundOfRegion_Class, rdf_type, null)
                 .removeAll(null, rdf_type, Obstacle_Class).removeAll(null, rdf_type, Region_Class).removeAll(null, rdf_type, Polygon_Class)
                 .removeAll(null, rdf_type, LowerBoundOfRegion_Class).removeAll(null, rdf_type, UpperBoundOfRegion_Class);
+        this.obstacle_num = 0;
+        this.obstacle_updated=true;
         return m;
     }
 
-    private Model deleteAllThreats() {
-        Model m = ontology_based_knowledge.removeAll(Threat_Class, hasCenter, null).removeAll(null, hasSpeed, null)
-                .removeAll(Threat_Class, hasRange, null).removeAll(null, hasThreatCapability, null)
-                .removeAll(null, rdf_type, Threat_Class);
+    public Model deleteAllThreats() {
+        Model m = ontology_based_knowledge.removeAll(null, hasThreatCenter, null).removeAll(null, hasThreatSpeed, null)
+                .removeAll(null, hasThreatRange, null).removeAll(null, hasThreatCapability, null)
+                .removeAll(null, rdf_type, Threat_Class).removeAll(Threat_Class, rdf_type, null);
+        this.threat_num = 0;
+        this.threat_updated=true;
         return m;
     }
 
-    private Model deleteAllConflicts() {
-        Model m = ontology_based_knowledge.removeAll(Conflict_Class, hasCenter, null).removeAll(Conflict_Class, hasRange, null)
+    public Model deleteAllConflicts() {
+        Model m = ontology_based_knowledge.removeAll(null, hasConflictCenter, null).removeAll(null, hasConflictRange, null)
                 .removeAll(null, hasExpectedConflictTime, null).removeAll(null, hasDecidedConflictTime, null).removeAll(null, this.conflictFromRobot, null)
-                .removeAll(null, rdf_type, Conflict_Class);
+                .removeAll(null, rdf_type, Conflict_Class).removeAll(Conflict_Class, rdf_type, null);
+        this.conflict_num = 0;
+        this.conflict_updated=true;
         return m;
     }
 
@@ -390,7 +427,9 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
             for (int i = 0; i < obstacle_num; i++) {
                 this.addObstacle(obstacles.get(i));
             }
+            this.obstacle_num = obstacle_num;
         }
+        this.obstacle_updated=true;
     }
 
     @Override
@@ -401,7 +440,9 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
             for (int i = 0; i < conflict_num; i++) {
                 this.addConflict(conflicts.get(i));
             }
+            this.conflict_num = conflict_num;
         }
+        this.conflict_updated=true;
     }
 
     @Override
@@ -412,7 +453,9 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
             for (int i = 0; i < threat_num; i++) {
                 this.addThreat(threats.get(i));
             }
+            this.threat_num = threat_num;
         }
+        this.threat_updated=true;
     }
 
     @Override
@@ -439,6 +482,8 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
         lowerbound_individual.addProperty(hasMinYCoordinate, min_y_coordinate);
         upperbound_individual.addProperty(hasMaxXCoordinate, max_x_coordinate);
         upperbound_individual.addProperty(hasMaxYCoordinate, max_y_coordinate);
+        this.obstacle_num++;
+        this.obstacle_updated=true;
     }
 
     @Override
@@ -454,12 +499,14 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
             Literal exptected_conflict_time = ontology_based_knowledge.createTypedLiteral(conflict_point.getExptected_time_step());
             Literal decided_conflict_time = ontology_based_knowledge.createTypedLiteral(conflict_point.getDecision_time_step());
             Literal conflict_from_robot = ontology_based_knowledge.createTypedLiteral(conflict.getUav_index());
-            conflict_individual.addProperty(hasCenter, center);
-            conflict_individual.addProperty(hasRange, conflict_range);
+            conflict_individual.addProperty(hasConflictCenter, center);
+            conflict_individual.addProperty(hasConflictRange, conflict_range);
             conflict_individual.addProperty(hasExpectedConflictTime, exptected_conflict_time);
             conflict_individual.addProperty(hasDecidedConflictTime, decided_conflict_time);
             conflict_individual.addProperty(conflictFromRobot, conflict_from_robot);
         }
+        this.conflict_num++;
+        this.conflict_updated=true;
     }
 
     @Override
@@ -471,16 +518,18 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
         Literal threat_range = ontology_based_knowledge.createTypedLiteral(threat.getThreat_range());
         Literal threat_cap = ontology_based_knowledge.createTypedLiteral(threat.getThreat_cap());
 
-        threat_individual.addProperty(hasCenter, center);
-        threat_individual.addProperty(hasSpeed, speed);
-        threat_individual.addProperty(hasRange, threat_range);
+        threat_individual.addProperty(hasThreatCenter, center);
+        threat_individual.addProperty(hasThreatSpeed, speed);
+        threat_individual.addProperty(hasThreatRange, threat_range);
         threat_individual.addProperty(hasThreatCapability, threat_cap);
+        this.threat_num++;
+        this.threat_updated=true;
     }
 
     @Override
     public boolean containsThreat(Threat threat) {
         Literal center = ontology_based_knowledge.createTypedLiteral(threat.getCoordinates()[0] + "," + threat.getCoordinates()[1]);
-        Selector selector = new SimpleSelector(null, hasCenter, center);
+        Selector selector = new SimpleSelector(null, hasThreatCenter, center);
         Model result_model = ontology_based_knowledge.query(selector);
         printStatements(result_model);
         return result_model.listStatements().hasNext();
@@ -496,42 +545,67 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
     }
 
     @Override
-    public boolean deleteComponent(TreePath path, Object leaf_node) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public boolean containsConflict(Conflict conflict) {
         return false;
     }
 
     @Override
-    public Object getRoot() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean removeObstacle(Obstacle obstacle) {
+        Literal points = ontology_based_knowledge.createTypedLiteral(obstacle.getPointsStr());
+        StmtIterator smt_list_to_find_polygon = ontology_based_knowledge.listStatements(null, has_points, points);
+        if (smt_list_to_find_polygon.hasNext()) {
+            Resource polygon_individual = smt_list_to_find_polygon.nextStatement().getSubject();
+            StmtIterator smt_list_to_find_region = ontology_based_knowledge.listStatements(null, has_polygon, polygon_individual);
+            if (smt_list_to_find_region.hasNext()) {
+                Resource region_individual = smt_list_to_find_region.nextStatement().getSubject();
+
+                RDFNode null_node = null;
+
+                StmtIterator smt_list_to_find_lower_bound = ontology_based_knowledge.listStatements(region_individual, has_lowerbound, null_node);
+                if (smt_list_to_find_lower_bound.hasNext()) {
+                    Resource lower_bound_individual = smt_list_to_find_lower_bound.nextStatement().getSubject();
+                    ontology_based_knowledge = (OntModel) ontology_based_knowledge.removeAll(lower_bound_individual, hasMinXCoordinate, null).removeAll(lower_bound_individual, hasMinYCoordinate, null);
+                }
+
+                StmtIterator smt_list_to_find_upper_bound = ontology_based_knowledge.listStatements(region_individual, has_upperbound, null_node);
+                if (smt_list_to_find_upper_bound.hasNext()) {
+                    Resource upper_bound_individual = smt_list_to_find_upper_bound.nextStatement().getSubject();
+                    ontology_based_knowledge = (OntModel) ontology_based_knowledge.removeAll(upper_bound_individual, hasMaxXCoordinate, null).removeAll(upper_bound_individual, hasMaxYCoordinate, null);
+                }
+
+                StmtIterator smt_list_to_find_obstacle = ontology_based_knowledge.listStatements(null, has_region, region_individual);
+                if (smt_list_to_find_obstacle.hasNext()) {
+                    Resource obstacle_individual = smt_list_to_find_obstacle.nextStatement().getSubject();
+                    ontology_based_knowledge = (OntModel) ontology_based_knowledge.removeAll(null, rdf_type, obstacle_individual).removeAll(obstacle_individual, has_region, null);
+                }
+                ontology_based_knowledge = (OntModel) ontology_based_knowledge.removeAll(region_individual, has_polygon, null).removeAll(region_individual, this.has_lowerbound, null).removeAll(region_individual, this.has_upperbound, null);
+            }
+            ontology_based_knowledge = (OntModel) ontology_based_knowledge.removeAll(polygon_individual, null, null);
+            this.obstacle_num--;
+            this.obstacle_updated=true;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
-    public Object getChild(Object parent, int index) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean removeThreat(Threat threat) {
+        Literal center = ontology_based_knowledge.createTypedLiteral(threat.getCoordinates()[0] + "," + threat.getCoordinates()[1]);
+        StmtIterator smt_list_to_find_threat_individual = ontology_based_knowledge.listStatements(null, hasThreatCenter, center);
+        if (smt_list_to_find_threat_individual.hasNext()) {
+            Resource threat_individual = smt_list_to_find_threat_individual.next().getSubject();
+            ontology_based_knowledge = (OntModel) ontology_based_knowledge.removeAll(threat_individual, hasThreatCenter, null).removeAll(threat_individual, hasThreatSpeed, null).removeAll(threat_individual, hasThreatRange, null).removeAll(threat_individual, hasThreatCapability, null);
+            this.threat_num--;
+            this.threat_updated=true;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
-    public int getChildCount(Object parent) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public boolean isLeaf(Object node) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void valueForPathChanged(TreePath path, Object newValue) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public int getIndexOfChild(Object parent, Object child) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean removeConflict(Conflict conflict) {
+        return false;
     }
 }

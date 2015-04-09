@@ -18,11 +18,6 @@ import javax.swing.tree.TreePath;
  */
 public class WorldKnowledge extends KnowledgeInterface {
 
-    private String rootNode = StaticInitConfig.UAV_KNOWLEDGE;
-    private String firstChild = StaticInitConfig.OBSTACLE_INFO;
-    private String secondChild = StaticInitConfig.THREAT_INFO;
-    private String thirdChild = StaticInitConfig.CONFLICT_INFO;
-
     private ArrayList<Obstacle> obstacles;
     private ArrayList<Threat> threats;
     private ArrayList<Conflict> conflicts;
@@ -55,95 +50,11 @@ public class WorldKnowledge extends KnowledgeInterface {
         threats.add(threat1);
         threats.add(threat2);
 
-        Conflict conflict1 = new Conflict(0, null, 1,2);
-        Conflict conflict2 = new Conflict(1, null, 1,2);
+        Conflict conflict1 = new Conflict(0, null, 1, 2);
+        Conflict conflict2 = new Conflict(1, null, 1, 2);
         conflicts.add(conflict1);
         conflicts.add(conflict2);
 
-    }
-
-    @Override
-    public Object getRoot() {
-        return rootNode;
-    }
-
-    @Override
-    public Object getChild(Object parent, int index) {
-        if (parent == rootNode) {
-            return root_child.get(index);
-        } else if (root_child.contains(parent)) {//parent is in second level
-            if (parent == firstChild) {
-                return obstacles.get(index);
-            } else if (parent == secondChild) {
-                return threats.get(index);
-            } else if (parent == thirdChild) {
-                return conflicts.get(index);
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public int getChildCount(Object parent) {
-        if (parent == rootNode) {
-            return 3;
-        } else if (root_child.contains(parent)) {//parent is in second level
-            if (parent == firstChild) {
-                return obstacles.size();
-            } else if (parent == secondChild) {
-                return threats.size();
-            } else if (parent == thirdChild) {
-                return conflicts.size();
-            }
-        }
-        return 0;
-    }
-
-    @Override
-    public boolean isLeaf(Object node) {
-        if (node == rootNode || root_child.contains(node)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public void valueForPathChanged(TreePath path, Object newValue) {
-
-    }
-
-    @Override
-    public int getIndexOfChild(Object parent, Object child) {
-        if (parent == rootNode) {
-            return root_child.indexOf(child);
-        } else if (root_child.contains(parent)) {//parent is in second level
-            if (parent == firstChild) {
-                return obstacles.indexOf(child);
-            } else if (parent == secondChild) {
-                return threats.indexOf(child);
-            } else if (parent == thirdChild) {
-                return conflicts.indexOf(child);
-            }
-        }
-        return -1;
-    }
-// Misc methods
-
-    @Override
-    public boolean deleteComponent(TreePath path, Object leaf_node) {
-        boolean result = false;
-        if (obstacles.contains(leaf_node)) {
-            result = obstacles.remove(leaf_node);
-            obstacle_num--;
-        } else if (threats.contains(leaf_node)) {
-            result = threats.remove(leaf_node);
-            threat_num--;
-        } else if (conflicts.contains(leaf_node)) {
-            result = conflicts.remove(leaf_node);
-            conflict_num--;
-        }
-        this.fireStructureChanged(path);
-        return result;
     }
 
     @Override
@@ -157,7 +68,7 @@ public class WorldKnowledge extends KnowledgeInterface {
             return;
         }
         this.obstacles = obstacles;
-        obstacle_num=obstacles.size();
+        obstacle_num = obstacles.size();
     }
 
     @Override
@@ -171,7 +82,7 @@ public class WorldKnowledge extends KnowledgeInterface {
             return;
         }
         this.threats = threats;
-        threat_num=threats.size();
+        threat_num = threats.size();
     }
 
     @Override
@@ -185,21 +96,18 @@ public class WorldKnowledge extends KnowledgeInterface {
             return;
         }
         this.conflicts = conflicts;
-        conflict_num=conflicts.size();
+        conflict_num = conflicts.size();
     }
 
     @Override
     public void addConflict(Conflict conflict) {
-        if(conflict_num==0)
-        {
+        if (conflict_num == 0) {
             this.conflicts.add(conflict);
             return;
         }
-        for(int i=0;i<conflict_num;i++)
-        {
-            Conflict temp_conflict=this.conflicts.get(i);
-            if(temp_conflict.getUav_index()==conflict.getUav_index())
-            {
+        for (int i = 0; i < conflict_num; i++) {
+            Conflict temp_conflict = this.conflicts.get(i);
+            if (temp_conflict.getUav_index() == conflict.getUav_index()) {
                 this.conflicts.remove(i);
                 this.conflicts.add(i, conflict);
                 return;
@@ -226,11 +134,10 @@ public class WorldKnowledge extends KnowledgeInterface {
     }
 
     @Override
-    public boolean containsConflict(Conflict conflict)
-    {
+    public boolean containsConflict(Conflict conflict) {
         return this.conflicts.contains(conflict);
     }
-    
+
     @Override
     public void addObstacle(Obstacle obstacle) {
         if (this.obstacles == null) {
@@ -238,6 +145,33 @@ public class WorldKnowledge extends KnowledgeInterface {
         }
         this.obstacles.add(obstacle);
         obstacle_num++;
+    }
+
+    @Override
+    public boolean removeObstacle(Obstacle obstacle) {
+        boolean result = this.obstacles.remove(obstacle);
+        if (result) {
+            obstacle_num--;
+        }
+        return result;
+    }
+
+    @Override
+    public boolean removeThreat(Threat threat) {
+        boolean result = this.threats.remove(threat);
+        if (result) {
+            threat_num--;
+        }
+        return result;
+    }
+
+    @Override
+    public boolean removeConflict(Conflict conflict) {
+        boolean result = this.conflicts.remove(conflict);
+        if (result) {
+            conflict_num--;
+        }
+        return result;
     }
 
 }

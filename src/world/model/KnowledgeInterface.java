@@ -26,7 +26,7 @@ public abstract class KnowledgeInterface implements TreeModel {
     protected int obstacle_num;
     protected int threat_num;
     protected int conflict_num;
-    
+
     protected ArrayList<Object> root_child;
     protected final ArrayList<TreeModelListener> treeModelListeners = new ArrayList<TreeModelListener>();
 
@@ -51,8 +51,6 @@ public abstract class KnowledgeInterface implements TreeModel {
         }
     }
 
-    public abstract boolean deleteComponent(TreePath path, Object leaf_node);
-
     @Override
     public void addTreeModelListener(TreeModelListener l) {
         treeModelListeners.add(l);
@@ -67,6 +65,84 @@ public abstract class KnowledgeInterface implements TreeModel {
     public Object getRoot() {
         return rootNode;
     }
+
+    @Override
+    public int getIndexOfChild(Object parent, Object child) {
+        if (parent == rootNode) {
+            return root_child.indexOf(child);
+        } else if (root_child.contains(parent)) {//parent is in second level
+            if (parent == firstChild) {
+                return this.getObstacles().indexOf(child);
+            } else if (parent == secondChild) {
+                return this.getThreats().indexOf(child);
+            } else if (parent == thirdChild) {
+                return this.getConflicts().indexOf(child);
+            }
+        }
+        return -1;
+    }
+
+    public boolean deleteComponent(TreePath path, Object leaf_node) {
+        boolean result = false;
+        if (this.containsObstacle((Obstacle) leaf_node)) {
+            result = this.removeObstacle((Obstacle) leaf_node);
+        } else if (this.containsThreat((Threat) leaf_node)) {
+            result = this.removeThreat((Threat) leaf_node);
+        } else if (this.containsConflict((Conflict) leaf_node)) {
+            result = this.removeConflict((Conflict) leaf_node);
+        }
+        this.fireStructureChanged(path);
+        return result;
+    }
+
+    @Override
+    public boolean isLeaf(Object node) {
+        if (node == rootNode || root_child.contains(node)) {
+            return false;
+        }
+        return true;
+    }
+    
+        @Override
+    public int getChildCount(Object parent) {
+        if (parent == rootNode) {
+            return 3;
+        } else if (root_child.contains(parent)) {//parent is in second level
+            if (parent == firstChild) {
+                return this.obstacle_num;
+            } else if (parent == secondChild) {
+                return this.threat_num;
+            } else if (parent == thirdChild) {
+                return this.conflict_num;
+            }
+        }
+        return 0;
+    }
+    @Override
+    public void valueForPathChanged(TreePath path, Object newValue) {
+    }
+    
+       @Override
+    public Object getChild(Object parent, int index) {
+        if (parent == rootNode) {
+            return root_child.get(index);
+        } else if (root_child.contains(parent)) {//parent is in second level
+            if (parent == firstChild) {
+                return this.getObstacles().get(index);
+            } else if (parent == secondChild) {
+                return this.getThreats().get(index);
+            } else if (parent == thirdChild) {
+                return this.getConflicts().get(index);
+            }
+        }
+        return null;
+    }
+    
+    public abstract boolean removeObstacle(Obstacle obstacle);
+
+    public abstract boolean removeThreat(Threat threat);
+
+    public abstract boolean removeConflict(Conflict conflict);
 
     public abstract ArrayList<Obstacle> getObstacles();
 

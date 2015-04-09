@@ -17,8 +17,8 @@ import util.DistanceUtil;
 import world.model.Conflict;
 import world.model.KnowledgeAwareInterface;
 import world.model.KnowledgeInterface;
+import world.model.OntologyBasedKnowledge;
 import world.model.Target;
-import world.model.WorldKnowledge;
 
 /**
  *
@@ -70,7 +70,7 @@ public class World implements KnowledgeAwareInterface {
      * @param init_config
      */
     public World(NonStaticInitConfig init_config) {
-        World.kb = new WorldKnowledge();
+        World.kb = new OntologyBasedKnowledge();//OntologyBasedKnowledge();WorldKnowledge
         initParameterFromInitConfig(init_config);
         initUAVs();
     }
@@ -114,7 +114,8 @@ public class World implements KnowledgeAwareInterface {
         uav_base_center[0] = uav_base_coordinate[0] + uav_base_width / 2;
         uav_base_center[1] = uav_base_coordinate[1] + uav_base_height / 2;
         for (int i = 0; i < attacker_num; i++) {
-            UAV attacker = new UAV(i, this.getThreats().get(i), StaticInitConfig.SIDE_A, uav_base_center, null);
+            Threat threat=this.getThreats().get(i);
+            UAV attacker = new UAV(i, threat, StaticInitConfig.SIDE_A, uav_base_center, null);
             attackers.add(attacker);
         }
         roleAssign(-1, -1);
