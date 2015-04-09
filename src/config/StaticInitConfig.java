@@ -68,7 +68,7 @@ public class StaticInitConfig {
     public static String OBSTACLE_NAME="障碍";
     public static String CONFLICT_NAME="冲突UAV";
     
-    public static int BROADCAST_INFOSHARE=0;
+    public static int BROADCAST_INFOSHARE=0; 
     public static int NONE_INFORSHARE=1;
     public static int REGISTER_BASED_INFORSHARE=2;
 }
