@@ -5,12 +5,9 @@
  */
 package world.model;
 
-import config.StaticInitConfig;
+import java.awt.Rectangle;
 import java.util.ArrayList;
-import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
 
 /**
  *
@@ -22,17 +19,13 @@ public class WorldKnowledge extends KnowledgeInterface {
     private ArrayList<Threat> threats;
     private ArrayList<Conflict> conflicts;
 
-    private ArrayList<Object> root_child;
     private ArrayList<TreeModelListener> treeModelListeners
             = new ArrayList<TreeModelListener>();
 
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(WorldKnowledge.class);
 
     public WorldKnowledge() {
-        root_child = new ArrayList<Object>();
-        root_child.add(firstChild);
-        root_child.add(secondChild);
-        root_child.add(thirdChild);
+        super();
         obstacles = new ArrayList<Obstacle>();
         threats = new ArrayList<Threat>();
         conflicts = new ArrayList<Conflict>();
@@ -45,8 +38,8 @@ public class WorldKnowledge extends KnowledgeInterface {
         obstacles.add(obstacle1);
         obstacles.add(obstacle2);
 
-        Threat threat1 = new Threat(0, null, 1);
-        Threat threat2 = new Threat(1, null, 1);
+        Threat threat1 = new Threat(0, null, 1,2);
+        Threat threat2 = new Threat(1, null, 1,4);
         threats.add(threat1);
         threats.add(threat2);
 

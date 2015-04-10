@@ -43,6 +43,4 @@ public abstract class Message {
     public void setMsg_id(int msg_id) {
         this.msg_id = msg_id;
     }
-    
-    
 }

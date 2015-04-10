@@ -7,6 +7,7 @@ package world;
 
 import java.util.List;
 import world.model.Conflict;
+import world.model.KnowledgeAwareInterface;
 import world.model.KnowledgeInterface;
 import world.model.Obstacle;
 import world.model.Target;
@@ -20,20 +21,20 @@ import world.uav.UAV;
  */
 public class BroadcastMessageDispatcher extends MessageDispatcher {
 
-    public BroadcastMessageDispatcher(World world) {
-        super(world);
+    public BroadcastMessageDispatcher(KnowledgeAwareInterface intelligent_unit) {
+        super(intelligent_unit);
     }
 
     @Override
     public void decideAndSumitMsgToSend() {
-        List<Obstacle> obstacles = world.getObstacles();
+        List<Obstacle> obstacles = intelligent_unit.getObstacles();
         int obstacle_num = obstacles.size();
-        List<Threat> threats=world.getThreats();
+        List<Threat> threats=intelligent_unit.getThreats();
         int threat_num=threats.size();
-        List<Conflict> conflicts=world.getConflicts();
+        List<Conflict> conflicts=intelligent_unit.getConflicts();
         int conflict_num=conflicts.size();
 
-        List<UAV> attackers = world.getAttackers();
+        List<UAV> attackers = World.getAttackers();
         int attacker_num = attackers.size();
         for (int i = 0; i < attacker_num; i++) {
             UAV attacker = attackers.get(i);

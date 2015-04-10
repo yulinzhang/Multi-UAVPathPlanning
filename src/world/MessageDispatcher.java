@@ -5,14 +5,12 @@
  */
 package world;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import world.model.Obstacle;
+import world.model.KnowledgeAwareInterface;
 import world.model.Target;
-import world.model.WorldKnowledge;
 import world.uav.UAV;
 
 /**
@@ -24,16 +22,16 @@ public abstract class MessageDispatcher {
     protected Map<Integer, LinkedList<Message>> recv_msg_list = new HashMap<Integer, LinkedList<Message>>();
     protected int num_of_msg_sent_this_time_step = 0;
     protected int num_of_msg_sent_total = 0;
-    protected World world;
+    protected KnowledgeAwareInterface intelligent_unit;
 
-    public MessageDispatcher(World world) {
-        this.world = world;
+    public MessageDispatcher(KnowledgeAwareInterface intelligent_unit) {
+        this.intelligent_unit = intelligent_unit;
     }
     public abstract void register(Integer uav_index, float[] current_loc,Target target);
     public abstract void decideAndSumitMsgToSend();
 
     public void dispatch() {
-        List<UAV> attackers = world.getAttackers();
+        List<UAV> attackers = World.getAttackers();
         int attacker_num = attackers.size();
         for (int i = 0; i < attacker_num; i++) {
             UAV attacker = attackers.get(i);

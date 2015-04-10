@@ -5,19 +5,30 @@
  */
 package world.model;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import world.Message;
 
 /**
  *
  * @author boluo
  */
-public class Target extends Message{
+public class Target extends Message implements Serializable {
+
     protected float[] coordinates;
     protected float speed;
     protected int index;
-    public Target(int index,float[] coordinates) {
-        this.index=index;
-        this.coordinates=coordinates;
+    protected boolean enabled = true;
+
+    public Target(int index, float[] coordinates) {
+        this.index = index;
+        this.coordinates = coordinates;
     }
 
     public float[] getCoordinates() {
@@ -48,5 +59,38 @@ public class Target extends Message{
     public void setSpeed(float speed) {
         this.speed = speed;
     }
-    
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public Object deepClone() {
+        try {
+            ByteArrayOutputStream bo = new ByteArrayOutputStream();
+            ObjectOutputStream oo = new ObjectOutputStream(bo);
+            oo.writeObject(this);
+            ByteArrayInputStream bi = new ByteArrayInputStream(bo.toByteArray());
+            ObjectInputStream oi = new ObjectInputStream(bi);
+            return (oi.readObject());
+        } catch (IOException ex) {
+            Logger.getLogger(Target.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Target.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        Target target = (Target) obj;
+        if (this.coordinates[0] == target.coordinates[0] && this.coordinates[1] == target.coordinates[1]) {
+            return true;
+        }
+        return false;
+    }
+
 }

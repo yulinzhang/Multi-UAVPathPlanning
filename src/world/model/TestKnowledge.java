@@ -32,9 +32,11 @@ public class TestKnowledge {
         polygon2.addPoint(2, 3);
         polygon2.addPoint(3, 5);
         Obstacle obs2 = new Obstacle(polygon2, 0);
+                System.out.println("hashcode="+obs1.hashCode());
+        System.out.println("hashcode="+obs2.hashCode());
 
         kb2.addObstacle(obs1);
-        result = kb2.containsObstacle(obs2);
+       result = kb2.containsObstacle(obs2);
         kb2.addObstacle(obs2);
         result = kb2.containsObstacle(obs2);
         ArrayList<Obstacle> obstacles = kb2.getObstacles();
@@ -50,14 +52,14 @@ public class TestKnowledge {
 
         float[] coord1 = new float[2];
         coord1[0] = 1;
-        Threat threat1 = new Threat(0, coord1, 0);
+        Threat threat1 = new Threat(0, coord1, 0,1);
         threat1.setSpeed(2);
         threat1.setTarget_type(0);
         threat1.setThreat_cap("aaa");
         threat1.setThreat_range(2);
         float[] coord2 = new float[2];
         coord1[0] = 2;
-        Threat threat2 = new Threat(0, coord2, 0);
+        Threat threat2 = new Threat(0, coord2, 0,2);
         threat2.setSpeed(3);
         threat2.setTarget_type(3);
         threat2.setThreat_cap("bbb");

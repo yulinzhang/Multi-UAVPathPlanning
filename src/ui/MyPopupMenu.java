@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import world.ControlCenter;
 import world.World;
 import world.model.Threat;
 
@@ -21,7 +22,7 @@ import world.model.Threat;
 public class MyPopupMenu extends JPopupMenu implements ActionListener {
 
     ArrayList<JMenuItem> items;
-    World world;
+    ControlCenter control_center;
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(MyPopupMenu.class);
 
     /** internal variable
@@ -29,11 +30,11 @@ public class MyPopupMenu extends JPopupMenu implements ActionListener {
      */
     private int choosen_attacker_index=-1;
     
-    public MyPopupMenu(World world) {
+    public MyPopupMenu(ControlCenter control_center) {
         super();
-        this.world = world;
+        this.control_center = control_center;
         items = new ArrayList<JMenuItem>();
-        ArrayList<Threat> threats = world.getThreats();
+        ArrayList<Threat> threats = this.control_center.getThreats();
         for (Threat threat : threats) {
             JMenuItem threat_item = new JMenuItem(StaticInitConfig.THREAT_NAME+threat.getIndex());
             items.add(threat_item);
@@ -51,7 +52,7 @@ public class MyPopupMenu extends JPopupMenu implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         int index = items.indexOf(e.getSource());
-        world.roleAssign(choosen_attacker_index, index);
+        control_center.roleAssign(choosen_attacker_index, index);
         StaticInitConfig.SIMULATION_ON = true;
     }
 

@@ -12,7 +12,6 @@ import config.StaticInitConfig;
 import java.awt.Color;
 import java.util.LinkedList;
 import java.util.ArrayList;
-import util.DistanceUtil;
 import world.Message;
 
 import world.model.shape.Circle;
@@ -21,6 +20,7 @@ import world.World;
 import world.model.Conflict;
 import world.model.KnowledgeAwareInterface;
 import world.model.KnowledgeInterface;
+import world.model.OntologyBasedKnowledge;
 import world.model.Target;
 import world.model.Threat;
 import world.model.WorldKnowledge;
@@ -43,8 +43,9 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
     private UAVPath path_planned_at_last_time_step;
     private UAVPath history_path;
     private boolean need_to_replan = true;
-    private boolean replanned_at_current_time_step=false;
-    
+    private boolean replanned_at_current_time_step = false;
+    private boolean target_reached=false;
+
     //variables for conflict planning
     private KnowledgeInterface kb;
 
@@ -61,17 +62,18 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
      * @param center_coordinates
      */
     public UAV(int index, Target target, int flag_of_war, float[] center_coordinates, ArrayList<Obstacle> obstacles) {
-        super(index, target, flag_of_war, center_coordinates);
+        super(index, (Target) target.deepClone(), flag_of_war, center_coordinates);
         this.uav_radar = new Circle(center_coordinates[0], center_coordinates[1], scout_radar_radius);
         this.path_planned_at_current_time_step = new UAVPath();
         this.history_path = new UAVPath();
         setPreviousWaypoint();
-        this.kb = new WorldKnowledge();
+        this.setTarget_reached(false);
+        this.kb = new OntologyBasedKnowledge();//OntologyBasedKnowledge();WorldKnowledge
         this.kb.setObstacles(obstacles);
         if (target == null) {
-            rrt_alg = new RRTAlg(super.getCenter_coordinates(), null, StaticInitConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, StaticInitConfig.rrt_iteration_times, speed, this.getObstacles(),this.getConflicts(),this.index);
+            rrt_alg = new RRTAlg(super.getCenter_coordinates(), null, StaticInitConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, StaticInitConfig.rrt_iteration_times, speed, null, this.getConflicts(), this.index);
         } else {
-            rrt_alg = new RRTAlg(super.getCenter_coordinates(), target.getCoordinates(), StaticInitConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, StaticInitConfig.rrt_iteration_times, speed, this.getObstacles(),this.getConflicts(),this.index);
+            rrt_alg = new RRTAlg(super.getCenter_coordinates(), target.getCoordinates(), StaticInitConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, StaticInitConfig.rrt_iteration_times, speed, null, this.getConflicts(), this.index);
         }
         initColor(index);
     }
@@ -118,11 +120,12 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
             } else {
                 logger.error("null path");
             }
-        this.setReplanned_at_current_time_step(true);
+            this.setReplanned_at_current_time_step(true);
         }
     }
 
     private void runRRT() {
+        rrt_alg.setObstacles(this.getObstacles());
         rrt_alg.setGoal_coordinate(target_indicated_by_role.getCoordinates());
         rrt_alg.setInit_coordinate(center_coordinates);
         rrt_tree = rrt_alg.buildRRT(center_coordinates, current_angle);
@@ -151,18 +154,6 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
 
     public void resetCurrentIndexOfPath() {
         this.current_index_of_planned_path = -1;
-    }
-
-    private boolean targetReached() {
-        if (this.target_indicated_by_role == null) {
-            return true;
-        } else if (DistanceUtil.distanceBetween(this.center_coordinates, this.target_indicated_by_role.getCoordinates()) < StaticInitConfig.SAFE_DISTANCE_FOR_TARGET) {
-            this.target_indicated_by_role = null;
-            return true;
-        } else {
-            return false;
-        }
-
     }
 
     public boolean moveToNextWaypoint() {
@@ -194,6 +185,7 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
         if (this.target_indicated_by_role == target_indicated_by_role) {
             return;
         }
+        this.setTarget_reached(false);
         this.target_indicated_by_role = target_indicated_by_role;
         this.setNeed_to_replan(true);
     }
@@ -238,6 +230,14 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
 
     public float[] getPrevious_waypoint() {
         return this.history_path.getLastWaypoint().toFloatArray();
+    }
+
+    public boolean isTarget_reached() {
+        return target_reached;
+    }
+
+    public void setTarget_reached(boolean target_reached) {
+        this.target_reached = target_reached;
     }
 
     public Circle getUav_radar() {
@@ -304,9 +304,16 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
 
     @Override
     public void addThreat(Threat threat) {
-        if (!this.kb.containsThreat(threat)) {
-            this.kb.addThreat(threat);
+        ArrayList<Threat> threats = this.getThreats();
+        for (int i = 0; i < threats.size(); i++) {
+            Threat current_threat = threats.get(i);
+            if (threat.getIndex() == current_threat.getIndex()) {
+                this.kb.removeThreat(current_threat);
+                this.addThreat(threat);
+                return;
+            }
         }
+        this.kb.addThreat(threat);
     }
 
     public KnowledgeInterface getKb() {

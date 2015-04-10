@@ -5,6 +5,7 @@
  */
 package world;
 
+import world.model.KnowledgeAwareInterface;
 import world.model.Target;
 
 /**
@@ -13,8 +14,8 @@ import world.model.Target;
  */
 public class DummyMessageDispatcher extends MessageDispatcher{
 
-    public DummyMessageDispatcher(World world) {
-        super(world);
+    public DummyMessageDispatcher(KnowledgeAwareInterface intelligent_unit) {
+        super(intelligent_unit);
     }
 
     @Override

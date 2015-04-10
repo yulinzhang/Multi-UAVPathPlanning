@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import world.model.Conflict;
+import world.model.KnowledgeAwareInterface;
 import world.model.KnowledgeInterface;
 import world.model.Obstacle;
 import world.model.Target;
@@ -26,8 +27,8 @@ public class RegisteredMessageDispatcher extends MessageDispatcher {
     private Map<Integer, Rectangle> gis_rect_registered;
     private Map<Integer, Integer> target_registered;
 
-    public RegisteredMessageDispatcher(World world) {
-        super(world);
+    public RegisteredMessageDispatcher(KnowledgeAwareInterface intelligent_unit) {
+        super(intelligent_unit);
         gis_rect_registered = new HashMap<Integer, Rectangle>();
         target_registered=new HashMap<Integer, Integer>();
     }
@@ -48,14 +49,14 @@ public class RegisteredMessageDispatcher extends MessageDispatcher {
 
     @Override
     public void decideAndSumitMsgToSend() {
-        List<Obstacle> obstacles = world.getObstacles();
+        List<Obstacle> obstacles = intelligent_unit.getObstacles();
         int obstacle_num = obstacles.size();
-        List<Threat> threats = world.getThreats();
+        List<Threat> threats = intelligent_unit.getThreats();
         int threat_num = threats.size();
-        List<Conflict> conflicts = world.getConflicts();
+        List<Conflict> conflicts = intelligent_unit.getConflicts();
         int conflict_num = conflicts.size();
 
-        List<UAV> attackers = world.getAttackers();
+        List<UAV> attackers = World.getAttackers();
         int attacker_num = attackers.size();
         for (int i = 0; i < attacker_num; i++) {
             UAV attacker = attackers.get(i);

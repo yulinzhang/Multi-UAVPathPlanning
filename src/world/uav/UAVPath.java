@@ -6,16 +6,16 @@
 package world.uav;
 
 import config.StaticInitConfig;
+import java.io.Serializable;
 import java.util.LinkedList;
 import util.DistanceUtil;
-import world.Message;
 import world.model.shape.Point;
 
 /**
  *
  * @author boluo
  */
-public class UAVPath{
+public class UAVPath implements Serializable{
 
     private LinkedList<Point> waypoints;
     private float path_length = 0;

@@ -27,11 +27,11 @@ public abstract class KnowledgeInterface implements TreeModel {
     protected int threat_num;
     protected int conflict_num;
 
-    protected ArrayList<Object> root_child;
+    protected ArrayList<String> root_child;
     protected final ArrayList<TreeModelListener> treeModelListeners = new ArrayList<TreeModelListener>();
 
     public KnowledgeInterface() {
-        root_child = new ArrayList<Object>();
+        root_child = new ArrayList<String>();
         root_child.add(firstChild);
         root_child.add(secondChild);
         root_child.add(thirdChild);
@@ -97,13 +97,13 @@ public abstract class KnowledgeInterface implements TreeModel {
 
     @Override
     public boolean isLeaf(Object node) {
-        if (node == rootNode || root_child.contains(node)) {
+        if (node.equals(rootNode) || root_child.contains(node.toString())) {
             return false;
         }
         return true;
     }
-    
-        @Override
+
+    @Override
     public int getChildCount(Object parent) {
         if (parent == rootNode) {
             return 3;
@@ -118,11 +118,12 @@ public abstract class KnowledgeInterface implements TreeModel {
         }
         return 0;
     }
+
     @Override
     public void valueForPathChanged(TreePath path, Object newValue) {
     }
-    
-       @Override
+
+    @Override
     public Object getChild(Object parent, int index) {
         if (parent == rootNode) {
             return root_child.get(index);
@@ -137,7 +138,7 @@ public abstract class KnowledgeInterface implements TreeModel {
         }
         return null;
     }
-    
+
     public abstract boolean removeObstacle(Obstacle obstacle);
 
     public abstract boolean removeThreat(Threat threat);

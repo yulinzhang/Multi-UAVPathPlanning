@@ -79,11 +79,9 @@ public class AnimationPanel extends JPanel implements MouseListener {
     private ArrayList<UAV> scouts;
     private ArrayList<UAV> enemy_uavs;
     private UAVBase uav_base;
-    private ArrayList<Obstacle> obstacles;
-    private ArrayList<Threat> threats;
 
     public static int highlight_uav_index = -1;
-    public static int highlight_obstacle_index = -1;
+    public static int highlight_obstacle_index =-1;
     public static int highlight_threat_index = -1;
 
     private long simulation_time_in_milli_seconds = 0;
@@ -150,15 +148,15 @@ public class AnimationPanel extends JPanel implements MouseListener {
             world = new World(init_config);
             this.scouts = world.getScouts();
             this.attackers = world.getAttackers();
-
+            
             //initiate obstacles in level 2
-            this.initObstaclesInObstacleImageInLevel2(world.getObstacles());
-            this.initTargetInObstacleImageLevel2(world.getThreats());
+            this.initObstaclesInObstacleImageInLevel2(world.getObstaclesForUIRendering());
+            this.updateTargetInUAVImageLevel(world.getThreatsForUIRendering());
 
             //initiate parameters according to world
             this.initParameterFromInitConfig(world);
 
-            my_popup_menu = new MyPopupMenu(world);
+            my_popup_menu = new MyPopupMenu(world.getControl_center());
             this.addMouseListener(this);
 
         } catch (IOException ex) {
@@ -203,8 +201,6 @@ public class AnimationPanel extends JPanel implements MouseListener {
         this.scouts = world.getScouts();
         this.attackers = world.getAttackers();
         this.enemy_uavs = world.getEnemy_uavs();
-        this.threats = world.getThreats();
-        this.obstacles = world.getObstacles();
         this.uav_base = world.getUav_base();
 
     }
@@ -228,12 +224,12 @@ public class AnimationPanel extends JPanel implements MouseListener {
      *
      * @param static_threats
      */
-    private void initTargetInObstacleImageLevel2(ArrayList<Threat> threats) {
+    private void updateTargetInUAVImageLevel(ArrayList<Threat> threats) {
         for (Threat threat : threats) {
-            if (threat.getIndex() == AnimationPanel.highlight_threat_index) {
-                virtualizer.drawTarget(obstacle_image_graphics, threat, GraphicConfig.threat_color, GraphicConfig.highlight_threat_color);
+            if (threat.getIndex()== AnimationPanel.highlight_threat_index) {
+                virtualizer.drawTarget(uav_image_graphics, threat, GraphicConfig.threat_color, GraphicConfig.highlight_threat_color);
             }
-            virtualizer.drawTarget(obstacle_image_graphics, threat, GraphicConfig.threat_color, null);
+            virtualizer.drawTarget(uav_image_graphics, threat, GraphicConfig.threat_color, null);
         }
     }
 
@@ -268,7 +264,8 @@ public class AnimationPanel extends JPanel implements MouseListener {
 
     private void updateImageCausedByUAVMovement() {
         initUAVBase(uav_image_graphics);
-        updateHighlightObstacleImage(obstacles);
+        updateTargetInUAVImageLevel(world.getThreatsForUIRendering());
+        updateHighlightObstacleImage(world.getObstaclesForUIRendering());
         updateUAVImageInLevel4();
         updateFogOfWarImageInLevel3();
         updateUAVHistoryPath();

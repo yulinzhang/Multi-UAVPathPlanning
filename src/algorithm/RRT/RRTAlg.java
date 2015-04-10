@@ -6,6 +6,7 @@
 package algorithm.RRT;
 
 import config.StaticInitConfig;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ import world.model.shape.Trajectory;
  *
  * @author boluo
  */
-public class RRTAlg {
+public class RRTAlg implements Serializable {
 
     /**
      * external variables
@@ -77,8 +78,12 @@ public class RRTAlg {
         this.bound_width = bound_width;
         this.goal_probability = goal_probability;
         this.goal_coordinate = goal_coordinate;
-        this.conflicts=conflicts;
-        this.uav_index=uav_index;
+        if (conflicts != null) {
+            this.conflicts = conflicts;
+        }else{
+            this.conflicts=new ArrayList<Conflict>();
+        }
+        this.uav_index = uav_index;
     }
 
     public RRTTree buildRRT(float[] init_coordinate, float current_angle) {
@@ -100,23 +105,20 @@ public class RRTAlg {
             nearest_node = nearestVertex(random_goal, G);
             //extend the child node and validate its confliction 
             new_node = extendTowardGoalWithDynamics(nearest_node, random_goal, this.max_delta_distance, max_angle);
-            new_node.setExpected_time_step(nearest_node.getExpected_time_step()+1);
-            boolean conflict_with_other_uavs=false;
-            int conflict_num=this.conflicts.size();
-            for(int i=0;i<conflict_num;i++)
-            {
-                Conflict conflict=this.conflicts.get(i);
-                if(conflict.getUav_index()>this.uav_index)
-                {
-                    conflict_with_other_uavs=ConflictCheckUtil.checkUAVConflict(new_node,conflict);
+            new_node.setExpected_time_step(nearest_node.getExpected_time_step() + 1);
+            boolean conflict_with_other_uavs = false;
+            int conflict_num = this.conflicts.size();
+            for (int i = 0; i < conflict_num; i++) {
+                Conflict conflict = this.conflicts.get(i);
+                if (conflict.getUav_index() > this.uav_index) {
+                    conflict_with_other_uavs = ConflictCheckUtil.checkUAVConflict(new_node, conflict);
                 }
-                if(conflict_with_other_uavs)
-                {
+                if (conflict_with_other_uavs) {
                     break;
                 }
             }
 //            conflict_with_other_uavs=false;
-            boolean conflicted = ConflictCheckUtil.checkNodeInObstacles(obstacles, new_node)||conflict_with_other_uavs;
+            boolean conflicted = ConflictCheckUtil.checkNodeInObstacles(obstacles, new_node) || conflict_with_other_uavs;
 //            boolean within_bound = BoundUtil.withinBound(new_node, bound_width, bound_height);
             //if not conflicted,add the child to the tree
             if (!conflicted && true) {
@@ -506,6 +508,14 @@ public class RRTAlg {
 
     public void setInit_coordinate(float[] init_coordinate) {
         this.init_coordinate = init_coordinate;
+    }
+
+    public ArrayList<Obstacle> getObstacles() {
+        return obstacles;
+    }
+
+    public void setObstacles(ArrayList<Obstacle> obstacles) {
+        this.obstacles = obstacles;
     }
 
 }

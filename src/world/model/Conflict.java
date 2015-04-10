@@ -6,7 +6,15 @@
 package world.model;
 
 import config.StaticInitConfig;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import world.Message;
 import world.model.shape.Point;
 
@@ -14,40 +22,36 @@ import world.model.shape.Point;
  *
  * @author boluo
  */
-public class Conflict extends Message{
+public class Conflict extends Message implements Serializable {
 
     private int uav_index;
     private float conflict_range;
     private LinkedList<Point> path_prefound;
     private int decision_time_step;
-    
-    public Conflict(int uav_index,LinkedList<Point> path_prefound,int decision_time_step,float conflict_range)
-    {
-        this.uav_index=uav_index;
-        this.path_prefound=path_prefound;
-        this.decision_time_step=decision_time_step;
-        this.msg_type=Message.CONFLICT_MSG;
-        this.conflict_range=conflict_range;
+
+    public Conflict(int uav_index, LinkedList<Point> path_prefound, int decision_time_step, float conflict_range) {
+        this.uav_index = uav_index;
+        this.path_prefound = path_prefound;
+        this.decision_time_step = decision_time_step;
+        this.msg_type = Message.CONFLICT_MSG;
+        this.conflict_range = conflict_range;
     }
-    
-    public void sort()
-    {
-        int path_len=path_prefound.size();
+
+    public void sort() {
+        int path_len = path_prefound.size();
         Point temp;
-        for(int i=0;i<path_len;i++)
-        {
-            Point point1=path_prefound.get(i);
-            for(int j=i+1;j<path_len;j++)
-            {
-                Point point2=path_prefound.get(j);
-                if(point1.getExptected_time_step()>=point2.getExptected_time_step())
-                {
+        for (int i = 0; i < path_len; i++) {
+            Point point1 = path_prefound.get(i);
+            for (int j = i + 1; j < path_len; j++) {
+                Point point2 = path_prefound.get(j);
+                if (point1.getExptected_time_step() >= point2.getExptected_time_step()) {
                     path_prefound.set(i, point2);
                     path_prefound.set(j, point1);
                 }
             }
         }
     }
+
     public int getUav_index() {
         return uav_index;
     }
@@ -79,17 +83,37 @@ public class Conflict extends Message{
     public void setConflict_range(float conflict_range) {
         this.conflict_range = conflict_range;
     }
-    
-    
+
     @Override
-    public String toString()
-    {
-        return StaticInitConfig.CONFLICT_NAME+this.uav_index;
+    public String toString() {
+        return StaticInitConfig.CONFLICT_NAME + this.uav_index;
     }
 
     @Override
     public int getMsgSize() {
         return this.path_prefound.size();
+    }
+    
+        @Override
+    public boolean equals(Object obj)
+    {
+        return false;
+    }
+    
+    public Object deepClone(){
+        try {
+            ByteArrayOutputStream bo = new ByteArrayOutputStream();
+            ObjectOutputStream oo = new ObjectOutputStream(bo);
+            oo.writeObject(this);
+            ByteArrayInputStream bi = new ByteArrayInputStream(bo.toByteArray());
+            ObjectInputStream oi = new ObjectInputStream(bi);
+            return (oi.readObject());
+        } catch (IOException ex) {
+            Logger.getLogger(Target.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Target.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
     
 }

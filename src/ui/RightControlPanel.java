@@ -37,8 +37,6 @@ public class RightControlPanel extends javax.swing.JPanel implements TreeSelecti
         RightControlPanel.jTree1.addMouseListener(this);
         RightControlPanel.jTree1.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         RightControlPanel.jTree1.addTreeSelectionListener(this);
-        RightControlPanel.kb = World.kb;
-        RightControlPanel.jTree1.setModel(kb);
         
         popMenu=new JPopupMenu();
         JMenuItem dellItem=new JMenuItem("删除");
@@ -114,8 +112,8 @@ public class RightControlPanel extends javax.swing.JPanel implements TreeSelecti
                 AnimationPanel.highlight_uav_index = index;
             }
         } else if(select_obj!=null){
-            AnimationPanel.highlight_obstacle_index = -1;
-            AnimationPanel.highlight_threat_index = -1;
+            AnimationPanel.highlight_obstacle_index =-1;
+            AnimationPanel.highlight_threat_index =-1;
             AnimationPanel.highlight_uav_index = -1;
         }
     }

@@ -8,13 +8,21 @@ package world.model;
 import config.StaticInitConfig;
 import java.awt.Polygon;
 import java.awt.Rectangle;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import world.Message;
 
 /**
  *
  * @author boluo
  */
-public class Obstacle extends Message {
+public class Obstacle extends Message implements Serializable {
 
     private int index;
     private Polygon shape;
@@ -26,7 +34,7 @@ public class Obstacle extends Message {
         if (shape != null) {
             this.mbr = shape.getBounds();
         }
-        this.msg_type=Message.OBSTACLE_MSG;
+        this.msg_type = Message.OBSTACLE_MSG;
     }
 
     public Polygon getShape() {
@@ -57,16 +65,14 @@ public class Obstacle extends Message {
     public String toString() {
         return StaticInitConfig.OBSTACLE_NAME + this.index;
     }
-    
-    public String getPointsStr()
-    {
-        int[] xpoints=shape.xpoints;
-        int[] ypoints=shape.ypoints;
-        int point_num=shape.npoints;
-        String result="";
-        for(int i=0;i<point_num;i++)
-        {
-            result+=xpoints[i]+","+ypoints[i]+" ";
+
+    public String getPointsStr() {
+        int[] xpoints = shape.xpoints;
+        int[] ypoints = shape.ypoints;
+        int point_num = shape.npoints;
+        String result = "";
+        for (int i = 0; i < point_num; i++) {
+            result += xpoints[i] + "," + ypoints[i] + " ";
         }
         return result.trim();
     }
@@ -76,4 +82,29 @@ public class Obstacle extends Message {
         return 1;
     }
 
+    public Object deepClone() {
+        try {
+            ByteArrayOutputStream bo = new ByteArrayOutputStream();
+            ObjectOutputStream oo = new ObjectOutputStream(bo);
+            oo.writeObject(this);
+            ByteArrayInputStream bi = new ByteArrayInputStream(bo.toByteArray());
+            ObjectInputStream oi = new ObjectInputStream(bi);
+            return (oi.readObject());
+        } catch (IOException ex) {
+            Logger.getLogger(Target.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Target.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Obstacle) {
+            Obstacle obs = (Obstacle) obj;
+            return this.mbr.equals(obs.mbr);
+        }else{
+            return false;
+        }
+    }
 }
