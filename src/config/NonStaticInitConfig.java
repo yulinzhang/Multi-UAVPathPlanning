@@ -20,10 +20,10 @@ import world.model.Threat;
 public class NonStaticInitConfig {
 
 
-    private int enemy_num;
-    private int threat_num;
-    private int attacker_num;
-    private int scout_num;
+    private int enemy_num; //The number of enemy uavs
+    private int threat_num; //The number of enemy threats
+    private int attacker_num; //The number of our attackers
+    private int scout_num; //The number of our scouts
 
     private ArrayList<Obstacle> obstacles;
     private ArrayList<Threat> threats;

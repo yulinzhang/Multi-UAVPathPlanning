@@ -32,23 +32,33 @@ public class UAVPath implements Serializable{
         return this.waypoints.size();
     }
 
+    /**
+     * add waypoint to end and undate path length
+     * 
+     * @param point 
+     */
     public void addWaypointToEnd(Point point) {
         if (this.waypoints.size() > 0) {
             float length = DistanceUtil.distanceBetween(point.toFloatArray(), this.waypoints.getLast().toFloatArray());
             this.waypoints.addLast(point);
             this.path_length += length;
         } else {
-            this.waypoints.add(point);
+            this.waypoints.add(point); //this point is origin
         }
     }
 
+    /**
+     * add waypoint to beginning and undate path length
+     * 
+     * @param point 
+     */
     public void addWaypointToBeginning(Point point) {
         if (this.waypoints.size() > 0) {
             float length = DistanceUtil.distanceBetween(point.toFloatArray(), this.waypoints.getFirst().toFloatArray());
             this.waypoints.addFirst(point);
             this.path_length += length;
         } else {
-            this.waypoints.add(point);
+            this.waypoints.add(point); //this point is origin
         }
     }
 
@@ -72,6 +82,12 @@ public class UAVPath implements Serializable{
         this.path_length = path_length;
     }
     
+    /**
+     * Determining whether UAC has reached the target point
+     * 
+     * @param target_coord
+     * @return 
+     */
     public boolean pathReachEndPoint(float[] target_coord)
     {
         float dist_to_target=DistanceUtil.distanceBetween(this.waypoints.getLast().toFloatArray(), target_coord);

@@ -14,16 +14,16 @@ import world.model.Threat;
  */
 public class StaticInitConfig {
 
-    public static boolean SIMULATION_ON = true;
+    public static boolean SIMULATION_ON = true; //enable simulation
 
-    public static Integer ATTACKER_NUM =3;
-    public static Integer SCOUT_NUM = 1;
-    public static Integer ENEMY_UAV_NUM = 0;
-    public static Integer THREAT_NUM = 3;
+    public static Integer ATTACKER_NUM =3; //The number of our attackers
+    public static Integer SCOUT_NUM = 1; //The number of our attackers
+    public static Integer ENEMY_UAV_NUM = 0; //The number of enemy uavs
+    public static Integer THREAT_NUM = 3; //The number of enemy threats
 
-    public static boolean VIEW_OBSTACLE = false;
-    public static boolean VIEW_THREAT = false;
-    public static boolean VIEW_ENEMY_UAV = false;
+    public static boolean VIEW_OBSTACLE = false; //Determine whether an obstacle is detected
+    public static boolean VIEW_THREAT = false; //Determine whether a threat is detected
+    public static boolean VIEW_ENEMY_UAV = false; //Determine whether an enemy uav is detected
 
     public static String VIEW_OBSTACLE_ACTION_COMMAND = "显示障碍";
     public static String VIEW_THREAT_ACTION_COMMAND = "显示威胁";
@@ -41,8 +41,10 @@ public class StaticInitConfig {
 
     public static Threat NON_ROLE = null;
 
+    //Extend towards the goal with probability
     public static float rrt_goal_toward_probability = 0.8f;
     public static int rrt_iteration_times = 1000;
+    //Set a safe distance from the target point
     public static int SAFE_DISTANCE_FOR_TARGET=5;
     public static int SAFE_DISTANCE_FOR_CONFLICT=5;
     public static int rrt_planning_times_for_each_uav=4;
@@ -56,7 +58,7 @@ public class StaticInitConfig {
     public static boolean SHOW_HISTORY_PATH = false;
     public static boolean SHOW_FOG_OF_WAR = true;
     
-    public static int STATIC_THREAT_TYPE = 0;
+    public static int STATIC_THREAT_TYPE = 0; //Distinguish between types of threats
     public static int DYNAMIC_THREAT_TYPE = 1;
     
     public static String UAV_KNOWLEDGE="UAV知识";
@@ -68,6 +70,7 @@ public class StaticInitConfig {
     public static String OBSTACLE_NAME="障碍";
     public static String CONFLICT_NAME="冲突UAV";
     
+    //Distinguish between types of information-sharing
     public static int BROADCAST_INFOSHARE=0; 
     public static int NONE_INFORSHARE=1;
     public static int REGISTER_BASED_INFORSHARE=2;

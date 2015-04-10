@@ -34,12 +34,12 @@ import world.model.shape.Trajectory;
  */
 public class UAV extends Unit implements KnowledgeAwareInterface {
 
-    private Circle uav_radar;
+    private Circle uav_radar; //the uav color in world
     private Color center_color;
-    public Color radar_color;
+    public Color radar_color; //the radar color in world
 
     private UAVPath path_planned_at_current_time_step;
-    private int current_index_of_planned_path = 0;
+    private int current_index_of_planned_path = 0; //index of waypoint
     private UAVPath path_planned_at_last_time_step;
     private UAVPath history_path;
     private boolean need_to_replan = true;
@@ -99,6 +99,9 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
         this.setPath_prefound(path);
     }
 
+    /**
+     * path planning
+     */
     public void pathPlan() {
         if (this.need_to_replan) {
             this.path_planned_at_last_time_step = this.path_planned_at_current_time_step;
@@ -156,6 +159,11 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
         this.current_index_of_planned_path = -1;
     }
 
+    /**
+     * Drive UAV to next waypoint
+     * 
+     * @return 
+     */
     public boolean moveToNextWaypoint() {
         current_index_of_planned_path++;
         if (path_planned_at_current_time_step.getWaypointNum() == 0 || current_index_of_planned_path >= path_planned_at_current_time_step.getWaypointNum()) {
@@ -195,6 +203,12 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
         this.history_path.addWaypointToEnd(previous_waypoint);
     }
 
+    /**
+     * parsing the received information, and the information is converted into 
+     * structures uav can understand.
+     * 
+     * @param msg 
+     */
     private void parseMessage(Message msg) {
         int msg_type = msg.getMsg_type();
         if (msg_type == Message.CONFLICT_MSG) {
@@ -210,12 +224,22 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
         }
     }
 
+    /**
+     * receive message and parse message
+     * 
+     * @param msg 
+     */
     public void receiveMesage(Message msg) {
         if (msg != null) {
             parseMessage(msg);
         }
     }
 
+    /**
+     * To determine whether the need for re-planning
+     * 
+     * @param need_to_replan 
+     */
     public void setNeed_to_replan(boolean need_to_replan) {
         this.need_to_replan = need_to_replan;
     }

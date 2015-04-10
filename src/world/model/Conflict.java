@@ -26,7 +26,7 @@ public class Conflict extends Message implements Serializable {
 
     private int uav_index;
     private float conflict_range;
-    private LinkedList<Point> path_prefound;
+    private LinkedList<Point> path_prefound; //waypoints have been generated
     private int decision_time_step;
 
     public Conflict(int uav_index, LinkedList<Point> path_prefound, int decision_time_step, float conflict_range) {
