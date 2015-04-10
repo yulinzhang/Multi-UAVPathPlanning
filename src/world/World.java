@@ -10,7 +10,7 @@ import world.model.Obstacle;
 import config.NonStaticInitConfig;
 import config.StaticInitConfig;
 import java.util.ArrayList;
-import java.util.TreeSet;
+import util.BoundUtil;
 import util.ConflictCheckUtil;
 import world.uav.UAV;
 import world.uav.UAVBase;
@@ -18,6 +18,8 @@ import util.DistanceUtil;
 import world.model.Conflict;
 import world.model.OntologyBasedKnowledge;
 import world.model.Target;
+import world.model.shape.Point;
+import world.uav.UAVPath;
 
 /**
  *
@@ -164,8 +166,7 @@ public class World {
             float[] attacker1_coord = attacker1.getCenter_coordinates();
             for (int j = i + 1; j < this.attacker_num; j++) {
                 UAV attacker2 = this.attackers.get(j);
-                if(attacker2.isTarget_reached())
-                {
+                if (attacker2.isTarget_reached()) {
                     continue;
                 }
                 float[] attacker2_coord = attacker2.getCenter_coordinates();
@@ -202,7 +203,7 @@ public class World {
         for (int i = 0; i < this.attacker_num; i++) {
             UAV attacker = this.attackers.get(i);
             boolean moved = attacker.moveToNextWaypoint();
-            Target uav_target = attacker.getRole_target();
+            Target uav_target = attacker.getTarget_indicated_by_role();
             if (moved || uav_target == null) {
                 continue;
             }
@@ -231,7 +232,8 @@ public class World {
                         attacker.setTarget_reached(true);
                         threat.setEnabled(false);
                     }
-                } else if (!attacker.containsThreat(threat) && dist_from_attacker_to_threat < attacker.getUav_radar().getRadius()) {
+                } else 
+                    if (!attacker.containsThreat(threat) && dist_from_attacker_to_threat < attacker.getUav_radar().getRadius()) {
                     attacker.addThreat(threat);
                     attacker.setNeed_to_replan(true);
                 }
@@ -295,8 +297,42 @@ public class World {
             Threat threat = threats.get(i);
             boolean moved = threat.moveToNextWaypoint();
             if (!moved) {
-                threat.setGoal(this.randomGoalForThreat());
-                threat.pathPlan();
+                planPathForThreat(threat);
+            }
+        }
+        this.control_center.setThreats(threats);
+    }
+
+    private void planPathForThreat(Threat threat) {
+        if (threat.getSpeed() == 0) {
+            return;
+        }
+        UAVPath path = new UAVPath();
+        float coord_x, coord_y;
+        coord_x = threat.getCoordinates()[0];
+        coord_y = threat.getCoordinates()[1];
+        float initial_angle = threat.getCurrent_angle();
+        float threat_angle = initial_angle;
+        float speed = threat.getSpeed();
+        boolean point_conflicted_with_obstacles;
+        Point point = new Point(coord_x, coord_y, threat_angle);
+        path.addWaypointToEnd(point);
+        while (true) {
+            coord_x += speed * (float) Math.cos(threat_angle);
+            coord_y += speed * (float) Math.sin(threat_angle);
+            point_conflicted_with_obstacles = ConflictCheckUtil.checkPointInObstacles(obstacles, coord_x, coord_y);
+            if (point_conflicted_with_obstacles || !BoundUtil.withinBound(coord_x, coord_y, bound_width, bound_height) || DistanceUtil.distanceBetween(threat.getCoordinates(), new float[]{coord_x, coord_y}) > StaticInitConfig.maximum_threat_movement_length) {
+                coord_x -= speed * (float) Math.cos(threat_angle);
+                coord_y -= speed * (float) Math.sin(threat_angle);
+                threat_angle += Math.PI / 2;
+                if (threat_angle > Math.PI * 2) {
+                    threat_angle -= Math.PI * 2;
+                    threat.setPath_planned_at_current_time_step(path);
+                    break;
+                }
+            } else {
+                point = new Point(coord_x, coord_y, threat_angle);
+                path.addWaypointToEnd(point);
             }
         }
     }
@@ -305,8 +341,11 @@ public class World {
      * undate all objects in world
      */
     public void updateAll() {
+        if (this.time_step > 2) {
+            int i = 0;
+        }
         updateConflict();
-//        updateThreatCoordinate();
+        updateThreatCoordinate();
         detectEvent();
         registerInfoRequirement();
         shareInfoAfterRegistration();

@@ -59,10 +59,6 @@ public class Unit {
         this.center_coordinates = center_coordinates;
     }
 
-    public Target getRole_target() {
-        return target_indicated_by_role;
-    }
-
     public void setRole_target(Threat role_target) {
         this.target_indicated_by_role = role_target;
     }

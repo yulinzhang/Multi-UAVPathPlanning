@@ -226,6 +226,8 @@ public class AnimationPanel extends JPanel implements MouseListener {
      */
     private void updateTargetInUAVImageLevel(ArrayList<Threat> threats) {
         for (Threat threat : threats) {
+            if(!threat.isEnabled())
+                continue;
             if (threat.getIndex()== AnimationPanel.highlight_threat_index) {
                 virtualizer.drawTarget(uav_image_graphics, threat, GraphicConfig.threat_color, GraphicConfig.highlight_threat_color);
             }

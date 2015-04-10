@@ -215,12 +215,15 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
             Conflict conflict = (Conflict) msg;
             //TODO:
             this.addConflict(conflict);
+            this.setNeed_to_replan(true);
         } else if (msg_type == Message.OBSTACLE_MSG) {
             Obstacle obstacle = (Obstacle) msg;
             this.addObstacle(obstacle);
+            this.setNeed_to_replan(true);
         } else if (msg_type == Message.THREAT_MSG) {
             Threat threat = (Threat) msg;
             this.addThreat(threat);
+            this.setNeed_to_replan(true);
         }
     }
 

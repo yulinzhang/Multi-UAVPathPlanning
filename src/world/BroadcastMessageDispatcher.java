@@ -43,7 +43,7 @@ public class BroadcastMessageDispatcher extends MessageDispatcher {
             for (int j = 0; j < obstacle_num; j++) {
                 Obstacle obstacle = obstacles.get(j);
                 if (!kb.containsObstacle(obstacle)) {
-                    this.addRecvMessage(i, obstacle);
+                    super.addRecvMessage(i, obstacle);
                 }
             }
             
@@ -61,7 +61,7 @@ public class BroadcastMessageDispatcher extends MessageDispatcher {
                 Conflict conflict=conflicts.get(j);
                 if(!kb.containsConflict(conflict))
                 {
-                    this.addRecvMessage(i, conflict);
+                    super.addRecvMessage(i, conflict);
                 }
             }
         }

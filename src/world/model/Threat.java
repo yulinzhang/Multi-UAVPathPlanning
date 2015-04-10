@@ -48,23 +48,17 @@ public class Threat extends Target implements Serializable {
         this.msg_type = Message.THREAT_MSG;
         this.speed = speed;
         this.path_planned_at_current_time_step = new UAVPath();
-        rrt_alg = new RRTAlg(coordinates, null, StaticInitConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, StaticInitConfig.rrt_iteration_times, speed, null, null, -1);
+//        rrt_alg = new RRTAlg(coordinates, null, StaticInitConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, StaticInitConfig.rrt_iteration_times, speed, null, null, -1);
     }
 
-    public void pathPlan() {
-        dummyPathPlan();
-    }
 
-    private void dummyPathPlan() {
-    }
-
-    private void runRRT() {
-        rrt_alg.setGoal_coordinate(goal);
-        rrt_alg.setInit_coordinate(coordinates);
-        rrt_tree = rrt_alg.buildRRT(coordinates, current_angle);
-        this.setPath_planned_at_current_time_step(rrt_tree.getPath_found());
-        this.resetCurrentIndexOfPath();
-    }
+//    private void runRRT() {
+//        rrt_alg.setGoal_coordinate(goal);
+//        rrt_alg.setInit_coordinate(coordinates);
+//        rrt_tree = rrt_alg.buildRRT(coordinates, current_angle);
+//        this.setPath_planned_at_current_time_step(rrt_tree.getPath_found());
+//        this.resetCurrentIndexOfPath();
+//    }
 
     public void resetCurrentIndexOfPath() {
         this.current_index_of_planned_path = -1;
@@ -74,12 +68,6 @@ public class Threat extends Target implements Serializable {
         if (this.speed == 0) {
             return true;
         }
-//        }else{
-//            for(float delta=0;delta<this.speed;delta++)
-//            {
-//                if(ConflictCheckUtil.checkNodeInObstacles(, null))
-//            }
-//        }
         current_index_of_planned_path++;
         if (path_planned_at_current_time_step.getWaypointNum() == 0 || current_index_of_planned_path >= path_planned_at_current_time_step.getWaypointNum()) {
             return false;
@@ -130,6 +118,14 @@ public class Threat extends Target implements Serializable {
         return goal;
     }
 
+    public float getCurrent_angle() {
+        return current_angle;
+    }
+
+    public void setCurrent_angle(float current_angle) {
+        this.current_angle = current_angle;
+    }
+
     public void setGoal(float[] goal) {
         this.goal = goal;
     }
@@ -144,6 +140,7 @@ public class Threat extends Target implements Serializable {
 
     public void setPath_planned_at_current_time_step(UAVPath path_planned_at_current_time_step) {
         this.path_planned_at_current_time_step = path_planned_at_current_time_step;
+        this.resetCurrentIndexOfPath();
     }
 
     @Override

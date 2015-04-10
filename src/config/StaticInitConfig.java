@@ -61,6 +61,8 @@ public class StaticInitConfig {
     public static int STATIC_THREAT_TYPE = 0; //Distinguish between types of threats
     public static int DYNAMIC_THREAT_TYPE = 1;
     
+    public static float maximum_threat_movement_length=20;
+    
     public static String UAV_KNOWLEDGE="UAV知识";
     public static String THREAT_INFO="威胁信息";
     public static String CONFLICT_INFO="冲突信息";

@@ -22,7 +22,12 @@ public class BoundUtil {
     public static boolean withinBound(RRTNode node, int bound_width, int bound_height)
     {
         float[] coordinate=node.getCoordinate();
-        if(coordinate[0]>bound_width||coordinate[0]<0||coordinate[1]>bound_height||coordinate[1]<0)
+        return withinBound(coordinate[0],coordinate[1],bound_width,bound_height);
+    }
+    
+    public static boolean withinBound(float coord_x,float coord_y,int bound_width, int bound_height)
+    {
+        if(coord_x>bound_width||coord_x<0||coord_y>bound_height||coord_y<0)
         {
             return false;
         }
