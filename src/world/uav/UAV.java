@@ -44,7 +44,8 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
     private UAVPath history_path;
     private boolean need_to_replan = true;
     private boolean replanned_at_current_time_step = false;
-    private boolean target_reached=false;
+    private boolean target_reached = false;
+    private boolean moved_at_last_time=false;
 
     //variables for conflict planning
     private KnowledgeInterface kb;
@@ -124,10 +125,13 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
                 logger.error("null path");
             }
             this.setReplanned_at_current_time_step(true);
+        } else {
+            this.setReplanned_at_current_time_step(false);
         }
     }
 
     private void runRRT() {
+        rrt_alg.setMax_delta_distance(this.speed);
         rrt_alg.setObstacles(this.getObstacles());
         rrt_alg.setGoal_coordinate(target_indicated_by_role.getCoordinates());
         rrt_alg.setInit_coordinate(center_coordinates);
@@ -161,12 +165,13 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
 
     /**
      * Drive UAV to next waypoint
-     * 
-     * @return 
+     *
+     * @return
      */
     public boolean moveToNextWaypoint() {
         current_index_of_planned_path++;
         if (path_planned_at_current_time_step.getWaypointNum() == 0 || current_index_of_planned_path >= path_planned_at_current_time_step.getWaypointNum()) {
+            this.moved_at_last_time=false;
             return false;
         }
         Point current_waypoint = this.path_planned_at_current_time_step.getWaypoint(current_index_of_planned_path);
@@ -174,6 +179,7 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
         setPreviousWaypoint();
         moveTo(coordinate[0], coordinate[1]);
         this.current_angle = (float) current_waypoint.getYaw();
+        this.moved_at_last_time=true;
         return true;
     }
 
@@ -193,7 +199,9 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
         if (this.target_indicated_by_role == target_indicated_by_role) {
             return;
         }
-        this.setTarget_reached(false);
+        if (target_indicated_by_role.getIndex() != -1) {
+            this.setTarget_reached(false);
+        }
         this.target_indicated_by_role = target_indicated_by_role;
         this.setNeed_to_replan(true);
     }
@@ -204,10 +212,10 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
     }
 
     /**
-     * parsing the received information, and the information is converted into 
+     * parsing the received information, and the information is converted into
      * structures uav can understand.
-     * 
-     * @param msg 
+     *
+     * @param msg
      */
     private void parseMessage(Message msg) {
         int msg_type = msg.getMsg_type();
@@ -229,8 +237,8 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
 
     /**
      * receive message and parse message
-     * 
-     * @param msg 
+     *
+     * @param msg
      */
     public void receiveMesage(Message msg) {
         if (msg != null) {
@@ -240,8 +248,8 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
 
     /**
      * To determine whether the need for re-planning
-     * 
-     * @param need_to_replan 
+     *
+     * @param need_to_replan
      */
     public void setNeed_to_replan(boolean need_to_replan) {
         this.need_to_replan = need_to_replan;
@@ -261,6 +269,14 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
 
     public boolean isTarget_reached() {
         return target_reached;
+    }
+
+    public boolean isMoved_at_last_time() {
+        return moved_at_last_time;
+    }
+
+    public void setMoved_at_last_time(boolean moved_at_last_time) {
+        this.moved_at_last_time = moved_at_last_time;
     }
 
     public void setTarget_reached(boolean target_reached) {
@@ -349,6 +365,14 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
 
     public void setKb(WorldKnowledge kb) {
         this.kb = kb;
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
     }
 
     public Color getCenter_color() {

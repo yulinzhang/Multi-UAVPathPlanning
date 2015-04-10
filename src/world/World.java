@@ -183,13 +183,29 @@ public class World {
         for (int i = 0; i < this.attacker_num; i++) {
             UAV attacker = this.attackers.get(i);
             int threat_index = attacker.getTarget_indicated_by_role().getIndex();
+            if (threat_index == -1) {
+                if (attacker.isTarget_reached() && !attacker.isMoved_at_last_time()) {
+                    float[] dummy_threat_coord = this.randomGoalForThreat(attacker.getCenter_coordinates());
+                    Threat dummy_threat = new Threat(-1, dummy_threat_coord, 0, 0);
+                    attacker.setTarget_indicated_by_role(dummy_threat);
+                    attacker.setNeed_to_replan(true);
+                    attacker.setSpeed(1);
+                }
+                continue;
+            }
+
             ArrayList<Threat> threats = this.getThreatsForUIRendering();
             for (int j = 0; j < threats.size(); j++) {
                 Threat threat = threats.get(j);
                 if (threat_index == threat.getIndex()) {
                     if (DistanceUtil.distanceBetween(attacker.getCenter_coordinates(), threat.getCoordinates()) < StaticInitConfig.SAFE_DISTANCE_FOR_TARGET) {
                         threat.setEnabled(false);
-                        attacker.setTarget_indicated_by_role(null);
+                        attacker.setTarget_reached(true);
+                        float[] dummy_threat_coord = this.randomGoalForThreat(attacker.getCenter_coordinates());
+                        Threat dummy_threat = new Threat(-1, dummy_threat_coord, 0, 0);
+                        attacker.setTarget_indicated_by_role(dummy_threat);
+                        attacker.setNeed_to_replan(true);
+                        attacker.setSpeed(1);
                     }
                 }
             }
@@ -203,10 +219,9 @@ public class World {
         for (int i = 0; i < this.attacker_num; i++) {
             UAV attacker = this.attackers.get(i);
             boolean moved = attacker.moveToNextWaypoint();
-            Target uav_target = attacker.getTarget_indicated_by_role();
-            if (moved || uav_target == null) {
-                continue;
-            }
+//            if (!moved) {
+////                attacker.setNeed_to_replan(true);
+//            }
         }
     }
 
@@ -227,13 +242,13 @@ public class World {
             for (int i = 0; i < threat_list_size; i++) {
                 Threat threat = this.getThreatsForUIRendering().get(i);
                 float dist_from_attacker_to_threat = DistanceUtil.distanceBetween(attacker.getCenter_coordinates(), threat.getCoordinates());
-                if (dist_from_attacker_to_threat < StaticInitConfig.SAFE_DISTANCE_FOR_TARGET) {
-                    if (threat.getIndex() == attacker.getTarget_indicated_by_role().getIndex()) {
-                        attacker.setTarget_reached(true);
-                        threat.setEnabled(false);
-                    }
-                } else 
-                    if (!attacker.containsThreat(threat) && dist_from_attacker_to_threat < attacker.getUav_radar().getRadius()) {
+//                if (dist_from_attacker_to_threat < StaticInitConfig.SAFE_DISTANCE_FOR_TARGET) {
+//                    if (threat.getIndex() == attacker.getTarget_indicated_by_role().getIndex()) {
+//                        attacker.setTarget_reached(true);
+//                        threat.setEnabled(false);
+//                    }
+//                } else 
+                if (!attacker.containsThreat(threat) && dist_from_attacker_to_threat < attacker.getUav_radar().getRadius()) {
                     attacker.addThreat(threat);
                     attacker.setNeed_to_replan(true);
                 }
@@ -274,7 +289,6 @@ public class World {
         for (int i = 0; i < this.attacker_num; i++) {
             UAV attacker = this.attackers.get(i);
             attacker.setNeed_to_replan(false);
-            attacker.setReplanned_at_current_time_step(false);
         }
     }
 
@@ -350,8 +364,9 @@ public class World {
         registerInfoRequirement();
         shareInfoAfterRegistration();
         planPathForAllAttacker();
-        updateAttackerCoordinate();
         resetDecisionParameter();
+        updateAttackerCoordinate();
+        checkThreatTerminate();
         checkConflict();
         this.time_step++;
     }
@@ -463,14 +478,15 @@ public class World {
 //    private boolean containsObstacle(Obstacle obstacle) {
 //        return this.obstacles.contains(obstacle);
 //    }
-    private float[] randomGoalForThreat() {
+    private float[] randomGoalForThreat(float[] current_coord) {
         float[] random_goal_coordinate = new float[2];
-        random_goal_coordinate[0] = (float) (Math.random() * this.bound_width);
-        random_goal_coordinate[1] = (float) (Math.random() * this.bound_height);
+        random_goal_coordinate[0] = current_coord[0]+(float) (100-Math.random() * 200);
+        random_goal_coordinate[1] = current_coord[1]+(float)  (100-Math.random() * 200);
+
         boolean collisioned = true;
         while (collisioned) {
-            random_goal_coordinate[0] = (float) (Math.random() * this.bound_width);
-            random_goal_coordinate[1] = (float) (Math.random() * this.bound_height);
+        random_goal_coordinate[0] = current_coord[0]+(float) (100-Math.random() * 200);
+        random_goal_coordinate[1] = current_coord[1]+(float)  (100-Math.random() * 200);
             if (!ConflictCheckUtil.checkPointInObstacles(this.getObstaclesForUIRendering(), random_goal_coordinate[0], random_goal_coordinate[1])) {
                 collisioned = false;
             }

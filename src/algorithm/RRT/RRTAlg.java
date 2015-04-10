@@ -514,6 +514,14 @@ public class RRTAlg implements Serializable {
         return obstacles;
     }
 
+    public float getMax_delta_distance() {
+        return max_delta_distance;
+    }
+
+    public void setMax_delta_distance(float max_delta_distance) {
+        this.max_delta_distance = max_delta_distance;
+    }
+
     public void setObstacles(ArrayList<Obstacle> obstacles) {
         this.obstacles = obstacles;
     }
