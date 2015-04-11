@@ -45,7 +45,7 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
     private boolean need_to_replan = true;
     private boolean replanned_at_current_time_step = false;
     private boolean target_reached = false;
-    private boolean moved_at_last_time=false;
+    private boolean moved_at_last_time = false;
 
     //variables for conflict planning
     private KnowledgeInterface kb;
@@ -171,7 +171,7 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
     public boolean moveToNextWaypoint() {
         current_index_of_planned_path++;
         if (path_planned_at_current_time_step.getWaypointNum() == 0 || current_index_of_planned_path >= path_planned_at_current_time_step.getWaypointNum()) {
-            this.moved_at_last_time=false;
+            this.moved_at_last_time = false;
             return false;
         }
         Point current_waypoint = this.path_planned_at_current_time_step.getWaypoint(current_index_of_planned_path);
@@ -179,7 +179,7 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
         setPreviousWaypoint();
         moveTo(coordinate[0], coordinate[1]);
         this.current_angle = (float) current_waypoint.getYaw();
-        this.moved_at_last_time=true;
+        this.moved_at_last_time = true;
         return true;
     }
 
@@ -353,8 +353,14 @@ public class UAV extends Unit implements KnowledgeAwareInterface {
             if (threat.getIndex() == current_threat.getIndex()) {
                 this.kb.removeThreat(current_threat);
                 this.addThreat(threat);
+                if (threat.getIndex() == this.target_indicated_by_role.getIndex()) {
+                    this.target_indicated_by_role = threat;
+                }
                 return;
             }
+        }
+        if (threat.getIndex() == this.target_indicated_by_role.getIndex()) {
+            this.target_indicated_by_role = threat;
         }
         this.kb.addThreat(threat);
     }

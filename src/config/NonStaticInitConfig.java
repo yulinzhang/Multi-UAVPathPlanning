@@ -82,7 +82,7 @@ public class NonStaticInitConfig {
 //                coordinate_y=400;
                 found = !ConflictCheckUtil.checkPointInObstacles(obstacles,coordinate_x, coordinate_y);
             }
-            Threat threat = new Threat(i, new float[]{coordinate_x, coordinate_y},StaticInitConfig.STATIC_THREAT_TYPE,0f);
+            Threat threat = new Threat(i, new float[]{coordinate_x, coordinate_y},StaticInitConfig.STATIC_THREAT_TYPE,1);
             threats.add(threat);
         }
     }

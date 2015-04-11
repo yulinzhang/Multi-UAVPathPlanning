@@ -46,7 +46,7 @@ public class StaticInitConfig {
     public static int rrt_iteration_times = 1000;
     //Set a safe distance from the target point
     public static int SAFE_DISTANCE_FOR_TARGET=5;
-    public static int SAFE_DISTANCE_FOR_CONFLICT=5;
+    public static int SAFE_DISTANCE_FOR_CONFLICT=2;
     public static int rrt_planning_times_for_each_uav=4;
 
     //how much time it takes to drive the simulaiton to next time step
