@@ -5,6 +5,7 @@
  */
 package world;
 
+import config.GraphicConfig;
 import world.model.Threat;
 import world.model.Obstacle;
 import config.NonStaticInitConfig;
@@ -12,7 +13,7 @@ import config.StaticInitConfig;
 import java.util.ArrayList;
 import util.BoundUtil;
 import util.ConflictCheckUtil;
-import world.uav.UAV;
+import world.uav.Attacker;
 import world.uav.UAVBase;
 import util.DistanceUtil;
 import world.model.Conflict;
@@ -20,6 +21,7 @@ import world.model.OntologyBasedKnowledge;
 import world.model.Target;
 import world.model.shape.Point;
 import world.uav.UAVPath;
+import world.uav.Scout;
 
 /**
  *
@@ -41,20 +43,27 @@ public class World {
     private int attacker_num; //The number of our attackers
 
     private float threat_radius = 100;
-    private float attacker_patrol_range; //The patrol range of attacker 
+    private float attacker_patrol_range; //The patrol range of scout 
 
     private int inforshare_algorithm = 0; //distinction between information-sharing algrithm
 
     //robot coordinates, robot_coordinates[1][0], robot_coordinates[1][1] represents the x, y coordinate of robot 1
-    private UAVBase uav_base;
+    private static UAVBase uav_base;
     /**
      * * internal variables
      *
      */
-    public static ArrayList<UAV> attackers;
-    private ArrayList<UAV> enemy_uavs;
-    private ArrayList<UAV> scouts;
+    public static ArrayList<Attacker> attackers;
+    private ArrayList<Attacker> enemy_uavs;
+    private ArrayList<Scout> scouts;
     private ControlCenter control_center;
+
+    private int total_path_len = 0;
+    private int total_msg_num = 0;
+
+    private int num_of_threat_remained;
+    private int no_threat_time_step = Integer.MAX_VALUE;
+    private int not_threat_time_found=0;
 
     private ArrayList<Conflict> conflicts;
     private ArrayList<Threat> threats;
@@ -67,6 +76,16 @@ public class World {
     private int conflict_times = 0;
 
     private float theta_increase_for_enemy_uav = (float) Math.PI / 40;
+
+    private boolean experiment_over = false;
+    public static String exp_index = "D:\\kingsoft\\dissertation\\simulator\\result";
+    public static String based_log_dir = "0";
+
+    static {
+        System.setProperty("LOGDIR", based_log_dir);
+        System.setProperty("EXP_INDEX", exp_index);
+    }
+
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(World.class);
 
     /**
@@ -78,14 +97,18 @@ public class World {
     public World(NonStaticInitConfig init_config) {
 //        World.kb = new WorldKnowledge();//OntologyBasedKnowledge();WorldKnowledge
         this.conflicts = new ArrayList<Conflict>();
-        this.control_center = new ControlCenter(new OntologyBasedKnowledge(), attackers);
+        this.control_center = new ControlCenter(new OntologyBasedKnowledge());
         initParameterFromInitConfig(init_config);
+        this.num_of_threat_remained = this.threat_num;
         initUAVs();
         this.control_center.setAttackers(attackers);
-        this.control_center.setObstacles(obstacles);
-        this.control_center.setThreats(threats);
+        this.control_center.setScouts(scouts);
+        this.control_center.setScout_speed(5);
+//        this.control_center.setObstacles(obstacles);
+//        this.control_center.setThreats(threats);
         this.control_center.setConflicts(conflicts);
-        control_center.roleAssign(-1, -1); //initialize role assignment
+        this.control_center.roleAssignForScouts();
+        control_center.roleAssignForAttacker(-1, -1); //initialize role assignment
     }
 
     /**
@@ -132,8 +155,13 @@ public class World {
         uav_base_center[1] = uav_base_coordinate[1] + uav_base_height / 2;
         for (int i = 0; i < attacker_num; i++) {
             Threat threat = this.getThreatsForUIRendering().get(i);
-            UAV attacker = new UAV(i, threat, StaticInitConfig.SIDE_A, uav_base_center, null);
+            Attacker attacker = new Attacker(i, null, StaticInitConfig.ATTACKER, uav_base_center, null);
             attackers.add(attacker);
+        }
+
+        for (int i = 0; i < scout_num; i++) {
+            Scout scout = new Scout(i, StaticInitConfig.SCOUT, uav_base_center, uav_base_center, control_center);
+            scouts.add(scout);
         }
     }
 
@@ -141,9 +169,9 @@ public class World {
      * initiate all uavs
      */
     private void initUAVs() {
-        this.scouts = new ArrayList<UAV>();
-        this.attackers = new ArrayList<UAV>();
-        this.enemy_uavs = new ArrayList<UAV>();
+        this.scouts = new ArrayList<Scout>();
+        this.attackers = new ArrayList<Attacker>();
+        this.enemy_uavs = new ArrayList<Attacker>();
         initScoutsAndAttackers();
 //        initEnemyUAV();
     }
@@ -152,7 +180,7 @@ public class World {
      * path planning for attackers
      */
     private void planPathForAllAttacker() {
-        for (UAV attacker : this.attackers) {
+        for (Attacker attacker : this.attackers) {
             attacker.pathPlan();
         }
     }
@@ -162,10 +190,10 @@ public class World {
      */
     private void checkConflict() {
         for (int i = 0; i < this.attacker_num; i++) {
-            UAV attacker1 = this.attackers.get(i);
+            Attacker attacker1 = this.attackers.get(i);
             float[] attacker1_coord = attacker1.getCenter_coordinates();
             for (int j = i + 1; j < this.attacker_num; j++) {
-                UAV attacker2 = this.attackers.get(j);
+                Attacker attacker2 = this.attackers.get(j);
                 if (attacker2.isTarget_reached()) {
                     continue;
                 }
@@ -179,36 +207,56 @@ public class World {
         }
     }
 
-    private void checkThreatTerminate() {
+    private void checkThreatReached() {
+        ArrayList<Obstacle> obstacles = this.obstacles;
         for (int i = 0; i < this.attacker_num; i++) {
-            UAV attacker = this.attackers.get(i);
+            Attacker attacker = this.attackers.get(i);
+            if (attacker.getTarget_indicated_by_role() == null) {
+                continue;
+            }
             int threat_index = attacker.getTarget_indicated_by_role().getIndex();
             if (threat_index == -1) {
-                if (attacker.isTarget_reached() && !attacker.isMoved_at_last_time()) {
-                    float[] dummy_threat_coord = this.randomGoalForThreat(attacker.getCenter_coordinates());
+                float[] target_coord = attacker.getTarget_indicated_by_role().getCoordinates();
+                float[] attacker_coord = attacker.getCenter_coordinates();
+                if (DistanceUtil.distanceBetween(attacker_coord, target_coord) < (attacker.getUav_radar().getRadius() + GraphicConfig.threat_height)) {
+                    attacker.setTarget_indicated_by_role(null);
+                    attacker.setNeed_to_replan(false);
+                    attacker.setTarget_reached(false);
+                    break;
+                }
+
+                if (attacker.isTarget_reached() || !attacker.isMoved_at_last_time()) {
+                    float[] dummy_threat_coord = this.randomGoalForAvailableUAV(attacker.getCenter_coordinates(), obstacles);
                     Threat dummy_threat = new Threat(-1, dummy_threat_coord, 0, 0);
                     attacker.setTarget_indicated_by_role(dummy_threat);
                     attacker.setNeed_to_replan(true);
-                    attacker.setSpeed(1);
+                    attacker.setTarget_reached(false);
+                    attacker.setSpeed(StaticInitConfig.SPEED_OF_ATTACKER_IDLE);
                 }
                 continue;
             }
 
-            ArrayList<Threat> threats = this.getThreatsForUIRendering();
+            ArrayList<Threat> threats = control_center.getThreats();
+            boolean threat_terminated = false;
             for (int j = 0; j < threats.size(); j++) {
                 Threat threat = threats.get(j);
                 if (threat_index == threat.getIndex()) {
-                    if (DistanceUtil.distanceBetween(attacker.getCenter_coordinates(), threat.getCoordinates()) < attacker.getUav_radar().getRadius()) {
+                    if (DistanceUtil.distanceBetween(attacker.getCenter_coordinates(), threat.getCoordinates()) < (attacker.getUav_radar().getRadius() + GraphicConfig.threat_height)) {
                         threat.setEnabled(false);
-                        attacker.setTarget_reached(true);
-                        float[] dummy_threat_coord = this.randomGoalForThreat(attacker.getCenter_coordinates());
+                        this.num_of_threat_remained--;
+                        attacker.setTarget_reached(false);
+                        float[] dummy_threat_coord = this.randomGoalForAvailableUAV(attacker.getCenter_coordinates(), obstacles);
                         Threat dummy_threat = new Threat(-1, dummy_threat_coord, 0, 0);
                         attacker.setTarget_indicated_by_role(dummy_threat);
                         attacker.setNeed_to_replan(true);
-                        attacker.setSpeed(1);
+                        attacker.setSpeed(StaticInitConfig.SPEED_OF_ATTACKER_IDLE);
+                        threat_terminated = true;
                     }
                     break;
                 }
+            }
+            if (threat_terminated) {
+                control_center.setThreats(threats);
             }
         }
     }
@@ -218,45 +266,73 @@ public class World {
      */
     private void updateAttackerCoordinate() {
         for (int i = 0; i < this.attacker_num; i++) {
-            UAV attacker = this.attackers.get(i);
+            Attacker attacker = this.attackers.get(i);
             boolean moved = attacker.moveToNextWaypoint();
-//            if (!moved) {
-////                attacker.setNeed_to_replan(true);
-//            }
+            if (moved) {
+//                scout.setNeed_to_replan(true);
+                logger.debug("attacker:" + attacker.getIndex() + " moved");
+            }
         }
     }
 
     /**
      * During patrol,the uav detect event by radar or share information
      */
-    private void detectEvent() {
-        for (UAV attacker : this.attackers) {
+    private void detectAttackerEvent() {
+        for (Attacker attacker : this.attackers) {
             int obs_list_size = this.getObstaclesForUIRendering().size();
             for (int i = 0; i < obs_list_size; i++) {
                 Obstacle obs = this.getObstaclesForUIRendering().get(i);
-                if (!attacker.containsObstacle(obs) && obs.getMbr().intersects(attacker.getUav_radar().getBounds())) {
-                    attacker.addObstacle(obs);
-                    attacker.setNeed_to_replan(true);
+                if (obs.getMbr().intersects(attacker.getUav_radar().getBounds())) {
+                    if (!attacker.containsObstacle(obs)) {
+                        attacker.addObstacle(obs);
+                        attacker.setNeed_to_replan(true);
+                        if (!control_center.containsObstacle(obs)) {
+                            control_center.addObstacle(obs);
+                        }
+                    }
                 }
             }
-            
+
             int threat_list_size = this.getThreatsForUIRendering().size();
             for (int i = 0; i < threat_list_size; i++) {
                 Threat threat = this.getThreatsForUIRendering().get(i);
                 float dist_from_attacker_to_threat = DistanceUtil.distanceBetween(attacker.getCenter_coordinates(), threat.getCoordinates());
-                if (threat.isEnabled()&& !attacker.containsThreat(threat) && dist_from_attacker_to_threat < attacker.getUav_radar().getRadius()) {
-                    attacker.addThreat(threat);
-                    attacker.setNeed_to_replan(true);
+                if (dist_from_attacker_to_threat < attacker.getUav_radar().getRadius() && threat.isEnabled()) {
+                    if (!attacker.containsThreat(threat)) {
+                        attacker.addThreat(threat);
+                        attacker.setNeed_to_replan(true);
+                    }
+
+                    if (!control_center.containsThreat(threat)) {
+                        control_center.addThreat(threat);
+                    }
                 }
             }
         }
     }
 
-    private void mandatoryReplan() {
-        for (int i = 0; i < this.attacker_num; i++) {
-            UAV attacker = this.attackers.get(i);
-            attacker.setNeed_to_replan(true);
-            attacker.setReplanned_at_current_time_step(true);
+    /**
+     * During patrol,the uav detect event by radar or share information
+     */
+    private void detectScoutEvent() {
+        for (Scout scout : this.scouts) {
+            int obs_list_size = this.getObstaclesForUIRendering().size();
+            for (int i = 0; i < obs_list_size; i++) {
+                Obstacle obs = this.getObstaclesForUIRendering().get(i);
+                if (!control_center.containsObstacle(obs) && obs.getMbr().intersects(scout.getUav_radar().getBounds())) {
+                    control_center.addObstacle(obs);
+                }
+            }
+
+            int threat_list_size = this.getThreatsForUIRendering().size();
+            for (int i = 0; i < threat_list_size; i++) {
+                Threat threat = this.getThreatsForUIRendering().get(i);
+                float dist_from_attacker_to_threat = DistanceUtil.distanceBetween(scout.getCenter_coordinates(), threat.getCoordinates());
+                if (threat.isEnabled() && !control_center.containsThreat(threat) && dist_from_attacker_to_threat < scout.getUav_radar().getRadius() * 0.9) {
+                    control_center.addThreat(threat);
+                }
+            }
         }
     }
 
@@ -266,10 +342,12 @@ public class World {
      */
     private void registerInfoRequirement() {
         for (int i = 0; i < this.attacker_num; i++) {
-            UAV attacker = this.attackers.get(i);
+            Attacker attacker = this.attackers.get(i);
             Target target = attacker.getTarget_indicated_by_role();
-            float[] attacker_coord = attacker.getCenter_coordinates();
-            this.msg_dispatcher.register(attacker.getIndex(), attacker_coord, target);
+            if (target != null) {
+                float[] attacker_coord = attacker.getCenter_coordinates();
+                this.msg_dispatcher.register(attacker.getIndex(), attacker_coord, target);
+            }
         }
     }
 
@@ -285,7 +363,7 @@ public class World {
 
     private void resetDecisionParameter() {
         for (int i = 0; i < this.attacker_num; i++) {
-            UAV attacker = this.attackers.get(i);
+            Attacker attacker = this.attackers.get(i);
             attacker.setNeed_to_replan(false);
         }
     }
@@ -295,7 +373,7 @@ public class World {
      */
     private void updateConflict() {
         for (int i = 0; i < this.attacker_num; i++) {
-            UAV attacker = this.attackers.get(i);
+            Attacker attacker = this.attackers.get(i);
             if (attacker.isReplanned_at_current_time_step()) {
                 Conflict conflict = new Conflict(attacker.getIndex(), attacker.getFuturePath().getWaypointsAsLinkedList(), this.time_step, StaticInitConfig.SAFE_DISTANCE_FOR_CONFLICT);
                 this.addConflict(conflict);
@@ -307,12 +385,14 @@ public class World {
         ArrayList<Threat> threats = this.getThreatsForUIRendering();
         for (int i = 0; i < threats.size(); i++) {
             Threat threat = threats.get(i);
+            if (!threat.isEnabled()) {
+                continue;
+            }
             boolean moved = threat.moveToNextWaypoint();
             if (!moved) {
                 planPathForThreat(threat);
             }
         }
-        this.control_center.setThreats(threats);
     }
 
     private void planPathForThreat(Threat threat) {
@@ -353,30 +433,93 @@ public class World {
      * undate all objects in world
      */
     public void updateAll() {
-        if (this.time_step > 2) {
-            int i = 0;
+        if (this.time_step == 0) {
+            logger.info("-------------------------------------");
+            logger.info("attacker_num=" + this.attacker_num + " scout_num=" + this.scout_num + " threat_num=" + this.threat_num +" obstalce_num="+NonStaticInitConfig.obstacle_num+ " infoshare=" + this.inforshare_algorithm + "(0:broadcast 1:noinfor 2:intelligent)");
         }
-        
-        updateThreatCoordinate();
-        detectEvent();
+        updateScoutInControlCenter();
+        logger.debug("scout updated in control center over");
+        detectScoutEvent();
+        logger.debug("scout event detect over");
+        detectAttackerEvent();
+        logger.debug("attacker detect over");
         registerInfoRequirement();
+        logger.debug("information register over");
         shareInfoAfterRegistration();
+        logger.debug("information share over");
+        roleAssignmentInControlCenter();
+        logger.debug("role assign in control center over");
         planPathForAllAttacker();
+        logger.debug("path planning for attackers over");
         resetDecisionParameter();
+        logger.debug("parameter rest over");
         updateAttackerCoordinate();
-        checkReplanning();
-        checkThreatTerminate();
-        checkConflict();
+        logger.debug("attacker coordinate update over");
+        recordResultInLog();
+        logger.debug("record result in log");
+        checkReplanningAccordingToAttackerMovement();
+        logger.debug("replanning check over");
+        checkThreatReached();
+        logger.debug("threat terminate check over");
+//        checkConflict();
         updateConflict();
+        logger.debug("conflict update over");
+        updateThreatCoordinate();
+        logger.debug("update threat over");
+        if (this.num_of_threat_remained == 0 && this.no_threat_time_step == Integer.MAX_VALUE) {
+            this.no_threat_time_step = this.time_step;
+        }
         this.time_step++;
+        if (this.time_step - this.no_threat_time_step > 10) {
+            this.setExperiment_over(true);
+        }
+        if (control_center.isScout_scanned_over()) {
+            this.not_threat_time_found++;
+        }
+        if(this.time_step>10000)
+        {
+            this.setExperiment_over(true);
+        }
+        if(this.not_threat_time_found>1000)
+        {
+            this.setExperiment_over(true);
+        }
     }
 
-    private void checkReplanning() {
+    private void recordResultInLog() {
+        this.total_path_len = (int) this.getTotalHistoryPathLen();
+        this.total_msg_num = msg_dispatcher.getTotalNumOfMsgSent();
+        logger.info(this.time_step + " " + this.total_path_len + " " + this.total_msg_num + " " + this.num_of_threat_remained);
+    }
+
+    private void roleAssignmentInControlCenter() {
+        if (this.control_center.isNeed_to_assign_role()) {
+            this.control_center.roleAssignForAttacker(-1, -1);
+        }
+    }
+
+    private void updateScoutInControlCenter() {
+        this.control_center.updateScoutCoordinate();
+    }
+
+    private void updateControlCenterKnowledge() {
+        this.control_center.setThreats(threats);
+    }
+
+    private void checkReplanningAccordingToAttackerMovement() {
         for (int i = 0; i < this.attacker_num; i++) {
-            UAV attacker = this.attackers.get(i);
+            Attacker attacker = this.attackers.get(i);
             boolean moved = attacker.isMoved_at_last_time();
             if (!moved) {
                 attacker.setNeed_to_replan(true);
+                if (attacker.getTarget_indicated_by_role() != null && attacker.getTarget_indicated_by_role().getIndex() == -1) {
+                    float[] dummy_threat_coord = World.randomGoalForAvailableUAV(attacker.getCenter_coordinates(), obstacles);
+                    Threat dummy_threat = new Threat(-1, dummy_threat_coord, 0, 0);
+                    attacker.setTarget_indicated_by_role(dummy_threat);
+                    attacker.setNeed_to_replan(true);
+                    attacker.setSpeed(StaticInitConfig.SPEED_OF_ATTACKER_IDLE);
+                    attacker.setTarget_reached(false);
+                }
             } else {
                 attacker.setNeed_to_replan(false);
             }
@@ -388,27 +531,27 @@ public class World {
      *
      * @return
      */
-    public float getTotalHistoryPathLen() {
+    private float getTotalHistoryPathLen() {
         float total_path_len = 0;
-        for (UAV attacker : attackers) {
+        for (Attacker attacker : attackers) {
             total_path_len += attacker.getHistory_path().getPath_length();
         }
         return total_path_len;
     }
 
-    public static ArrayList<UAV> getAttackers() {
+    public static ArrayList<Attacker> getAttackers() {
         return attackers;
     }
 
-    public void setAttackers(ArrayList<UAV> attackers) {
+    public void setAttackers(ArrayList<Attacker> attackers) {
         this.attackers = attackers;
     }
 
-    public ArrayList<UAV> getScouts() {
+    public ArrayList<Scout> getScouts() {
         return scouts;
     }
 
-    public void setScouts(ArrayList<UAV> scouts) {
+    public void setScouts(ArrayList<Scout> scouts) {
         this.scouts = scouts;
     }
 
@@ -428,6 +571,14 @@ public class World {
         return control_center;
     }
 
+    public float getTotal_path_len() {
+        return total_path_len;
+    }
+
+    public int getTotal_msg_num() {
+        return total_msg_num;
+    }
+
     public float getAttacker_patrol_range() {
         return attacker_patrol_range;
     }
@@ -436,8 +587,16 @@ public class World {
         return uav_base;
     }
 
-    public ArrayList<UAV> getEnemy_uavs() {
+    public ArrayList<Attacker> getEnemy_uavs() {
         return enemy_uavs;
+    }
+
+    public boolean isExperiment_over() {
+        return experiment_over;
+    }
+
+    public void setExperiment_over(boolean experiment_over) {
+        this.experiment_over = experiment_over;
     }
 
     public ArrayList<Obstacle> getObstaclesForUIRendering() {
@@ -480,20 +639,27 @@ public class World {
         this.conflicts.add(conflict);
     }
 
-    private float[] randomGoalForThreat(float[] current_coord) {
-        float[] random_goal_coordinate = new float[2];
-        random_goal_coordinate[0] = current_coord[0] + (float) (50 - Math.random() * 100);
-        random_goal_coordinate[1] = current_coord[1] + (float) (50 - Math.random() * 100);
-        ArrayList<Obstacle> obstacles = this.getObstaclesForUIRendering();
-        boolean collisioned = true;
-        while (collisioned) {
-            random_goal_coordinate[0] = current_coord[0] + (float) (50 - Math.random() * 100);
-            random_goal_coordinate[1] = current_coord[1] + (float) (50 - Math.random() * 100);
-            if (!ConflictCheckUtil.checkPointInObstacles(obstacles, random_goal_coordinate[0], random_goal_coordinate[1])) {
-                collisioned = false;
-            }
-        }
-        return random_goal_coordinate;
+    public static float[] randomGoalForAvailableUAV(float[] current_coord, ArrayList<Obstacle> obstacles) {
+//        float[] random_goal_coordinate = new float[2];
+//        double random_theta = Math.random() * Math.PI * 2;
+//        random_goal_coordinate[0] = current_coord[0] + (float) Math.cos(random_theta) * 400;
+//        random_goal_coordinate[1] = current_coord[1] + (float) Math.sin(random_theta) * 400;
+//        boolean collisioned = true;
+//        boolean withinBound = BoundUtil.withinBound(random_goal_coordinate[0], random_goal_coordinate[0], World.bound_width, World.bound_height);
+//        while (collisioned && !withinBound) {
+//            random_goal_coordinate[0] = current_coord[0] + (float) Math.cos(random_theta) * 400;
+//            random_goal_coordinate[1] = current_coord[1] + (float) Math.sin(random_theta) * 400;
+//            if (!ConflictCheckUtil.checkPointInObstacles(obstacles, random_goal_coordinate[0], random_goal_coordinate[1])) {
+//                collisioned = false;
+//            } else {
+//                random_theta = Math.PI / 4 + Math.random() * Math.PI / 2;
+//            }
+//            withinBound = BoundUtil.withinBound(random_goal_coordinate[0], random_goal_coordinate[0], World.bound_width, World.bound_height);
+//            logger.debug("find random goal for uav");
+//        }
+//        return random_goal_coordinate;
+        return World.uav_base.getCoordinate();
+
     }
 
 }

@@ -20,9 +20,9 @@ public class Unit {
      *
      */
     protected int index;
-    protected Target target_indicated_by_role=null;
+    protected Target target_indicated_by_role = null;
     //which side the unit belongs to 
-    protected int flag_of_war;
+    protected int uav_type;
     protected float[] center_coordinates = new float[2];
     /**
      * internal variables
@@ -31,13 +31,16 @@ public class Unit {
     protected Triangle uav_center;
 
     public static int scout_radar_radius = 30; //The scout range of radar
+    public static int attacker_radar_radius = 20;
     public static int center_height = 10;
     public static int center_width = 8;
 
-    public Unit(int index, Target target_indicated_by_role, int flag_of_war, float[] center_coordinates) {
+    public Unit(int index, Target target_indicated_by_role, int uav_type, float[] center_coordinates) {
         this.index = index;
-        this.target_indicated_by_role = target_indicated_by_role;
-        this.flag_of_war=flag_of_war;
+        if (target_indicated_by_role != null) {
+            this.target_indicated_by_role = (Target)target_indicated_by_role.deepClone();
+        }
+        this.uav_type = uav_type;
         this.center_coordinates[0] = center_coordinates[0];
         this.center_coordinates[1] = center_coordinates[1];
         this.uav_center = new Triangle(center_coordinates[0], center_coordinates[1], 0, center_width, center_height);
@@ -75,6 +78,12 @@ public class Unit {
         return target_indicated_by_role;
     }
 
+    public int getUav_type() {
+        return uav_type;
+    }
 
+    public void setUav_type(int uav_type) {
+        this.uav_type = uav_type;
+    }
 
 }

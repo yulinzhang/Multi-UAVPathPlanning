@@ -42,6 +42,8 @@ public class RRTAlg implements Serializable {
     private ArrayList<Conflict> conflicts;
     private int uav_index;
 
+    private boolean idle_uav = false;
+
     /**
      * internal variables
      *
@@ -80,27 +82,37 @@ public class RRTAlg implements Serializable {
         this.goal_coordinate = goal_coordinate;
         if (conflicts != null) {
             this.conflicts = conflicts;
-        }else{
-            this.conflicts=new ArrayList<Conflict>();
+        } else {
+            this.conflicts = new ArrayList<Conflict>();
         }
         this.uav_index = uav_index;
     }
 
-    public RRTTree buildRRT(float[] init_coordinate, float current_angle) {
+    public RRTTree buildRRT(float[] init_coordinate, float current_angle, boolean idle_uav) {
+
         this.setInit_coordinate(init_coordinate);
         RRTTree G = new RRTTree();
         RRTNode start_node = new RRTNode(init_coordinate[0], init_coordinate[1]);
         start_node.setCurrent_angle(current_angle);
         G.addNode(start_node, null);
+        float probability = goal_probability;
+//        if(idle_uav)
+//        {
+//            probability=0.1f;
+//        }else{
+//            probability=goal_probability;
+//        }
 
         float[] random_goal;
-        RRTNode nearest_node;
+        RRTNode nearest_node = null;
         RRTNode new_node = null;
+
         int time_step = 0;
+        int num_of_trap = 0;
 //        while (true) {
         for (; time_step <= k_step;) {
             //random choose a direction or goal
-            random_goal = randGoal(this.goal_coordinate, goal_probability, bound_width, bound_height, obstacles);
+            random_goal = randGoal(this.goal_coordinate, probability, bound_width, bound_height, obstacles);
             //choose the nearest node to extend
             nearest_node = nearestVertex(random_goal, G);
             //extend the child node and validate its confliction 
@@ -123,15 +135,24 @@ public class RRTAlg implements Serializable {
             //if not conflicted,add the child to the tree
             if (!conflicted && true) {
                 G.addNode(new_node, nearest_node);
-                if (DistanceUtil.distanceBetween(new_node.getCoordinate(), goal_coordinate) < goal_range_for_delta) {
-                    G.generatePath(new_node);
+                if (DistanceUtil.distanceBetween(new_node.getCoordinate(), goal_coordinate) < this.max_delta_distance) {
+                    Point goal_point = new Point(goal_coordinate[0], goal_coordinate[1], 0);
+                    G.generatePath();
+                    G.getPath_found().addWaypointToEnd(goal_point);
                     logger.debug(time_step);
                     return G;
                 }
-                time_step++;
+//                time_step++;
             }
+            time_step++;
+//            num_of_trap++;
+//            if (idle_uav && num_of_trap > 2 * k_step) {
+//                new_node = nearest_node;
+//                break;
+//            }
+//           new_node=nearest_node; 
         }
-        G.generatePath(new_node);
+        G.generatePath();
 //        G.setPath_found(null);
         return G;
     }
@@ -189,7 +210,8 @@ public class RRTAlg implements Serializable {
                 }
 
                 if (distanceBetween(parent.getCoordinate(), goal_coordinate) < goal_range_for_delta) {
-                    G.generatePath(parent);
+//                    G.generatePath(parent);
+                    G.generatePath();
                     return G;
                 }
 
@@ -210,7 +232,8 @@ public class RRTAlg implements Serializable {
                 }
             }
         }
-        G.generatePath(new_node);
+//        G.generatePath(new_node);
+        G.generatePath();
         return G;
     }
 
@@ -254,7 +277,8 @@ public class RRTAlg implements Serializable {
                     }
 
                     if (DistanceUtil.distanceBetween(nearest_node.getCoordinate(), goal_coordinate) < goal_range_for_delta) {
-                        G.generatePath(nearest_node);
+//                        G.generatePath(nearest_node);
+                        G.generatePath();
                         return G;
                     }
 
@@ -286,7 +310,8 @@ public class RRTAlg implements Serializable {
             }
 
         }
-        G.generatePath(nearest_node);
+//        G.generatePath(nearest_node);
+        G.generatePath();
         return G;
     }
 
@@ -318,7 +343,8 @@ public class RRTAlg implements Serializable {
                 //
                 if (distanceBetween(new_node.getCoordinate(), goal_coordinate) < goal_range_for_delta) {
                     G.addNode(new_node, nearest_node);
-                    G.generatePath(new_node);
+//                    G.generatePath(new_node);
+                    G.generatePath();
                     return G;
                 }
                 int max_num = 200;//(int) (2 * Math.E * Math.log(G.getNodeCount()));
@@ -336,7 +362,8 @@ public class RRTAlg implements Serializable {
                 time_step++;
             }
         }
-        G.generatePath(new_node);
+//        G.generatePath(new_node);
+        G.generatePath();
         return G;
     }
 
@@ -491,8 +518,8 @@ public class RRTAlg implements Serializable {
                 toward_goal_angle = temp_goal_angle2;
             }
         }
-        new_node_coord[0] = nearest_coordinate[0] + (float) Math.cos(toward_goal_angle) * max_length;
-        new_node_coord[1] = nearest_coordinate[1] + (float) Math.sin(toward_goal_angle) * max_length;
+        new_node_coord[0] = nearest_coordinate[0] + (float) (Math.cos(toward_goal_angle) * max_length);
+        new_node_coord[1] = nearest_coordinate[1] + (float) (Math.sin(toward_goal_angle) * max_length);
 
 //        boolean conflicted = ConflictCheckUtil.checkPointInObstaclesAndThreats(obstacles, threats, new_node_coord[0], new_node_coord[1]);
 //        if (conflicted) {

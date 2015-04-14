@@ -64,8 +64,8 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
     private DatatypeProperty hasExpectedConflictTime, hasDecidedConflictTime, conflictFromRobot;
     private ObjectProperty has_region, has_polygon, has_lowerbound, has_upperbound, rdf_type;
     private DatatypeProperty hasConflictCenter, hasConflictRange;
-    private DatatypeProperty hasThreatCenter, hasThreatSpeed, hasThreatRange, hasThreatCapability,hasThreatIndex,threatEnabled;
-    private DatatypeProperty has_points, hasMaxXCoordinate, hasMaxYCoordinate, hasMinXCoordinate, hasMinYCoordinate,hasObstacleIndex;
+    private DatatypeProperty hasThreatCenter, hasThreatSpeed, hasThreatRange, hasThreatCapability, hasThreatIndex, threatEnabled;
+    private DatatypeProperty has_points, hasMaxXCoordinate, hasMaxYCoordinate, hasMinXCoordinate, hasMinYCoordinate, hasObstacleIndex;
 
     /**
      * cache to speed the information retrieve process.
@@ -106,7 +106,7 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
         hasMaxYCoordinate = ontology_based_knowledge.createDatatypeProperty(base_ns + "hasMaxYCoordinate");
         hasMinXCoordinate = ontology_based_knowledge.createDatatypeProperty(base_ns + "hasMinXCoordinate");
         hasMinYCoordinate = ontology_based_knowledge.createDatatypeProperty(base_ns + "hasMinYCoordinate");
-        hasObstacleIndex=ontology_based_knowledge.createDatatypeProperty(base_ns + "hasObstacleIndex");
+        hasObstacleIndex = ontology_based_knowledge.createDatatypeProperty(base_ns + "hasObstacleIndex");
 
         //class and property for threat
         Threat_Class = ontology_based_knowledge.createClass(base_ns + "Threat");
@@ -115,8 +115,8 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
         hasThreatSpeed = ontology_based_knowledge.createDatatypeProperty(base_ns + "hasThreatSpeed");
         hasThreatRange = ontology_based_knowledge.createDatatypeProperty(base_ns + "hasThreatRange");
         hasThreatCapability = ontology_based_knowledge.createDatatypeProperty(base_ns + "hasThreatCapability");
-        hasThreatIndex=ontology_based_knowledge.createDatatypeProperty(base_ns + "hasThreatIndex");
-        threatEnabled=ontology_based_knowledge.createDatatypeProperty(base_ns + "threatEnabled");
+        hasThreatIndex = ontology_based_knowledge.createDatatypeProperty(base_ns + "hasThreatIndex");
+        threatEnabled = ontology_based_knowledge.createDatatypeProperty(base_ns + "threatEnabled");
 
         //class and property for conflict
         Conflict_Class = ontology_based_knowledge.createClass(base_ns + "Conflict");
@@ -135,7 +135,7 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
         polygon.addPoint(3, 6);
         Obstacle obs = new Obstacle(polygon, 0);
         float[] coord = new float[2];
-        Threat threat = new Threat(0, coord, 0,3);
+        Threat threat = new Threat(0, coord, 0, 3);
         threat.setSpeed(2);
         threat.setTarget_type(0);
         threat.setThreat_cap("aaa");
@@ -267,7 +267,7 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
             QuerySolution result = results.next();
             Polygon polygon = new Polygon();
             String raw_points_str = StringUtil.parseLiteralStr(result.get("points").toString());
-            String[] points_str =raw_points_str.split(" ");
+            String[] points_str = raw_points_str.split(" ");
             for (String point_str : points_str) {
                 String[] coord_str = point_str.split(",");
                 int[] coord = new int[2];
@@ -275,15 +275,15 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
                 coord[1] = Integer.parseInt(coord_str[1]);
                 polygon.addPoint(coord[0], coord[1]);
             }
-            
-            String raw_obstacle_index=StringUtil.parseLiteralStr(result.get("index").toString());
-            Integer obstacle_index=Integer.parseInt(raw_obstacle_index);
+
+            String raw_obstacle_index = StringUtil.parseLiteralStr(result.get("index").toString());
+            Integer obstacle_index = Integer.parseInt(raw_obstacle_index);
             Obstacle obstacle = new Obstacle(polygon, 0);
             obstacle.setIndex(obstacle_index);
             obstacles.add(obstacle);
         }
-        this.obstacles_cache=obstacles;
-        this.obstacle_updated=false;
+        this.obstacles_cache = obstacles;
+        this.obstacle_updated = false;
         return obstacles;
     }
 
@@ -346,8 +346,8 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
             conflict.sort();
             conflicts.add(conflict);
         }
-        this.conflicts_cache=conflicts;
-        this.conflict_updated=false;
+        this.conflicts_cache = conflicts;
+        this.conflict_updated = false;
         return conflicts;
     }
 
@@ -385,27 +385,26 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
 
             String raw_therat_cap_str = StringUtil.parseLiteralStr(result.get("threatCap").toString());
 
-            String raw_threat_index=StringUtil.parseLiteralStr(result.get("index").toString());
-            Integer threat_index=Integer.parseInt(raw_threat_index);
-            
-            String raw_threat_enabled_index=StringUtil.parseLiteralStr(result.get("threat_enabled").toString());
-            boolean threat_enabled=false;
-            if(raw_threat_enabled_index.equals("true"))
-            {
-                threat_enabled=true;
-            }else{
-                threat_enabled=false;
+            String raw_threat_index = StringUtil.parseLiteralStr(result.get("index").toString());
+            Integer threat_index = Integer.parseInt(raw_threat_index);
+
+            String raw_threat_enabled_index = StringUtil.parseLiteralStr(result.get("threat_enabled").toString());
+            boolean threat_enabled = false;
+            if (raw_threat_enabled_index.equals("true")) {
+                threat_enabled = true;
+            } else {
+                threat_enabled = false;
             }
-            
-            Threat threat = new Threat(0, center_coord, 0,speed);
+
+            Threat threat = new Threat(0, center_coord, 0, speed);
             threat.setThreat_cap(raw_therat_cap_str);
             threat.setThreat_range(range);
             threat.setIndex(threat_index);
             threat.setEnabled(threat_enabled);
             threats.add(threat);
         }
-        this.threats_cache=threats;
-        this.threat_updated=false;
+        this.threats_cache = threats;
+        this.threat_updated = false;
         return threats;
     }
 
@@ -419,7 +418,7 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
                 .removeAll(null, rdf_type, Obstacle_Class).removeAll(null, rdf_type, Region_Class).removeAll(null, rdf_type, Polygon_Class)
                 .removeAll(null, rdf_type, LowerBoundOfRegion_Class).removeAll(null, rdf_type, UpperBoundOfRegion_Class);
         this.obstacle_num = 0;
-        this.obstacle_updated=true;
+        this.obstacle_updated = true;
         return m;
     }
 
@@ -428,7 +427,7 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
                 .removeAll(null, hasThreatRange, null).removeAll(null, hasThreatCapability, null).removeAll(null, hasThreatIndex, null).removeAll(null, threatEnabled, null)
                 .removeAll(null, rdf_type, Threat_Class).removeAll(Threat_Class, rdf_type, null);
         this.threat_num = 0;
-        this.threat_updated=true;
+        this.threat_updated = true;
         return m;
     }
 
@@ -437,7 +436,7 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
                 .removeAll(null, hasExpectedConflictTime, null).removeAll(null, hasDecidedConflictTime, null).removeAll(null, this.conflictFromRobot, null)
                 .removeAll(null, rdf_type, Conflict_Class).removeAll(Conflict_Class, rdf_type, null);
         this.conflict_num = 0;
-        this.conflict_updated=true;
+        this.conflict_updated = true;
         return m;
     }
 
@@ -451,7 +450,7 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
             }
             this.obstacle_num = obstacle_num;
         }
-        this.obstacle_updated=true;
+        this.obstacle_updated = true;
     }
 
     @Override
@@ -464,7 +463,7 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
             }
             this.conflict_num = conflict_num;
         }
-        this.conflict_updated=true;
+        this.conflict_updated = true;
     }
 
     @Override
@@ -477,7 +476,7 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
             }
             this.threat_num = threat_num;
         }
-        this.threat_updated=true;
+        this.threat_updated = true;
     }
 
     @Override
@@ -494,7 +493,7 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
         Literal max_y_coordinate = ontology_based_knowledge.createTypedLiteral(obs.getMbr().getMaxY());
         Literal min_x_coordinate = ontology_based_knowledge.createTypedLiteral(obs.getMbr().getMinX());
         Literal min_y_coordinate = ontology_based_knowledge.createTypedLiteral(obs.getMbr().getMinY());
-        Literal obstacle_index=ontology_based_knowledge.createTypedLiteral(obs.getIndex());
+        Literal obstacle_index = ontology_based_knowledge.createTypedLiteral(obs.getIndex());
 
         obs_individual.addProperty(has_region, region_individual);
         region_individual.addProperty(has_polygon, polygon_individual);
@@ -507,11 +506,29 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
         upperbound_individual.addProperty(hasMaxXCoordinate, max_x_coordinate);
         upperbound_individual.addProperty(hasMaxYCoordinate, max_y_coordinate);
         this.obstacle_num++;
-        this.obstacle_updated=true;
+        this.obstacle_updated = true;
     }
 
     @Override
     public void addConflict(Conflict conflict) {
+        ArrayList<Conflict> conflicts = this.getConflicts();
+        if (conflict_num == 0) {
+            addConflictWithoutCheck(conflict);
+            return;
+        }
+        for (int i = 0; i < conflict_num; i++) {
+            Conflict temp_conflict = conflicts.get(i);
+            if (temp_conflict.getUav_index() == conflict.getUav_index()) {
+                this.removeConflict(temp_conflict);
+                addConflictWithoutCheck(conflict);
+                return;
+            }
+        }
+        addConflictWithoutCheck(conflict);
+        conflict_num++;
+    }
+
+    private void addConflictWithoutCheck(Conflict conflict) {
 
         LinkedList<Point> path = conflict.getPath_prefound();
         int path_len = path.size();
@@ -530,7 +547,7 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
             conflict_individual.addProperty(conflictFromRobot, conflict_from_robot);
         }
         this.conflict_num++;
-        this.conflict_updated=true;
+        this.conflict_updated = true;
     }
 
     @Override
@@ -541,8 +558,8 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
         Literal speed = ontology_based_knowledge.createTypedLiteral(threat.getSpeed());
         Literal threat_range = ontology_based_knowledge.createTypedLiteral(threat.getThreat_range());
         Literal threat_cap = ontology_based_knowledge.createTypedLiteral(threat.getThreat_cap());
-        Literal threat_index=ontology_based_knowledge.createTypedLiteral(threat.getIndex());
-        Literal threat_enabled=ontology_based_knowledge.createTypedLiteral(threat.isEnabled());
+        Literal threat_index = ontology_based_knowledge.createTypedLiteral(threat.getIndex());
+        Literal threat_enabled = ontology_based_knowledge.createTypedLiteral(threat.isEnabled());
 
         threat_individual.addProperty(hasThreatCenter, center);
         threat_individual.addProperty(hasThreatSpeed, speed);
@@ -551,7 +568,7 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
         threat_individual.addProperty(hasThreatIndex, threat_index);
         threat_individual.addProperty(threatEnabled, threat_enabled);
         this.threat_num++;
-        this.threat_updated=true;
+        this.threat_updated = true;
     }
 
     @Override
@@ -610,7 +627,7 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
             }
             ontology_based_knowledge = (OntModel) ontology_based_knowledge.removeAll(polygon_individual, null, null);
             this.obstacle_num--;
-            this.obstacle_updated=true;
+            this.obstacle_updated = true;
             return true;
         } else {
             return false;
@@ -625,7 +642,7 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
             Resource threat_individual = smt_list_to_find_threat_individual.next().getSubject();
             ontology_based_knowledge = (OntModel) ontology_based_knowledge.removeAll(threat_individual, hasThreatCenter, null).removeAll(threat_individual, hasThreatSpeed, null).removeAll(threat_individual, hasThreatRange, null).removeAll(threat_individual, hasThreatCapability, null);
             this.threat_num--;
-            this.threat_updated=true;
+            this.threat_updated = true;
             return true;
         } else {
             return false;

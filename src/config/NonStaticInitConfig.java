@@ -39,7 +39,7 @@ public class NonStaticInitConfig {
     private int bound_width = 800;
     private int bound_height = 600;
     
-
+    public static int obstacle_num=21;
     
     public NonStaticInitConfig(int enemy_num, int threat_num, int attacker_num, int scout_num, UAVBase uav_base,int inforshare_algorithm) {
         this.enemy_num = enemy_num;
@@ -48,9 +48,6 @@ public class NonStaticInitConfig {
         this.scout_num = scout_num;
         this.uav_base = uav_base;
         this.inforshare_algorithm=inforshare_algorithm;
-        
-        initObstacles();
-        initThreats();
     }
     
     public NonStaticInitConfig()
@@ -58,8 +55,8 @@ public class NonStaticInitConfig {
         this.enemy_num=0;
         this.threat_num=5;
         this.attacker_num=5;
-        this.scout_num=0;
-        this.inforshare_algorithm=StaticInitConfig.BROADCAST_INFOSHARE;
+        this.scout_num=10;
+        this.inforshare_algorithm=StaticInitConfig.NONE_INFORSHARE;
         float[] coordinate=new float[]{0,0};
         UAVBase uav_base=new UAVBase(coordinate,100,100);
         this.uav_base=uav_base;
@@ -68,7 +65,7 @@ public class NonStaticInitConfig {
     }
 
     
-    private void initThreats() {
+    public void initThreats() {
         threats = new ArrayList<Threat>();
         Random random = new Random(System.currentTimeMillis());
         for (int i = 0; i < threat_num; i++) {
@@ -82,7 +79,7 @@ public class NonStaticInitConfig {
 //                coordinate_y=400;
                 found = !ConflictCheckUtil.checkPointInObstacles(obstacles,coordinate_x, coordinate_y);
             }
-            Threat threat = new Threat(i, new float[]{coordinate_x, coordinate_y},StaticInitConfig.STATIC_THREAT_TYPE,1);
+            Threat threat = new Threat(i, new float[]{coordinate_x, coordinate_y},StaticInitConfig.STATIC_THREAT_TYPE,0);
             threats.add(threat);
         }
     }
@@ -97,9 +94,10 @@ public class NonStaticInitConfig {
     /**
      * Get file path of KML,and that file storages the polygons represented obstacles
      */
-    private void initObstacles() {
+    public void initObstacles() {
         if (StaticInitConfig.EXTERNAL_KML_FILE_PATH == null) {
-            obstacles = ObtacleUtil.readObstacleFromResourceKML("/resources/Obstacle.kml"); //get obstacle from kml
+            String obs_path="/resources/Obstacle"+NonStaticInitConfig.obstacle_num+".kml";
+            obstacles = ObtacleUtil.readObstacleFromResourceKML(obs_path); //get obstacle from kml
         } else {
             obstacles = ObtacleUtil.readObstacleFromExternalKML(StaticInitConfig.EXTERNAL_KML_FILE_PATH);
         }

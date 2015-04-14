@@ -52,7 +52,7 @@ public class MyPopupMenu extends JPopupMenu implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         int index = items.indexOf(e.getSource());
-        control_center.roleAssign(choosen_attacker_index, index);
+        control_center.roleAssignForAttacker(choosen_attacker_index, index);
         StaticInitConfig.SIMULATION_ON = true;
     }
 

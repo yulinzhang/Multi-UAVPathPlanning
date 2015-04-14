@@ -17,10 +17,11 @@ import java.awt.Stroke;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
-import world.uav.UAV;
+import world.uav.Attacker;
 import world.model.shape.Circle;
 import world.model.Obstacle;
 import world.model.Threat;
+import world.uav.UAV;
 import world.uav.UAVPath;
 
 /**
@@ -29,16 +30,32 @@ import world.uav.UAVPath;
  */
 public class MyGraphic {
 
-//    public void clearUAVShadowInUAVImage(Graphics2D graphics,UAV scout) {
+//    public void clearUAVShadowInUAVImage(Graphics2D graphics,Attacker uav) {
 //        graphics.setComposite(AlphaComposite.Clear);
-//        graphics.fill(scout.getUav_radar());
+//        graphics.fill(uav.getUav_radar());
 //    }
-    public void drawScoutInFogOfWarInLevel3(Graphics2D graphics, UAV scout) {
+    public void drawUAVInFogOfWarInLevel3(Graphics2D graphics, UAV uav) {
+        if (!uav.isVisible()) {
+            return;
+        }
         graphics.setComposite(AlphaComposite.Clear);
-        graphics.fill(scout.getUav_radar());
+        graphics.fill(uav.getUav_radar());
+    }
+
+    public void showObstacleInFogOfWar(Graphics2D graphics, Obstacle obs) {
+        graphics.setComposite(AlphaComposite.Clear);
+        graphics.fill(obs.getMbr());
+    }
+
+    public void showThreatInFogOfWar(Graphics2D graphics, Threat threat) {
+        graphics.setComposite(AlphaComposite.Clear);
+        graphics.fillRect((int) threat.getCoordinates()[0] - GraphicConfig.threat_width / 2, (int) threat.getCoordinates()[1] - GraphicConfig.threat_height / 2, GraphicConfig.threat_width, GraphicConfig.threat_height);
     }
 
     public void drawUAVInUAVImage(Graphics2D graphics, UAV uav, Color uav_highlight_color) {
+        if (!uav.isVisible()) {
+            return;
+        }
         graphics.setComposite(AlphaComposite.SrcOver);
         graphics.setColor(uav.getRadar_color());
         Circle uav_radar = uav.getUav_radar();
@@ -51,7 +68,10 @@ public class MyGraphic {
         }
     }
 
-    public void drawUAVHistoryPath(Graphics2D graphics, UAV uav, Color uav_history_path_color) {
+    public void drawUAVHistoryPath(Graphics2D graphics, Attacker uav, Color uav_history_path_color) {
+        if (!uav.isVisible()) {
+            return;
+        }
         float[] previous_waypoint = uav.getPrevious_waypoint();
         float[] current_waypoint = uav.getCenter_coordinates();
         Stroke bs = new BasicStroke(2.0f, BasicStroke.CAP_BUTT,
@@ -62,7 +82,10 @@ public class MyGraphic {
         graphics.drawLine((int) previous_waypoint[0], (int) previous_waypoint[1], (int) current_waypoint[0], (int) current_waypoint[1]);
     }
 
-    public void drawUAVPlannedPath(Graphics2D graphics, UAV uav, Color uav_planned_path_color) {
+    public void drawUAVPlannedPath(Graphics2D graphics, Attacker uav, Color uav_planned_path_color) {
+        if (!uav.isVisible()) {
+            return;
+        }
         graphics.setColor(uav.getCenter_color());
         graphics.setStroke(new BasicStroke(2.0f)); //Set the width of the stroke
         UAVPath planned_path = uav.getFuturePath();
@@ -77,12 +100,15 @@ public class MyGraphic {
 
             }
         }
-        
+
         Stroke bs = new BasicStroke(2.0f, BasicStroke.CAP_BUTT,
                 BasicStroke.JOIN_BEVEL, 0,
                 new float[]{0.5f, 2}, 0);
         graphics.setStroke(bs);
         planned_path = uav.getPath_planned_at_last_time_step();
+        if (planned_path == null) {
+            return;
+        }
         planned_path_size = planned_path.getWaypointNum();
         for (int i = 0; i < planned_path_size; i++) {
             current_waypoint = planned_path.getWaypoint(i).toFloatArray();
@@ -93,7 +119,10 @@ public class MyGraphic {
         }
     }
 
-    public void drawUAVPlannedTree(Graphics2D graphics, UAV uav, Color uav_planned_tree_color) {
+    public void drawUAVPlannedTree(Graphics2D graphics, Attacker uav, Color uav_planned_tree_color) {
+        if (!uav.isVisible()) {
+            return;
+        }
         graphics.setColor(uav_planned_tree_color);
         graphics.setStroke(new BasicStroke(0.5f)); //Set the width of the stroke
         float[] current_waypoint;

@@ -21,6 +21,8 @@ public class RRTTree {
     private ArrayList<RRTNode> vertices;
     private ArrayList<RRTNode> parents_of_vertices;
     private ArrayList<ArrayList<RRTNode>> children_of_vertices;
+    
+    private RRTNode last_time_added=null;
 
     /**
      * variable to store the path
@@ -46,10 +48,11 @@ public class RRTTree {
         if (!vertices.contains(child)) {
             vertices.add(child);
             addParent(child, parent);
+            this.last_time_added=child;
         }
     }
 
-    public void addParent(RRTNode child, RRTNode parent) {
+    private void addParent(RRTNode child, RRTNode parent) {
         int index = vertices.indexOf(child);
         parents_of_vertices.add(index, parent);
         children_of_vertices.add(index, new ArrayList<RRTNode>());
@@ -129,7 +132,12 @@ public class RRTTree {
         return vertices.size();
     }
 
-    public void generatePath(RRTNode n) {
+    public void generatePath() {
+        RRTNode n=this.last_time_added;
+        if(n==null)
+        {
+            return;
+        }
         Point point = new Point(n.getCoordinate()[0], n.getCoordinate()[1], n.getCurrent_angle());
         path_found.addWaypointToBeginning(point);
         RRTNode parent = this.getParent(n);
@@ -146,6 +154,14 @@ public class RRTTree {
 
     public void setPath_found(UAVPath path) {
         this.path_found = path;
+    }
+
+    public RRTNode getLast_time_added() {
+        return last_time_added;
+    }
+
+    public void setLast_time_added(RRTNode last_time_added) {
+        this.last_time_added = last_time_added;
     }
 
 }

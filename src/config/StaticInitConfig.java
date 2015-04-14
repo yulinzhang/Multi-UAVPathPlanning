@@ -36,22 +36,24 @@ public class StaticInitConfig {
     public static String EXTERNAL_KML_FILE_PATH = null; //KML file path stored static obstacle
     public static String ROBOT_ONTOLOGY_TEMPLATE_FILE_PATH="D:\\KingSoft\\Dissertation\\Simulator\\ontology-owl\\robot_ontology_template.owl";
 
-    public static int SIDE_A = 0;
-    public static int SIDE_B = 1;
+    public static int ATTACKER = 0;
+    public static int SCOUT = 1;
 
     public static Threat NON_ROLE = null;
 
     //Extend towards the goal with probability
-    public static float rrt_goal_toward_probability = 0.8f;
-    public static int rrt_iteration_times = 1000;
+    public static float rrt_goal_toward_probability = 0.4f;
+    public static int rrt_iteration_times = 8000;
     //Set a safe distance from the target point
     public static int SAFE_DISTANCE_FOR_TARGET=5;
     public static int SAFE_DISTANCE_FOR_CONFLICT=2;
-    public static int rrt_planning_times_for_each_uav=4;
+    public static int rrt_planning_times_for_attacker=4;
+    public static int rrt_planning_times_for_scout=1;
 
     //how much time it takes to drive the simulaiton to next time step
     public static int INIT_SIMULATION_DELAY = 100; //milliseconds,this value will be set according to the user's simulation speed
     public static Timer SIMULATION_WITH_UI_TIMER; //simulation Timer
+    public static float SPEED_TIMES=12;
 
     public static boolean SHOW_PLANNED_PATH = true;
     public static boolean SHOW_PLANNED_TREE = true;
@@ -76,4 +78,8 @@ public class StaticInitConfig {
     public static int BROADCAST_INFOSHARE=0; 
     public static int NONE_INFORSHARE=1;
     public static int REGISTER_BASED_INFORSHARE=2;
+    
+    public static int SPEED_OF_ATTACKER_ON_TASK=5;
+    public static int SPEED_OF_SCOUT=1;
+    public static int SPEED_OF_ATTACKER_IDLE=2;
 }
