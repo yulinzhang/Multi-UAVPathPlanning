@@ -7,14 +7,17 @@ package world.uav;
 
 import algorithm.RRT.RRTAlg;
 import algorithm.RRT.RRTTree;
-import config.GraphicConfig;
+import algorithm.rrt1.rrtalg.Edge;
+import algorithm.rrt1.rrtalg.MyDomain;
+import algorithm.rrt1.rrtalg.MyDomainDubingsV2;
+import algorithm.rrt1.rrtalg.MyRRTStar;
+import algorithm.rrt1.rrtalg.MyRRTStarDubin;
 import config.StaticInitConfig;
-import java.awt.Color;
 import java.util.LinkedList;
 import java.util.ArrayList;
-import util.ConflictCheckUtil;
+import java.util.List;
+import org.jgrapht.GraphPath;
 import util.DistanceUtil;
-import util.VectorUtil;
 import world.Message;
 
 import world.model.shape.Circle;
@@ -78,10 +81,19 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
     }
 
     public void ignoreEverythingAndTestDubinPath() {
-        Point start = new Point(this.getCenter_coordinates()[0], this.getCenter_coordinates()[1], Math.PI * 2);
-        Point end = new Point(target_indicated_by_role.getCoordinates()[0], target_indicated_by_role.getCoordinates()[1], Math.PI * 2 - Math.PI * 7 / 4);
-        DubinsCurve dc = new DubinsCurve(start, end, 150, false);
-        Trajectory traj = dc.getTrajectory(1, 10);
+        Point start = new Point(this.getCenter_coordinates()[0], this.getCenter_coordinates()[1], this.current_angle);
+        Point end = new Point(target_indicated_by_role.getCoordinates()[0], target_indicated_by_role.getCoordinates()[1], 0);
+        DubinsCurve min_dc = null;
+        double min_len = Float.MAX_VALUE;
+        for (double angle = 0; angle < Math.PI * 2; angle += Math.PI / 12) {
+            end.setYaw(angle);
+            DubinsCurve dc = new DubinsCurve(start, end, 10, false, 10, 1);
+            if (dc.getLength() < min_len) {
+                min_dc = dc;
+                min_len = dc.getLength();
+            }
+        }
+        Trajectory traj = min_dc.getTraj();
         logger.debug("total waypoint num:" + traj.getPoints().length);
         logger.debug("total traj lenght:" + traj.getCost());
         logger.debug("end node:" + traj.getEndPoint());
@@ -90,7 +102,47 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
         for (Point point : traj.getPoints()) {
             path.addWaypointToEnd(point);
         }
+
         this.setPath_prefound(path);
+        this.resetCurrentIndexOfPath();
+    }
+
+    public void pathPlanV2() {
+        float[] goal_coord = this.getTarget_indicated_by_role().getCoordinates();
+        Point goal = new Point(goal_coord[0], goal_coord[1], 0);
+        Point initialState = new Point(this.center_coordinates[0], this.center_coordinates[1], this.current_angle);
+        MyDomain my_domain = new MyDomain(this.kb.getObstacles(), initialState, goal, 0.8);
+        MyRRTStar rrt = new MyRRTStar(my_domain, initialState, 500, 0, DistanceUtil.distanceBetween(goal_coord, initialState.toFloatArray()));
+        GraphPath<Point, Edge> rrt_path = rrt.plan(5000);
+        List<Edge> edges = rrt_path.getEdgeList();
+        UAVPath path = new UAVPath();
+        for (Edge edge : edges) {
+            List<Point> waypoints = edge.getWaypoints(10);
+            for (Point point : waypoints) {
+                path.addWaypointToEnd(point);
+            }
+        }
+        this.setPath_prefound(path);
+        this.resetCurrentIndexOfPath();
+    }
+
+    public void pathPlanV3() {
+        float[] goal_coord = this.getTarget_indicated_by_role().getCoordinates();
+        Point goal = new Point(goal_coord[0], goal_coord[1], 0);
+        Point initialState = new Point(this.center_coordinates[0], this.center_coordinates[1], this.current_angle);
+        MyDomainDubingsV2 my_domain = new MyDomainDubingsV2(this.kb.getObstacles(), initialState, goal, 0.4);
+        MyRRTStarDubin rrt = new MyRRTStarDubin(my_domain, initialState, 500, 0, DistanceUtil.distanceBetween(goal_coord, initialState.toFloatArray()));
+        GraphPath<Point, DubinsCurve> rrt_path = rrt.plan(50000);
+        List<DubinsCurve> edges = rrt_path.getEdgeList();
+        UAVPath path = new UAVPath();
+        for (DubinsCurve edge : edges) {
+            Point[] waypoints = edge.getTraj().getPoints();
+            for (Point point : waypoints) {
+                path.addWaypointToEnd(point);
+            }
+        }
+        this.setPath_prefound(path);
+        this.resetCurrentIndexOfPath();
     }
 
     /**
@@ -124,6 +176,12 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
                 }
             }
             if (shortest_path != null) {
+                Point path_dest=shortest_path.getLastWaypoint();
+                if(path_dest.getX()==this.center_coordinates[0]&&path_dest.getY()==this.center_coordinates[1])
+                {
+                    this.setVisible(false);
+                    logger.error("-----------------------------------------------------------");
+                }
                 this.path_planned_at_current_time_step = shortest_path;
             } else {
                 logger.error("null path");
@@ -146,14 +204,6 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
         rrt_alg.setGoal_coordinate(target_indicated_by_role.getCoordinates());
         rrt_alg.setInit_coordinate(center_coordinates);
         rrt_tree = rrt_alg.buildRRT(center_coordinates, current_angle, idle_uav);
-        this.setPath_prefound(rrt_tree.getPath_found());
-        this.resetCurrentIndexOfPath();
-    }
-
-    public void runRRTStar() {
-        rrt_alg.setGoal_coordinate(target_indicated_by_role.getCoordinates());
-        rrt_alg.setInit_coordinate(center_coordinates);
-        rrt_tree = rrt_alg.buildRRTStar2FromIRRT(center_coordinates, current_angle);
         this.setPath_prefound(rrt_tree.getPath_found());
         this.resetCurrentIndexOfPath();
     }
@@ -202,6 +252,10 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
     }
 
     public UAVPath getFuturePath() {
+        if(!this.isVisible())
+        {
+            return null;
+        }
         UAVPath future_path = new UAVPath();
         for (int i = current_index_of_planned_path; i < path_planned_at_current_time_step.getWaypointNum(); i++) {
             future_path.addWaypointToEnd(path_planned_at_current_time_step.getWaypoint(i));

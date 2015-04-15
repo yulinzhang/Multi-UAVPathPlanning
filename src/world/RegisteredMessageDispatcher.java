@@ -67,7 +67,7 @@ public class RegisteredMessageDispatcher extends MessageDispatcher {
 
             for (int j = 0; j < threat_num; j++) {
                 Threat threat = threats.get(j);
-                if (threat.getIndex() == threat_index && !kb.containsThreat(threat)) {
+                if (threat.getIndex() == threat_index) {
                     this.addRecvMessage(i, threat);
                 }
             }

@@ -1,5 +1,6 @@
 package world.model.shape;
 
+import config.StaticInitConfig;
 import java.io.ObjectInputStream.GetField;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,13 +19,16 @@ public class DubinsCurve {
 
     public static void main(String[] args)
     {
-        Point start = new Point(100, 100, Math.PI / 2);
-        Point end = new Point(-400, -300, Math.PI / 4);
+        Point start = new Point(0, 0, Math.PI / 2);
+        Point end = new Point(400, 300, Math.PI / 4);
         System.out.println(Math.toDegrees(0.2));
-        DubinsCurve dc = new DubinsCurve(start, end, 1, false);
-
-        final Trajectory traj = dc.getTrajectory(10, 1);
+        DubinsCurve dc = new DubinsCurve(start, end, 1, false,10,1);
+        final Trajectory traj = dc.getTrajectory(1, 1);
                 System.out.println(end);
+        for(Point point:traj.getPoints())
+        {
+            System.out.println(point);
+        }
         System.out.println("distance:" + DistanceUtil.distanceBetween(new float[]{100,100}, new float[]{-400,-300}));
         System.out.println("total cost:"+traj.getCost());
                 System.out.println("total time:"+traj.getMaxTime());
@@ -87,11 +91,14 @@ public class DubinsCurve {
     }
 
     private Point start;
+    private Point end;
     private double rho;
     private DubinsPath path;
+    private Trajectory traj;
+    private boolean exact=false;
 
-    public DubinsCurve(Point start, Point end, double rho) {
-        this(start, end, rho, false);
+    public DubinsCurve(Point start, Point end, double rho,double speed, int samplingInterval) {
+        this(start, end, rho, false,speed,samplingInterval);
     }
 
     /** 
@@ -101,8 +108,9 @@ public class DubinsCurve {
      * @param rho
      * @param reverseAllowed
      */
-    public DubinsCurve(Point start, Point end, double rho, boolean reverseAllowed) {
+    public DubinsCurve(Point start, Point end, double rho, boolean reverseAllowed,double speed, int samplingInterval) {
         this.start = start;
+        this.end=end;
         this.rho = rho;
 
         this.path = getDubinsPath(start, end, rho);
@@ -114,7 +122,9 @@ public class DubinsCurve {
                 this.path = reversedPath;
             }
         }
+        this.traj=this.getTrajectory(speed, samplingInterval);
     }
+    
 
     protected DubinsPath getDubinsPath(Point start, Point end, double rho) {
         // Normalize to relative coordinate system, where the origin is at start (0,0)
@@ -128,17 +138,25 @@ public class DubinsCurve {
         return canonicalDubins(d, alpha, beta);
     }
 
-    public Trajectory getTrajectory(double speed, int samplingInterval) {
+    private Trajectory getTrajectory(double speed, int samplingInterval) {
 
         double duration = (path.length() * rho) / speed;
         int nPoints = (int) Math.floor(duration / samplingInterval);
-
+        if(nPoints==0)
+        {
+            return null;
+        }
         Point points[] = new Point[nPoints];
 
         for (int i = 0; i < nPoints; i++) {
             points[i] = interpolate((i * samplingInterval) / duration);
         }
-
+        if(DistanceUtil.distanceBetween(points[nPoints-1].toFloatArray(), end.toFloatArray())<5)
+        {
+            this.exact=true;
+        }else{
+            this.exact=false;
+        }
         Trajectory traj = new Trajectory(points, samplingInterval, path.length() * rho);
         return traj;
     }
@@ -444,6 +462,22 @@ public class DubinsCurve {
 
     public DubinsPath getCanonicalPath() {
         return path;
+    }
+
+    public Trajectory getTraj() {
+        return traj;
+    }
+
+    public void setTraj(Trajectory traj) {
+        this.traj = traj;
+    }
+
+    public boolean isExact() {
+        return exact;
+    }
+
+    public void setExact(boolean exact) {
+        this.exact = exact;
     }
 
 }

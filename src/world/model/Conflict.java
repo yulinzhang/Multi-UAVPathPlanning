@@ -97,6 +97,7 @@ public class Conflict extends Message implements Serializable {
         @Override
     public boolean equals(Object obj)
     {
+        
         return false;
     }
     

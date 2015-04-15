@@ -56,7 +56,7 @@ public class NonStaticInitConfig {
         this.threat_num=5;
         this.attacker_num=5;
         this.scout_num=10;
-        this.inforshare_algorithm=StaticInitConfig.NONE_INFORSHARE;
+        this.inforshare_algorithm=StaticInitConfig.REGISTER_BASED_INFORSHARE;
         float[] coordinate=new float[]{0,0};
         UAVBase uav_base=new UAVBase(coordinate,100,100);
         this.uav_base=uav_base;
@@ -79,7 +79,7 @@ public class NonStaticInitConfig {
 //                coordinate_y=400;
                 found = !ConflictCheckUtil.checkPointInObstacles(obstacles,coordinate_x, coordinate_y);
             }
-            Threat threat = new Threat(i, new float[]{coordinate_x, coordinate_y},StaticInitConfig.STATIC_THREAT_TYPE,0);
+            Threat threat = new Threat(i, new float[]{coordinate_x, coordinate_y},StaticInitConfig.STATIC_THREAT_TYPE,5);
             threats.add(threat);
         }
     }

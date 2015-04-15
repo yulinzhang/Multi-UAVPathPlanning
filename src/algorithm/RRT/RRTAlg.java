@@ -18,9 +18,7 @@ import util.MapSortUtil;
 import util.VectorUtil;
 import world.model.Conflict;
 import world.model.Obstacle;
-import world.model.shape.DubinsCurve;
 import world.model.shape.Point;
-import world.model.shape.Trajectory;
 
 /**
  *
@@ -32,30 +30,30 @@ public class RRTAlg implements Serializable {
      * external variables
      *
      */
-    private ArrayList<Obstacle> obstacles;
-    private int bound_width = 800;
-    private int bound_height = 600;
-    private float[] init_coordinate;
-    private float[] goal_coordinate;
-    private float current_angle;
-    private float goal_probability = 0.6f;
-    private ArrayList<Conflict> conflicts;
-    private int uav_index;
+    protected ArrayList<Obstacle> obstacles;
+    protected int bound_width = 800;
+    protected int bound_height = 600;
+    protected float[] init_coordinate;
+    protected float[] goal_coordinate;
+    protected float current_angle;
+    protected float goal_probability = 0.6f;
+    protected ArrayList<Conflict> conflicts;
+    protected int uav_index;
 
-    private boolean idle_uav = false;
+    protected boolean idle_uav = false;
 
     /**
      * internal variables
      *
      */
-    private int k_step = 20;
-    private float max_delta_distance = 5;
-    private float max_angle = (float) Math.PI / 12;
+    protected int k_step = 20;
+    protected float max_delta_distance = 5;
+    protected float max_angle = (float) Math.PI / 12;
     /**
      * less than goal_range_for_delta means goal reached
      *
      */
-    private float goal_range_for_delta = StaticInitConfig.SAFE_DISTANCE_FOR_TARGET;
+    protected float goal_range_for_delta = StaticInitConfig.SAFE_DISTANCE_FOR_TARGET;
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(RRTAlg.class);
 
     /**
@@ -88,7 +86,7 @@ public class RRTAlg implements Serializable {
         this.uav_index = uav_index;
     }
 
-    public RRTTree buildRRT(float[] init_coordinate, float current_angle, boolean idle_uav) {
+    public RRTTree buildRRT(float[] init_coordinate, double current_angle, boolean idle_uav) {
 
         this.setInit_coordinate(init_coordinate);
         RRTTree G = new RRTTree();
@@ -157,163 +155,7 @@ public class RRTAlg implements Serializable {
         return G;
     }
 
-    @Deprecated
-    public RRTTree buildRRTStar3(float[] init_coordinate, float current_angle) {
-        this.setInit_coordinate(init_coordinate);
-        RRTTree G = new RRTTree();
-        RRTNode start_node = new RRTNode(init_coordinate[0], init_coordinate[1]);
-        start_node.setCurrent_angle(current_angle);
-        G.addNode(start_node, null);
-
-        float[] random_goal;
-        RRTNode nearest_node;
-        RRTNode new_node = null;
-        double radius = 9999;
-
-        for (int time_step = 1; time_step <= k_step;) {
-            //random choose a direction or goal
-            random_goal = randGoal(this.goal_coordinate, goal_probability, bound_width, bound_height, obstacles);
-            //choose the nearest node to extend
-            nearest_node = nearestVertex(random_goal, G);
-            //extend the child node and validate its confliction
-
-            Point start = new Point(nearest_node.getCoordinate()[0], nearest_node.getCoordinate()[1], nearest_node.getCurrent_angle());
-            Point end = new Point(random_goal[0], random_goal[1], Math.PI / 4);
-            DubinsCurve dc = new DubinsCurve(start, end, 150, false);
-            Trajectory traj = dc.getTrajectory(1, 10);
-            Point z_new = traj.getEndPoint();
-
-            if (!ConflictCheckUtil.checkTrajectoryInObstacles(obstacles, traj)) {
-                RRTNode min_point_toward_z_new = nearest_node;
-                ArrayList<RRTNode> nearestNodesToNewNodeSet = neareSortedNodesToNode(G, z_new.toFloatArray(), Math.E * 2 * Math.log(G.getNodeCount() + 1));
-                float c_min = nearest_node.getPath_lenght_from_root() + (float) traj.getCost();
-                RRTNode z_min = nearest_node;
-                Trajectory traj_min = traj;
-                for (RRTNode z_near : nearestNodesToNewNodeSet) {
-                    Point near_as_start = new Point(z_near.getCoordinate()[0], z_near.getCoordinate()[1], z_near.getCurrent_angle());
-                    DubinsCurve inner_dc = new DubinsCurve(near_as_start, z_new, 150, false);
-                    Trajectory inner_traj = inner_dc.getTrajectory(1, 10);
-                    Point inner_end_point = inner_traj.getEndPoint();
-                    if (!ConflictCheckUtil.checkTrajectoryInObstacles(obstacles, inner_traj) && DistanceUtil.distanceBetween(new float[]{(float) inner_end_point.getX(), (float) inner_end_point.getY()}, z_near.getCoordinate()) < 1) {
-                        if (z_near.getPath_lenght_from_root() + inner_traj.getCost() < c_min) {
-                            c_min = z_near.getPath_lenght_from_root() + (float) inner_traj.getCost();
-                            z_min = z_near;
-                            traj_min = inner_traj;
-                        }
-                    }
-                }
-                RRTNode parent = z_min;
-                for (Point point : traj_min.getPoints()) {
-                    RRTNode node_to_add = new RRTNode((float) point.getX(), (float) point.getY());
-                    G.addNode(node_to_add, parent);
-                    parent = node_to_add;
-                }
-
-                if (distanceBetween(parent.getCoordinate(), goal_coordinate) < goal_range_for_delta) {
-//                    G.generatePath(parent);
-                    G.generatePath();
-                    return G;
-                }
-
-                RRTNode z_new_node = parent;
-                for (RRTNode z_near : nearestNodesToNewNodeSet) {
-                    if (z_near == z_min) {
-                        continue;
-                    }
-                    Point near_as_start = new Point(z_near.getCoordinate()[0], z_near.getCoordinate()[1], z_near.getCurrent_angle());
-                    DubinsCurve inner_dc = new DubinsCurve(z_new, near_as_start, 150, false);
-                    Trajectory inner_traj = inner_dc.getTrajectory(1, 10);
-                    Point inner_end_point = inner_traj.getEndPoint();
-                    if (!ConflictCheckUtil.checkTrajectoryInObstacles(obstacles, inner_traj) && DistanceUtil.distanceBetween(new float[]{(float) inner_end_point.getX(), (float) inner_end_point.getY()}, z_near.getCoordinate()) < 1) {
-                        if (z_near.getPath_lenght_from_root() > z_new_node.getPath_lenght_from_root() + c_min) {
-                            G.changeParent(z_new_node, z_near);
-                        }
-                    }
-                }
-            }
-        }
-//        G.generatePath(new_node);
-        G.generatePath();
-        return G;
-    }
-
-    @Deprecated
-    public RRTTree buildRRTStar2FromIRRT(float[] init_coordinate, float current_angle) {
-        this.setInit_coordinate(init_coordinate);
-        RRTTree G = new RRTTree();
-        RRTNode start_node = new RRTNode(init_coordinate[0], init_coordinate[1]);
-        start_node.setCurrent_angle(current_angle);
-        G.addNode(start_node, null);
-
-        float[] random_goal;
-        ArrayList<RRTNode> near_node_set;
-        RRTNode nearest_node = null;
-        RRTNode new_node = null;
-        double radius = 9999;
-
-        for (int time_step = 1; time_step <= k_step;) {
-            //random choose a direction or goal
-            random_goal = randGoal(this.goal_coordinate, goal_probability, bound_width, bound_height, obstacles);
-            //choose the nearest node to extend
-            near_node_set = neareSortedNodesToNode(G, random_goal, radius);
-
-            boolean node_added = false;
-            for (int i = 0; i < near_node_set.size(); i++) {
-                nearest_node = near_node_set.get(i);
-
-                Point start = new Point(nearest_node.getCoordinate()[0], nearest_node.getCoordinate()[1], nearest_node.getCurrent_angle());
-                Point end = new Point(random_goal[0], random_goal[1], Math.PI / 4);
-                DubinsCurve dc = new DubinsCurve(start, end, 150, false);
-                Trajectory traj = dc.getTrajectory(1, 10);
-                if (!ConflictCheckUtil.checkTrajectoryInObstacles(obstacles, traj)) {
-
-                    int total_num = traj.getMaxTime();
-                    for (int j = 0; j <= total_num; j++) {
-                        Point point = traj.get(j);
-                        float[] point_coord = point.toFloatArray();
-                        RRTNode node = new RRTNode(point_coord[0], point_coord[1]);
-                        nearest_node = node;
-                        G.addNode(node, nearest_node);
-                    }
-
-                    if (DistanceUtil.distanceBetween(nearest_node.getCoordinate(), goal_coordinate) < goal_range_for_delta) {
-//                        G.generatePath(nearest_node);
-                        G.generatePath();
-                        return G;
-                    }
-
-                    node_added = true;
-                }
-                if (node_added) {
-                    break;
-                }
-            }
-
-            //rewire
-            if (node_added) {
-                for (int i = 0; i < near_node_set.size(); i++) {
-                    RRTNode this_node = near_node_set.get(i);
-                    float newNodePathLenght = nearest_node.getPath_lenght_from_root();
-                    double thisNodepathLength = this_node.getPath_lenght_from_root();
-                    float distance = DistanceUtil.distanceBetween(nearest_node.getCoordinate(), this_node.getCoordinate());
-
-                    if (newNodePathLenght + distance < thisNodepathLength) {
-                        Point start = new Point(nearest_node.getCoordinate()[0], nearest_node.getCoordinate()[1], nearest_node.getCurrent_angle());
-                        Point end = new Point(this_node.getCoordinate()[0], this_node.getCoordinate()[1], Math.PI / 4);
-                        DubinsCurve dc = new DubinsCurve(start, end, 150, false);
-                        Trajectory traj = dc.getTrajectory(1, 10);
-                        if (!ConflictCheckUtil.checkTrajectoryInObstacles(obstacles, traj)) {
-                            G.changeParent(this_node, nearest_node);
-                        }
-                    }
-                }
-            }
-
-        }
-//        G.generatePath(nearest_node);
-        G.generatePath();
-        return G;
-    }
+   
 
     @Deprecated
     public RRTTree buildRRTStar1(float[] init_coordinate, float current_angle) {
@@ -367,7 +209,7 @@ public class RRTAlg implements Serializable {
         return G;
     }
 
-    private void rewireRRTStar(RRTTree G, RRTNode potential_parent, RRTNode new_node) {
+    protected void rewireRRTStar(RRTTree G, RRTNode potential_parent, RRTNode new_node) {
         float[] new_node_coordinate = new_node.getCoordinate();
         float[] potential_parent_coordinate = potential_parent.getCoordinate();
         if (!ConflictCheckUtil.checkLineInObstacles(obstacles, potential_parent_coordinate, new_node_coordinate)) {
@@ -387,7 +229,7 @@ public class RRTAlg implements Serializable {
      * @param radius
      * @return
      */
-    private ArrayList<RRTNode> neareSortedNodesToNode(RRTTree G, float[] node_coordinate, double radius) {
+    protected ArrayList<RRTNode> neareSortedNodesToNode(RRTTree G, float[] node_coordinate, double radius) {
         RRTNode temp_node;
         Map<RRTNode, Double> NeareNodeSet = new HashMap<RRTNode, Double>();
         double temp_dist;
@@ -410,7 +252,7 @@ public class RRTAlg implements Serializable {
      * @param G
      * @return
      */
-    private RRTNode nearestVertex(float[] goal_coordinate, RRTTree G) {
+    protected RRTNode nearestVertex(float[] goal_coordinate, RRTTree G) {
         RRTNode temp_node;
         RRTNode nearest_node = null;
 
@@ -440,7 +282,7 @@ public class RRTAlg implements Serializable {
      * @param threats
      * @return
      */
-    private float[] randGoal(float[] goal_coordinate, float goal_probability, float width, float height, ArrayList<Obstacle> obstacles) {
+    protected float[] randGoal(float[] goal_coordinate, float goal_probability, float width, float height, ArrayList<Obstacle> obstacles) {
         float probability = (float) Math.random();
         if (probability <= goal_probability) {
             return goal_coordinate;
@@ -468,11 +310,11 @@ public class RRTAlg implements Serializable {
      * @param max_angle
      * @return
      */
-    private RRTNode extendTowardGoalWithoutDynamics(RRTNode nearest_node, float[] random_goal_coordinate, float max_length, float max_angle) {
-        float current_angle = nearest_node.getCurrent_angle();
+    protected RRTNode extendTowardGoalWithoutDynamics(RRTNode nearest_node, float[] random_goal_coordinate, float max_length, double max_angle) {
+        double current_angle = nearest_node.getCurrent_angle();
         float[] nearest_coordinate = nearest_node.getCoordinate();
-        float toward_goal_angle = VectorUtil.getAngleOfTwoVector(random_goal_coordinate, nearest_coordinate);
-        float delta_angle = toward_goal_angle - current_angle;
+        double toward_goal_angle = VectorUtil.getAngleOfTwoVector(random_goal_coordinate, nearest_coordinate);
+        double delta_angle = toward_goal_angle - current_angle;
 
         float total_dist_from_nearest_to_goal = DistanceUtil.distanceBetween(nearest_coordinate, random_goal_coordinate);
 
@@ -499,24 +341,26 @@ public class RRTAlg implements Serializable {
      * @param max_angle
      * @return
      */
-    private RRTNode extendTowardGoalWithDynamics(RRTNode nearest_node, float[] random_goal_coordinate, float max_length, float max_angle) {
-        float current_angle = nearest_node.getCurrent_angle();
+    protected RRTNode extendTowardGoalWithDynamics(RRTNode nearest_node, float[] random_goal_coordinate, float max_length, double max_angle) {
+        double current_angle = nearest_node.getCurrent_angle();
         float[] nearest_coordinate = nearest_node.getCoordinate();
-        float toward_goal_angle = VectorUtil.getAngleOfVectorRelativeToXCoordinate(random_goal_coordinate[0] - nearest_coordinate[0], random_goal_coordinate[1] - nearest_coordinate[1]);
-        float delta_angle = VectorUtil.getBetweenAngle(toward_goal_angle, current_angle);
+        double toward_goal_angle = VectorUtil.getAngleOfVectorRelativeToXCoordinate(random_goal_coordinate[0] - nearest_coordinate[0], random_goal_coordinate[1] - nearest_coordinate[1]);
+        double delta_angle = VectorUtil.getBetweenAngle(toward_goal_angle, current_angle);
         float[] new_node_coord = new float[2];
+        float len=max_length;
         if (delta_angle > max_angle) {
-            float temp_goal_angle1 = VectorUtil.getNormalAngle(current_angle - max_angle);
-            float delta_angle_1 = VectorUtil.getBetweenAngle(toward_goal_angle, temp_goal_angle1);
+            double temp_goal_angle1 = VectorUtil.getNormalAngle(current_angle - max_angle);
+            double delta_angle_1 = VectorUtil.getBetweenAngle(toward_goal_angle, temp_goal_angle1);
 
-            float temp_goal_angle2 = VectorUtil.getNormalAngle(current_angle + max_angle);
-            float delta_angle_2 = VectorUtil.getBetweenAngle(toward_goal_angle, temp_goal_angle2);
+            double temp_goal_angle2 = VectorUtil.getNormalAngle(current_angle + max_angle);
+            double delta_angle_2 = VectorUtil.getBetweenAngle(toward_goal_angle, temp_goal_angle2);
 
             if (delta_angle_1 < delta_angle_2) {
                 toward_goal_angle = temp_goal_angle1;
             } else {
                 toward_goal_angle = temp_goal_angle2;
             }
+            len=Math.min(len, DistanceUtil.distanceBetween(nearest_coordinate, random_goal_coordinate));
         }
         new_node_coord[0] = nearest_coordinate[0] + (float) (Math.cos(toward_goal_angle) * max_length);
         new_node_coord[1] = nearest_coordinate[1] + (float) (Math.sin(toward_goal_angle) * max_length);

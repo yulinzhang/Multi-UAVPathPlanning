@@ -55,9 +55,9 @@ public class BroadcastMessageDispatcher extends MessageDispatcher {
 
             for (int j = 0; j < threat_num; j++) {
                 Threat threat = threats.get(j);
-                if (!kb.containsThreat(threat)) {
+//                if (!kb.containsThreat(threat)) {
                     this.addRecvMessage(i, threat);
-                }
+//                }
             }
             
             if(attacker_rect==null)

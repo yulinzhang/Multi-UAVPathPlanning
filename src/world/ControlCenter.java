@@ -36,10 +36,10 @@ public class ControlCenter implements KnowledgeAwareInterface {
     Map<Integer, LinkedList<Point>> way_point_for_uav;
     private float scout_speed;
     private boolean need_to_assign_role = true;
-    
-    private int scout_remained=-1;
-    private boolean scout_scanned_over=false;
-    
+
+    private int scout_remained = -1;
+    private boolean scout_scanned_over = false;
+
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ControlCenter.class);
 
     public ControlCenter(KnowledgeInterface kb) {
@@ -67,18 +67,28 @@ public class ControlCenter implements KnowledgeAwareInterface {
         }
     }
 
+    public void updateThreat(Threat threat) {
+        ArrayList<Threat> threats = this.kb.getThreats();//remove threat with the same index
+        for (Threat old_threat : threats) {
+            if (old_threat.getIndex() == threat.getIndex()) {
+                this.kb.removeThreat(old_threat);
+                this.kb.addThreat(threat);
+                return;
+            }
+        }
+        this.kb.addThreat(threat);
+    }
+
     public void updateScoutCoordinate() {
         int scout_num = this.scouts.size();
         for (int i = 0; i < scout_num; i++) {
             Scout scout = this.scouts.get(i);
             scout.moveToNextWaypoint();
-            boolean visible=scout.isVisible();
-            if(!visible)
-            {
+            boolean visible = scout.isVisible();
+            if (!visible) {
                 this.scout_remained--;
             }
-            if(this.scout_remained==0)
-            {
+            if (this.scout_remained == 0) {
                 this.setScout_scanned_over(true);
             }
         }
@@ -199,7 +209,7 @@ public class ControlCenter implements KnowledgeAwareInterface {
         int threat_num = threats.size();
         int attacker_num = attackers.size();
         ArrayList<Obstacle> obstacles = this.getObstacles();
-        
+
         for (int i = 0; i < threat_num; i++) {
             Threat threat = threats.get(i);
             if (!threat.isEnabled()) {
@@ -224,6 +234,9 @@ public class ControlCenter implements KnowledgeAwareInterface {
             Attacker attacker_to_assign = null;
             for (int j = 0; j < attacker_num; j++) {
                 Attacker current_attacker = this.attackers.get(j);
+                if (!current_attacker.isVisible()) {
+                    continue;
+                }
                 if (assigned_attacker.contains(current_attacker.getIndex())) {
                     continue;
                 }
@@ -303,7 +316,7 @@ public class ControlCenter implements KnowledgeAwareInterface {
 
     public void setScouts(ArrayList<Scout> scouts) {
         this.scouts = scouts;
-        this.scout_remained=this.scouts.size();
+        this.scout_remained = this.scouts.size();
     }
 
     @Override

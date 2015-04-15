@@ -22,8 +22,8 @@ public class UAV extends Unit {
     protected Color center_color;
     protected Color radar_color; //the radar color in world
     protected Circle uav_radar;
-    protected float current_angle = 0;
-    protected float max_angle = (float) Math.PI / 4;
+    protected double current_angle = 0;
+    protected double max_angle =Math.PI / 4;
     protected int speed = 5;
     protected boolean visible=true;
 
@@ -42,16 +42,16 @@ public class UAV extends Unit {
         this.setCenter_coordinates(uav_radar.getCenter_coordinates());
     }
 
-    protected float[] extendTowardGoalWithDynamics(float[] current_coordinate, float current_angle, float[] random_goal_coordinate, float max_length, float max_angle) {
-        float toward_goal_angle = VectorUtil.getAngleOfVectorRelativeToXCoordinate(random_goal_coordinate[0] - current_coordinate[0], random_goal_coordinate[1] - current_coordinate[1]);
-        float delta_angle = VectorUtil.getBetweenAngle(toward_goal_angle, current_angle);
+    protected float[] extendTowardGoalWithDynamics(float[] current_coordinate, double current_angle, float[] random_goal_coordinate, float max_length, double max_angle) {
+        double toward_goal_angle = VectorUtil.getAngleOfVectorRelativeToXCoordinate(random_goal_coordinate[0] - current_coordinate[0], random_goal_coordinate[1] - current_coordinate[1]);
+        double delta_angle = VectorUtil.getBetweenAngle(toward_goal_angle, current_angle);
         float[] new_node_coord = new float[2];
         if (delta_angle > max_angle) {
-            float temp_goal_angle1 = VectorUtil.getNormalAngle(current_angle - max_angle);
-            float delta_angle_1 = VectorUtil.getBetweenAngle(toward_goal_angle, temp_goal_angle1);
+            double temp_goal_angle1 = VectorUtil.getNormalAngle(current_angle - max_angle);
+            double delta_angle_1 = VectorUtil.getBetweenAngle(toward_goal_angle, temp_goal_angle1);
 
-            float temp_goal_angle2 = VectorUtil.getNormalAngle(current_angle + max_angle);
-            float delta_angle_2 = VectorUtil.getBetweenAngle(toward_goal_angle, temp_goal_angle2);
+            double temp_goal_angle2 = VectorUtil.getNormalAngle(current_angle + max_angle);
+            double delta_angle_2 = VectorUtil.getBetweenAngle(toward_goal_angle, temp_goal_angle2);
 
             if (delta_angle_1 < delta_angle_2) {
                 toward_goal_angle = temp_goal_angle1;
@@ -97,11 +97,11 @@ public class UAV extends Unit {
         return radar_color;
     }
 
-    public float getCurrent_angle() {
+    public double getCurrent_angle() {
         return current_angle;
     }
 
-    public void setCurrent_angle(float current_angle) {
+    public void setCurrent_angle(double current_angle) {
         this.current_angle = current_angle;
     }
 

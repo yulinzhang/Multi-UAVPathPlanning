@@ -86,9 +86,11 @@ public class Target extends Message implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        Target target = (Target) obj;
-        if (this.coordinates[0] == target.coordinates[0] && this.coordinates[1] == target.coordinates[1]) {
-            return true;
+        if (obj instanceof Target) {
+            Target target = (Target) obj;
+            if (this.index==target.index) {
+                return true;
+            }
         }
         return false;
     }

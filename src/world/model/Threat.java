@@ -147,7 +147,7 @@ public class Threat extends Target implements Serializable {
     public boolean equals(Object obj) {
         if (obj instanceof Threat) {
             Threat threat = (Threat) obj;
-            if (this.index==threat.getIndex()&&this.coordinates[0] == threat.coordinates[0] && this.coordinates[1] == threat.coordinates[1]) {
+            if (this.index==threat.getIndex()) {//&&this.coordinates[0] == threat.coordinates[0] && this.coordinates[1] == threat.coordinates[1]
                 return true;
             }
         }

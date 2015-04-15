@@ -14,7 +14,7 @@ public class RRTNode {
     private float[] coordinate;
     private float path_lenght_from_root;
     private float distance_from_goal;
-    private float current_angle=-1;
+    private double current_angle=-1;
     private int expected_time_step=-1;
 
     public RRTNode() {
@@ -65,11 +65,11 @@ public class RRTNode {
         return "N = (" + coordinate[0] + "," + coordinate[1] + ")";
     }
 
-    public void setCurrent_angle(float current_angle) {
+    public void setCurrent_angle(double current_angle) {
         this.current_angle = current_angle;
     }
 
-    public float getCurrent_angle() {
+    public double getCurrent_angle() {
         return current_angle;
     }
 

@@ -135,12 +135,25 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
         polygon.addPoint(3, 6);
         Obstacle obs = new Obstacle(polygon, 0);
         float[] coord = new float[2];
+        coord[0]=2;
+        coord[1]=3;
         Threat threat = new Threat(0, coord, 0, 3);
         threat.setSpeed(2);
         threat.setTarget_type(0);
         threat.setThreat_cap("aaa");
         threat.setThreat_range(2);
+        threat.setEnabled(false);
         kb.addThreat(threat);
+        
+        float[] coord1=new float[2];
+        coord1[0]=1;
+        coord1[0]=2;
+        Threat threat1=new Threat(1,coord1,2,4);
+        threat1.setEnabled(false);
+        kb.addThreat(threat1);
+        kb.removeThreat(threat1);
+        ArrayList<Threat> threats=kb.getThreats();
+        logger.debug("size=" + kb.getThreats().size());
 //        OntologyBasedKnowledge.printStatements(kb.ontology_based_knowledge);
         kb.addObstacle(obs);
 //        kb.addObstacle(obs);
@@ -640,7 +653,7 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
         StmtIterator smt_list_to_find_threat_individual = ontology_based_knowledge.listStatements(null, hasThreatCenter, center);
         if (smt_list_to_find_threat_individual.hasNext()) {
             Resource threat_individual = smt_list_to_find_threat_individual.next().getSubject();
-            ontology_based_knowledge = (OntModel) ontology_based_knowledge.removeAll(threat_individual, hasThreatCenter, null).removeAll(threat_individual, hasThreatSpeed, null).removeAll(threat_individual, hasThreatRange, null).removeAll(threat_individual, hasThreatCapability, null);
+            ontology_based_knowledge = (OntModel) ontology_based_knowledge.removeAll(threat_individual, hasThreatCenter, null).removeAll(threat_individual, hasThreatSpeed, null).removeAll(threat_individual, hasThreatRange, null).removeAll(threat_individual, hasThreatCapability, null).removeAll(threat_individual, hasThreatIndex, null).removeAll(threat_individual, threatEnabled, null).removeAll(null, null, threat_individual);
             this.threat_num--;
             this.threat_updated = true;
             return true;

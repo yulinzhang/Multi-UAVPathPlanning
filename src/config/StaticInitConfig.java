@@ -53,12 +53,14 @@ public class StaticInitConfig {
     //how much time it takes to drive the simulaiton to next time step
     public static int INIT_SIMULATION_DELAY = 100; //milliseconds,this value will be set according to the user's simulation speed
     public static Timer SIMULATION_WITH_UI_TIMER; //simulation Timer
-    public static float SPEED_TIMES=12;
+    public static float SPEED_TIMES=10;
 
     public static boolean SHOW_PLANNED_PATH = true;
     public static boolean SHOW_PLANNED_TREE = true;
     public static boolean SHOW_HISTORY_PATH = false;
     public static boolean SHOW_FOG_OF_WAR = true;
+    
+    public static boolean debug_rrt=false;
     
     public static int STATIC_THREAT_TYPE = 0; //Distinguish between types of threats
     public static int DYNAMIC_THREAT_TYPE = 1;
