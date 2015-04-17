@@ -92,8 +92,6 @@ public class AnimationPanel extends JPanel implements MouseListener {
 
     private MyPopupMenu my_popup_menu;
 
-    private static int uav_base_line_width = 3;
-
     public AnimationPanel() {
         initComponents();
     }
@@ -175,7 +173,7 @@ public class AnimationPanel extends JPanel implements MouseListener {
 
     public void start() {
         //drive the world and ui
-        StaticInitConfig.SIMULATION_WITH_UI_TIMER = new javax.swing.Timer((int)(StaticInitConfig.INIT_SIMULATION_DELAY/StaticInitConfig.SPEED_TIMES), new animatorListener(this));
+        StaticInitConfig.SIMULATION_WITH_UI_TIMER = new javax.swing.Timer((int) (StaticInitConfig.INIT_SIMULATION_DELAY / StaticInitConfig.SPEED_TIMES), new animatorListener(this));
         StaticInitConfig.SIMULATION_WITH_UI_TIMER.start();
     }
 
@@ -233,12 +231,7 @@ public class AnimationPanel extends JPanel implements MouseListener {
      * @param uav_image_graphics
      */
     private void initUAVBase(Graphics2D uav_image_graphics) {
-        uav_image_graphics.setColor(Color.white);
-        uav_image_graphics.setStroke(new BasicStroke(uav_base_line_width));
-        uav_image_graphics.drawRect((int) uav_base.getCoordinate()[0], (int) uav_base.getCoordinate()[1], uav_base.getBase_width(), uav_base.getBase_height());
-        uav_image_graphics.setColor(GraphicConfig.uav_base_color);
-        uav_image_graphics.fillRect((int) uav_base.getCoordinate()[0], (int) uav_base.getCoordinate()[1], uav_base.getBase_width(), uav_base.getBase_height());
-        uav_image_graphics.drawImage(uav_base.getImage(), (int) uav_base.getCoordinate()[0], (int) uav_base.getCoordinate()[1], uav_base.getBase_width() * 2 / 3, uav_base.getBase_height() * 2 / 3, null);
+        virtualizer.drawUAVBase(uav_image_graphics, uav_base);
     }
 
     /**
@@ -270,10 +263,9 @@ public class AnimationPanel extends JPanel implements MouseListener {
     }
 
     private void updateThreatImage() {
-        ArrayList<Threat> threats=control_center.getThreats();
-        for(Threat threat:threats)
-        {
-           if (!threat.isEnabled()) {
+        ArrayList<Threat> threats = control_center.getThreats();
+        for (Threat threat : threats) {
+            if (!threat.isEnabled()) {
                 continue;
             }
             if (threat.getIndex() == AnimationPanel.highlight_threat_index) {
@@ -340,8 +332,7 @@ public class AnimationPanel extends JPanel implements MouseListener {
         if (!StaticInitConfig.SHOW_FOG_OF_WAR) {
             return;
         }
-        for(Attacker attcker:AnimationPanel.attackers)
-        {
+        for (Attacker attcker : AnimationPanel.attackers) {
             virtualizer.drawUAVInFogOfWarInLevel3(fog_of_war_graphics, (UAV) attcker);
         }
         for (Scout scout : this.scouts) {
@@ -457,8 +448,7 @@ public class AnimationPanel extends JPanel implements MouseListener {
             }
             updateImageCausedByUAVMovement();
             repaint();
-            if(world.isExperiment_over())
-            {
+            if (world.isExperiment_over()) {
                 System.exit(0);
             }
 

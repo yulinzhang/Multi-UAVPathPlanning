@@ -75,8 +75,6 @@ public class NonStaticInitConfig {
             while (!found) {
                 coordinate_x = random.nextFloat()*(bound_width-2*attacker_patrol_range)+attacker_patrol_range;
                 coordinate_y = random.nextFloat()*(bound_height-2*attacker_patrol_range)+attacker_patrol_range;
-//                coordinate_x=400;
-//                coordinate_y=400;
                 found = !ConflictCheckUtil.checkPointInObstacles(obstacles,coordinate_x, coordinate_y);
             }
             Threat threat = new Threat(i, new float[]{coordinate_x, coordinate_y},StaticInitConfig.STATIC_THREAT_TYPE,5);

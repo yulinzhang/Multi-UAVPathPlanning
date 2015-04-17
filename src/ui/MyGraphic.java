@@ -22,6 +22,7 @@ import world.model.shape.Circle;
 import world.model.Obstacle;
 import world.model.Threat;
 import world.uav.UAV;
+import world.uav.UAVBase;
 import world.uav.UAVPath;
 
 /**
@@ -29,7 +30,7 @@ import world.uav.UAVPath;
  * @author Yulin_Zhang
  */
 public class MyGraphic {
-
+    private static int uav_base_line_width = 3;
 //    public void clearUAVShadowInUAVImage(Graphics2D graphics,Attacker uav) {
 //        graphics.setComposite(AlphaComposite.Clear);
 //        graphics.fill(uav.getUav_radar());
@@ -180,5 +181,15 @@ public class MyGraphic {
         graphics.setStroke(new BasicStroke(3.0f));//Set the width of the stroke
         graphics.drawString(StaticInitConfig.THREAT_NAME + target.getIndex(), target.getCoordinates()[0] - 10, target.getCoordinates()[1] - 15);
         graphics.drawRect((int) target.getCoordinates()[0] - GraphicConfig.threat_width / 2, (int) target.getCoordinates()[1] - GraphicConfig.threat_height / 2, GraphicConfig.threat_width, GraphicConfig.threat_height);
+    }
+    
+    public void drawUAVBase(Graphics2D graphics, UAVBase uav_base)
+    {
+         graphics.setColor(Color.white);
+        graphics.setStroke(new BasicStroke(uav_base_line_width));
+        graphics.drawRect((int) uav_base.getCoordinate()[0], (int) uav_base.getCoordinate()[1], uav_base.getBase_width(), uav_base.getBase_height());
+        graphics.setColor(GraphicConfig.uav_base_color);
+        graphics.fillRect((int) uav_base.getCoordinate()[0], (int) uav_base.getCoordinate()[1], uav_base.getBase_width(), uav_base.getBase_height());
+        graphics.drawImage(uav_base.getImage(), (int) uav_base.getCoordinate()[0], (int) uav_base.getCoordinate()[1], uav_base.getBase_width() * 2 / 3, uav_base.getBase_height() * 2 / 3, null);
     }
 }

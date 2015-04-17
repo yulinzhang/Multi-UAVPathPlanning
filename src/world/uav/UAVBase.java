@@ -5,6 +5,7 @@
  */
 package world.uav;
 
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -20,12 +21,14 @@ public class UAVBase {
     private int base_width;
     private int base_height;
     private BufferedImage image;
+    private Rectangle base_rect;
 
     public UAVBase(float[] coordinate, int base_width, int base_height) {
         try {
             this.coordinate = coordinate;
             this.base_width = base_width;
             this.base_height = base_height;
+            this.base_rect=new Rectangle((int)coordinate[0],(int)coordinate[1],this.base_width,this.base_height);
             image=ImageUtil.retrieveImage("/resources/radar2.jpg");
         } catch (IOException ex) {
             Logger.getLogger(UAVBase.class.getName()).log(Level.SEVERE, null, ex);

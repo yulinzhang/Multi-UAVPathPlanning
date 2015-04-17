@@ -46,45 +46,14 @@ import world.model.shape.Point;
  *
  * @author boluo
  */
-public class OntologyBasedKnowledge extends KnowledgeInterface {
+public class OntologyBasedKnowledge_ObstacleSpecified extends OntologyBasedKnowledge {
+  
+    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(OntologyBasedKnowledge_ObstacleSpecified.class);
 
-    public OntModel ontology_based_knowledge;
-    public static String base_ns = "http://www.multiagent.com.cn/robotontology/";
-    public static String rdf_ns = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
-    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(OntologyBasedKnowledge.class);
-    public String prefix = "PREFIX mars:<http://www.multiagent.com.cn/robotontology/>" + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>";
+    
 
-    /**
-     * internal variables
-     *
-     *
-     */
-    public OntClass Obstacle_Class, Region_Class, Polygon_Class, LowerBoundOfRegion_Class, UpperBoundOfRegion_Class, Threat_Class;
-    public OntClass Conflict_Class;
-    public DatatypeProperty hasExpectedConflictTime, hasDecidedConflictTime, conflictFromRobot;
-    public ObjectProperty has_region, has_polygon, has_lowerbound, has_upperbound, rdf_type;
-    public DatatypeProperty hasConflictCenter, hasConflictRange;
-    public DatatypeProperty hasThreatCenter, hasThreatSpeed, hasThreatRange, hasThreatCapability, hasThreatIndex, threatEnabled;
-    public DatatypeProperty has_points, hasMaxXCoordinate, hasMaxYCoordinate, hasMinXCoordinate, hasMinYCoordinate, hasObstacleIndex;
-
-    /**
-     * cache to speed the information retrieve process.
-     *
-     */
-    public boolean obstacle_updated = false, threat_updated = false, conflict_updated = false;
-    public ArrayList<Obstacle> obstacles_cache = new ArrayList<Obstacle>();
-    public ArrayList<Threat> threats_cache = new ArrayList<Threat>();
-    public ArrayList<Conflict> conflicts_cache = new ArrayList<Conflict>();
-
-    public OntologyBasedKnowledge() {
-        super();
-        ontology_based_knowledge = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, null);
-        try {
-            ontology_based_knowledge.read(new FileInputStream(StaticInitConfig.ROBOT_ONTOLOGY_TEMPLATE_FILE_PATH), null);
-        } catch (FileNotFoundException ex) {
-            logger.error(ex);
-        }
-        initClassAndProperty();
+    public OntologyBasedKnowledge_ObstacleSpecified() {
+       super();
     }
 
     public void initClassAndProperty() {
@@ -128,7 +97,7 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
     }
 
     public static void main(String[] args) {
-        OntologyBasedKnowledge kb = new OntologyBasedKnowledge();
+        OntologyBasedKnowledge_ObstacleSpecified kb = new OntologyBasedKnowledge_ObstacleSpecified();
         Polygon polygon = new Polygon();
         polygon.addPoint(0, 1);
         polygon.addPoint(2, 4);
@@ -195,30 +164,7 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
 //        logger.debug(OntologyBasedKnowledge.printOntology(kb.ontology_based_knowledge));
     }
 
-    public static String printOntology(Model m) {
-        StringWriter writer = new StringWriter();
-        m.write(writer, "RDF/XML-ABBREV", base_ns);
-        String rdf_merged_result = writer.toString();
-        return rdf_merged_result;
-    }
-
-    public static void printStatements(Model m) {
-        int total = 0;
-        for (StmtIterator i = m.listStatements(); i.hasNext();) {
-            Statement stmt = i.nextStatement();
-            total++;
-            logger.debug(" - " + PrintUtil.print(stmt));
-        }
-        logger.debug(total);
-    }
-
-    public static void printStatements(Model m, Resource s, Property p, Resource o) {
-        for (StmtIterator i = m.listStatements(s, p, o); i.hasNext();) {
-            Statement stmt = i.nextStatement();
-            logger.debug(" - " + PrintUtil.print(stmt));
-        }
-    }
-
+   
     public void init() {
         OntClass Obstacle_Class = ontology_based_knowledge.createClass(base_ns + "Obstacle");
         OntClass Region_Class = ontology_based_knowledge.createClass(base_ns + "Region");
@@ -300,126 +246,6 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
         return obstacles;
     }
 
-    @Override
-    public ArrayList<Conflict> getConflicts() {
-        if (!this.conflict_updated) {
-            return this.conflicts_cache;
-        }
-        ArrayList<Conflict> conflicts = new ArrayList<Conflict>();
-        Map<Integer, Conflict> conflict_map = new HashMap<Integer, Conflict>();
-        String sparql = "SELECT ?conflict_center ?conflict_range ?exptected_conflict_time ?decided_conflict_time ?uav_index"
-                + "{"
-                + "?conflict_ind rdf:type mars:Conflict ."
-                + "?conflict_ind mars:hasConflictCenter ?conflict_center ."
-                + "?conflict_ind mars:hasConflictRange ?conflict_range ."
-                + "?conflict_ind mars:hasExpectedConflictTime ?exptected_conflict_time ."
-                + "?conflict_ind mars:hasDecidedConflictTime ?decided_conflict_time ."
-                + "?conflict_ind mars:conflictFromRobot ?uav_index"
-                + "}";
-        Query query = QueryFactory.create(prefix + sparql);
-        QueryExecution qe = QueryExecutionFactory.create(query, ontology_based_knowledge);
-        ResultSet results = qe.execSelect();
-//        ResultSetFormatter.out(System.out, results, query);
-        while (results.hasNext()) {
-            QuerySolution result = results.next();
-            String raw_center_str = StringUtil.parseLiteralStr(result.get("conflict_center").toString());
-            String[] coord_str = raw_center_str.split(",");
-            float[] center_coord = new float[2];
-            center_coord[0] = Float.parseFloat(coord_str[0]);
-            center_coord[1] = Float.parseFloat(coord_str[1]);
-
-            String raw_range_str = StringUtil.parseLiteralStr(result.get("conflict_range").toString());
-            float range = Float.parseFloat(raw_range_str);
-
-            String raw_expected_conflict_time_str = StringUtil.parseLiteralStr(result.get("exptected_conflict_time").toString());
-            int expected_conflict_time = Integer.parseInt(raw_expected_conflict_time_str);
-
-            String raw_decided_conflict_time_str = StringUtil.parseLiteralStr(result.get("decided_conflict_time").toString());
-            int decided_conflict_time = Integer.parseInt(raw_decided_conflict_time_str);
-
-            String raw_uav_index_str = StringUtil.parseLiteralStr(result.get("uav_index").toString());
-            int uav_index = Integer.parseInt(raw_uav_index_str);
-
-            Point point = new Point(center_coord[0], center_coord[1], 0);
-            point.setDecision_time_step(decided_conflict_time);
-            point.setExptected_time_step(expected_conflict_time);
-
-            Conflict conflict = conflict_map.get(uav_index);
-            if (conflict == null) {
-                LinkedList<Point> path = new LinkedList<Point>();
-                conflict = new Conflict(uav_index, path, decided_conflict_time, range);
-                conflict_map.put(uav_index, conflict);
-            }
-            LinkedList<Point> path = conflict.getPath_prefound();
-            path.add(point);
-        }
-        Iterator<Conflict> conflict_iter = conflict_map.values().iterator();
-        while (conflict_iter.hasNext()) {
-            Conflict conflict = conflict_iter.next();
-            conflict.sort();
-            conflicts.add(conflict);
-        }
-        this.conflicts_cache = conflicts;
-        this.conflict_updated = false;
-        return conflicts;
-    }
-
-    @Override
-    public ArrayList<Threat> getThreats() {
-        if (!this.threat_updated) {
-            return this.threats_cache;
-        }
-        ArrayList<Threat> threats = new ArrayList<Threat>();
-        String sparql = "SELECT ?center ?speed ?range ?threatCap ?index ?threat_enabled"
-                + "{"
-                + "?threat_ind mars:hasThreatCenter ?center ."
-                + "?threat_ind mars:hasThreatSpeed ?speed ."
-                + "?threat_ind mars:hasThreatRange ?range ."
-                + "?threat_ind mars:hasThreatIndex ?index ."
-                + "?threat_ind mars:threatEnabled ?threat_enabled ."
-                + "?threat_ind mars:hasThreatCapability ?threatCap"
-                + "}";
-        Query query = QueryFactory.create(prefix + sparql);
-        QueryExecution qe = QueryExecutionFactory.create(query, ontology_based_knowledge);
-        ResultSet results = qe.execSelect();
-        while (results.hasNext()) {
-            QuerySolution result = results.next();
-            String raw_center_str = StringUtil.parseLiteralStr(result.get("center").toString());
-            String[] coord_str = raw_center_str.split(",");
-            float[] center_coord = new float[2];
-            center_coord[0] = Float.parseFloat(coord_str[0]);
-            center_coord[1] = Float.parseFloat(coord_str[1]);
-
-            String raw_speed_str = StringUtil.parseLiteralStr(result.get("speed").toString());
-            float speed = Float.parseFloat(raw_speed_str);
-
-            String raw_range_str = StringUtil.parseLiteralStr(result.get("range").toString());
-            float range = Float.parseFloat(raw_range_str);
-
-            String raw_therat_cap_str = StringUtil.parseLiteralStr(result.get("threatCap").toString());
-
-            String raw_threat_index = StringUtil.parseLiteralStr(result.get("index").toString());
-            Integer threat_index = Integer.parseInt(raw_threat_index);
-
-            String raw_threat_enabled_index = StringUtil.parseLiteralStr(result.get("threat_enabled").toString());
-            boolean threat_enabled = false;
-            if (raw_threat_enabled_index.equals("true")) {
-                threat_enabled = true;
-            } else {
-                threat_enabled = false;
-            }
-
-            Threat threat = new Threat(0, center_coord, 0, speed);
-            threat.setThreat_cap(raw_therat_cap_str);
-            threat.setThreat_range(range);
-            threat.setIndex(threat_index);
-            threat.setEnabled(threat_enabled);
-            threats.add(threat);
-        }
-        this.threats_cache = threats;
-        this.threat_updated = false;
-        return threats;
-    }
 
     private Model deleteAllObstacles() {
         Model m = ontology_based_knowledge.removeAll(null, has_region, null).removeAll(null, has_polygon, null)
@@ -435,24 +261,6 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
         return m;
     }
 
-    public Model deleteAllThreats() {
-        Model m = ontology_based_knowledge.removeAll(null, hasThreatCenter, null).removeAll(null, hasThreatSpeed, null)
-                .removeAll(null, hasThreatRange, null).removeAll(null, hasThreatCapability, null).removeAll(null, hasThreatIndex, null).removeAll(null, threatEnabled, null)
-                .removeAll(null, rdf_type, Threat_Class).removeAll(Threat_Class, rdf_type, null);
-        this.threat_num = 0;
-        this.threat_updated = true;
-        return m;
-    }
-
-    public Model deleteAllConflicts() {
-        Model m = ontology_based_knowledge.removeAll(null, hasConflictCenter, null).removeAll(null, hasConflictRange, null)
-                .removeAll(null, hasExpectedConflictTime, null).removeAll(null, hasDecidedConflictTime, null).removeAll(null, this.conflictFromRobot, null)
-                .removeAll(null, rdf_type, Conflict_Class).removeAll(Conflict_Class, rdf_type, null);
-        this.conflict_num = 0;
-        this.conflict_updated = true;
-        return m;
-    }
-
     @Override
     public void setObstacles(ArrayList<Obstacle> obstacles) {
         ontology_based_knowledge = (OntModel) deleteAllObstacles();
@@ -464,32 +272,6 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
             this.obstacle_num = obstacle_num;
         }
         this.obstacle_updated = true;
-    }
-
-    @Override
-    public void setConflicts(ArrayList<Conflict> conflicts) {
-        ontology_based_knowledge = (OntModel) deleteAllConflicts();
-        if (conflicts != null) {
-            int conflict_num = conflicts.size();
-            for (int i = 0; i < conflict_num; i++) {
-                this.addConflict(conflicts.get(i));
-            }
-            this.conflict_num = conflict_num;
-        }
-        this.conflict_updated = true;
-    }
-
-    @Override
-    public void setThreats(ArrayList<Threat> threats) {
-        ontology_based_knowledge = (OntModel) deleteAllThreats();
-        if (threats != null) {
-            int threat_num = threats.size();
-            for (int i = 0; i < threat_num; i++) {
-                this.addThreat(threats.get(i));
-            }
-            this.threat_num = threat_num;
-        }
-        this.threat_updated = true;
     }
 
     @Override
@@ -523,88 +305,12 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
     }
 
     @Override
-    public void addConflict(Conflict conflict) {
-        ArrayList<Conflict> conflicts = this.getConflicts();
-        if (conflict_num == 0) {
-            addConflictWithoutCheck(conflict);
-            return;
-        }
-        for (int i = 0; i < conflict_num; i++) {
-            Conflict temp_conflict = conflicts.get(i);
-            if (temp_conflict.getUav_index() == conflict.getUav_index()) {
-                this.removeConflict(temp_conflict);
-                addConflictWithoutCheck(conflict);
-                return;
-            }
-        }
-        addConflictWithoutCheck(conflict);
-        conflict_num++;
-    }
-
-    private void addConflictWithoutCheck(Conflict conflict) {
-
-        LinkedList<Point> path = conflict.getPath_prefound();
-        int path_len = path.size();
-        for (int i = 0; i < path_len; i++) {
-            Point conflict_point = path.get(i);
-            Individual conflict_individual = Conflict_Class.createIndividual();
-            Literal center = ontology_based_knowledge.createTypedLiteral(conflict_point.getX() + "," + conflict_point.getY());
-            Literal conflict_range = ontology_based_knowledge.createTypedLiteral(conflict.getConflict_range());
-            Literal exptected_conflict_time = ontology_based_knowledge.createTypedLiteral(conflict_point.getExptected_time_step());
-            Literal decided_conflict_time = ontology_based_knowledge.createTypedLiteral(conflict_point.getDecision_time_step());
-            Literal conflict_from_robot = ontology_based_knowledge.createTypedLiteral(conflict.getUav_index());
-            conflict_individual.addProperty(hasConflictCenter, center);
-            conflict_individual.addProperty(hasConflictRange, conflict_range);
-            conflict_individual.addProperty(hasExpectedConflictTime, exptected_conflict_time);
-            conflict_individual.addProperty(hasDecidedConflictTime, decided_conflict_time);
-            conflict_individual.addProperty(conflictFromRobot, conflict_from_robot);
-        }
-        this.conflict_num++;
-        this.conflict_updated = true;
-    }
-
-    @Override
-    public void addThreat(Threat threat) {
-        Individual threat_individual = Threat_Class.createIndividual();
-
-        Literal center = ontology_based_knowledge.createTypedLiteral(threat.getCoordinates()[0] + "," + threat.getCoordinates()[1]);
-        Literal speed = ontology_based_knowledge.createTypedLiteral(threat.getSpeed());
-        Literal threat_range = ontology_based_knowledge.createTypedLiteral(threat.getThreat_range());
-        Literal threat_cap = ontology_based_knowledge.createTypedLiteral(threat.getThreat_cap());
-        Literal threat_index = ontology_based_knowledge.createTypedLiteral(threat.getIndex());
-        Literal threat_enabled = ontology_based_knowledge.createTypedLiteral(threat.isEnabled());
-
-        threat_individual.addProperty(hasThreatCenter, center);
-        threat_individual.addProperty(hasThreatSpeed, speed);
-        threat_individual.addProperty(hasThreatRange, threat_range);
-        threat_individual.addProperty(hasThreatCapability, threat_cap);
-        threat_individual.addProperty(hasThreatIndex, threat_index);
-        threat_individual.addProperty(threatEnabled, threat_enabled);
-        this.threat_num++;
-        this.threat_updated = true;
-    }
-
-    @Override
-    public boolean containsThreat(Threat threat) {
-        Literal center = ontology_based_knowledge.createTypedLiteral(threat.getCoordinates()[0] + "," + threat.getCoordinates()[1]);
-        Selector selector = new SimpleSelector(null, hasThreatCenter, center);
-        Model result_model = ontology_based_knowledge.query(selector);
-//        printStatements(result_model);
-        return result_model.listStatements().hasNext();
-    }
-
-    @Override
     public boolean containsObstacle(Obstacle obstacle) {
         Literal points = ontology_based_knowledge.createTypedLiteral(obstacle.getPointsStr());
         Selector selector = new SimpleSelector(null, has_points, points);
         Model result_model = ontology_based_knowledge.query(selector);
 //        printStatements(result_model);
         return result_model.listStatements().hasNext();
-    }
-
-    @Override
-    public boolean containsConflict(Conflict conflict) {
-        return false;
     }
 
     @Override
@@ -646,39 +352,5 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
             return false;
         }
     }
-
-//    @Override
-//    public boolean removeThreat(Threat threat) {
-//        Literal center = ontology_based_knowledge.createTypedLiteral(threat.getCoordinates()[0] + "," + threat.getCoordinates()[1]);
-//        StmtIterator smt_list_to_find_threat_individual = ontology_based_knowledge.listStatements(null, hasThreatCenter, center);
-//        if (smt_list_to_find_threat_individual.hasNext()) {
-//            Resource threat_individual = smt_list_to_find_threat_individual.next().getSubject();
-//            ontology_based_knowledge = (OntModel) ontology_based_knowledge.removeAll(threat_individual, hasThreatCenter, null).removeAll(threat_individual, hasThreatSpeed, null).removeAll(threat_individual, hasThreatRange, null).removeAll(threat_individual, hasThreatCapability, null).removeAll(threat_individual, hasThreatIndex, null).removeAll(threat_individual, threatEnabled, null).removeAll(null, null, threat_individual);
-//            this.threat_num--;
-//            this.threat_updated = true;
-//            return true;
-//        } else {
-//            return false;
-//        }
-//    }
-    
-     @Override
-    public boolean removeThreat(Threat threat) {
-        Literal index = ontology_based_knowledge.createTypedLiteral(threat.getIndex());
-        StmtIterator smt_list_to_find_threat_individual = ontology_based_knowledge.listStatements(null, hasThreatIndex, index);
-        if (smt_list_to_find_threat_individual.hasNext()) {
-            Resource threat_individual = smt_list_to_find_threat_individual.next().getSubject();
-            ontology_based_knowledge = (OntModel) ontology_based_knowledge.removeAll(threat_individual, hasThreatCenter, null).removeAll(threat_individual, hasThreatSpeed, null).removeAll(threat_individual, hasThreatRange, null).removeAll(threat_individual, hasThreatCapability, null).removeAll(threat_individual, hasThreatIndex, null).removeAll(threat_individual, threatEnabled, null).removeAll(null, null, threat_individual);
-            this.threat_num--;
-            this.threat_updated = true;
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public boolean removeConflict(Conflict conflict) {
-        return false;
-    }
+   
 }

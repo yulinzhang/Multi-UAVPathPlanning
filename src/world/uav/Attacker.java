@@ -48,6 +48,7 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
     private boolean replanned_at_current_time_step = false;
     private boolean target_reached = false;
     private boolean moved_at_last_time = false;
+    private boolean within_uav_base=true;
 
     //variables for conflict planning
     private KnowledgeInterface kb;
@@ -411,7 +412,7 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
             if (threat.getIndex() == current_threat.getIndex()) {
                 this.kb.removeThreat(current_threat);
                 this.addThreat(threat);
-                if (threat.getIndex() == this.target_indicated_by_role.getIndex()) {
+                if (this.target_indicated_by_role!=null && threat.getIndex() == this.target_indicated_by_role.getIndex()) {
                     this.target_indicated_by_role = threat;
                 }
                 return;
