@@ -11,7 +11,6 @@ import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -20,25 +19,16 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Selector;
 import com.hp.hpl.jena.rdf.model.SimpleSelector;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.util.PrintUtil;
-import config.StaticInitConfig;
+import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import java.awt.Polygon;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map;
+import util.PolygonUtil;
 import util.StringUtil;
 import world.model.shape.Point;
 
@@ -47,13 +37,11 @@ import world.model.shape.Point;
  * @author boluo
  */
 public class OntologyBasedKnowledge_ObstacleSpecified extends OntologyBasedKnowledge {
-  
+
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(OntologyBasedKnowledge_ObstacleSpecified.class);
 
-    
-
     public OntologyBasedKnowledge_ObstacleSpecified() {
-       super();
+        super();
     }
 
     public void initClassAndProperty() {
@@ -104,8 +92,8 @@ public class OntologyBasedKnowledge_ObstacleSpecified extends OntologyBasedKnowl
         polygon.addPoint(3, 6);
         Obstacle obs = new Obstacle(polygon, 0);
         float[] coord = new float[2];
-        coord[0]=2;
-        coord[1]=3;
+        coord[0] = 2;
+        coord[1] = 3;
         Threat threat = new Threat(0, coord, 0, 3);
         threat.setSpeed(2);
         threat.setTarget_type(0);
@@ -113,22 +101,22 @@ public class OntologyBasedKnowledge_ObstacleSpecified extends OntologyBasedKnowl
         threat.setThreat_range(2);
         threat.setEnabled(false);
         kb.addThreat(threat);
-        
-        float[] coord1=new float[2];
-        coord1[0]=1;
-        coord1[0]=2;
-        Threat threat1=new Threat(1,coord1,2,4);
+
+        float[] coord1 = new float[2];
+        coord1[0] = 1;
+        coord1[0] = 2;
+        Threat threat1 = new Threat(1, coord1, 2, 4);
         threat1.setEnabled(false);
         kb.addThreat(threat1);
         kb.removeThreat(threat1);
-        ArrayList<Threat> threats=kb.getThreats();
+        ArrayList<Threat> threats = kb.getThreats();
         logger.debug("size=" + kb.getThreats().size());
 //        OntologyBasedKnowledge.printStatements(kb.ontology_based_knowledge);
         kb.addObstacle(obs);
 //        kb.addObstacle(obs);
         kb.removeObstacle(obs);
         kb.addObstacle(obs);
-        logger.debug("size=" + kb.getObstacles().size());
+        logger.debug("size=" + kb.getObstaclesByDFS().size());
 //        OntologyBasedKnowledge.printStatements(kb.ontology_based_knowledge);
 //        kb.getObstacles();
 //        kb.getThreats();
@@ -164,7 +152,6 @@ public class OntologyBasedKnowledge_ObstacleSpecified extends OntologyBasedKnowl
 //        logger.debug(OntologyBasedKnowledge.printOntology(kb.ontology_based_knowledge));
     }
 
-   
     public void init() {
         OntClass Obstacle_Class = ontology_based_knowledge.createClass(base_ns + "Obstacle");
         OntClass Region_Class = ontology_based_knowledge.createClass(base_ns + "Region");
@@ -206,6 +193,39 @@ public class OntologyBasedKnowledge_ObstacleSpecified extends OntologyBasedKnowl
         upperbound_individual.addProperty(hasMaxYCoordinate, max_y_coordinate);
     }
 
+    public ArrayList<Obstacle> getObstaclesByDFS() {
+        ArrayList<Obstacle> obstacles=new ArrayList<Obstacle>();
+        ExtendedIterator<Individual> region_individuals = ontology_based_knowledge.listIndividuals(Region_Class);
+        while (region_individuals.hasNext()) {
+            Individual region_ind = region_individuals.next();
+            StmtIterator region_has_polygon_smt_iter = ontology_based_knowledge.listStatements(region_ind, has_polygon, this.null_node);
+            StmtIterator region_has_index_smt_iter = ontology_based_knowledge.listStatements(region_ind, hasObstacleIndex, this.null_node);
+            if (region_has_polygon_smt_iter.hasNext() && region_has_index_smt_iter.hasNext()) {
+                Statement region_has_polygon_smt = region_has_polygon_smt_iter.nextStatement();
+                Resource polygon_ind = region_has_polygon_smt.getObject().asResource();
+                
+                Statement  region_has_index_smt=region_has_index_smt_iter.nextStatement();
+                Integer obstacle_index=region_has_index_smt.getInt();
+                
+                StmtIterator polygon_has_points_smt_iter = ontology_based_knowledge.listStatements(polygon_ind, has_points, this.null_node);
+                if (polygon_has_points_smt_iter.hasNext()) {
+                    Statement polygon_has_points_smt = polygon_has_points_smt_iter.nextStatement();
+                    String raw_raw_points_str=polygon_has_points_smt.getObject().asLiteral().toString();
+                    logger.debug(raw_raw_points_str);
+                    String raw_points_str = StringUtil.parseLiteralStr(polygon_has_points_smt.getObject().asLiteral().toString());
+                    Polygon polygon = PolygonUtil.genPolygonFromRawOntologyString(raw_points_str);
+
+                    Obstacle obstacle = new Obstacle(polygon, 0);
+                    obstacle.setIndex(obstacle_index);
+                    obstacles.add(obstacle);
+                }
+            }
+        }
+        return obstacles;
+    }
+    
+    
+    
     @Override
     public ArrayList<Obstacle> getObstacles() {
         if (!this.obstacle_updated) {
@@ -224,16 +244,8 @@ public class OntologyBasedKnowledge_ObstacleSpecified extends OntologyBasedKnowl
         ResultSet results = qe.execSelect();
         while (results.hasNext()) {
             QuerySolution result = results.next();
-            Polygon polygon = new Polygon();
             String raw_points_str = StringUtil.parseLiteralStr(result.get("points").toString());
-            String[] points_str = raw_points_str.split(" ");
-            for (String point_str : points_str) {
-                String[] coord_str = point_str.split(",");
-                int[] coord = new int[2];
-                coord[0] = Integer.parseInt(coord_str[0]);
-                coord[1] = Integer.parseInt(coord_str[1]);
-                polygon.addPoint(coord[0], coord[1]);
-            }
+            Polygon polygon = PolygonUtil.genPolygonFromRawOntologyString(raw_points_str);
 
             String raw_obstacle_index = StringUtil.parseLiteralStr(result.get("index").toString());
             Integer obstacle_index = Integer.parseInt(raw_obstacle_index);
@@ -246,7 +258,8 @@ public class OntologyBasedKnowledge_ObstacleSpecified extends OntologyBasedKnowl
         return obstacles;
     }
 
-
+    
+    
     private Model deleteAllObstacles() {
         Model m = ontology_based_knowledge.removeAll(null, has_region, null).removeAll(null, has_polygon, null)
                 .removeAll(null, has_points, null).removeAll(null, has_lowerbound, null).removeAll(null, has_upperbound, null)
@@ -323,8 +336,6 @@ public class OntologyBasedKnowledge_ObstacleSpecified extends OntologyBasedKnowl
             if (smt_list_to_find_region.hasNext()) {
                 Resource region_individual = smt_list_to_find_region.nextStatement().getSubject();
 
-                RDFNode null_node = null;
-
                 StmtIterator smt_list_to_find_lower_bound = ontology_based_knowledge.listStatements(region_individual, has_lowerbound, null_node);
                 if (smt_list_to_find_lower_bound.hasNext()) {
                     Resource lower_bound_individual = smt_list_to_find_lower_bound.nextStatement().getSubject();
@@ -352,5 +363,5 @@ public class OntologyBasedKnowledge_ObstacleSpecified extends OntologyBasedKnowl
             return false;
         }
     }
-   
+
 }

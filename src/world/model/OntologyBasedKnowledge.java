@@ -67,6 +67,7 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
     public DatatypeProperty hasThreatCenter, hasThreatSpeed, hasThreatRange, hasThreatCapability, hasThreatIndex, threatEnabled;
     public DatatypeProperty has_points, hasMaxXCoordinate, hasMaxYCoordinate, hasMinXCoordinate, hasMinYCoordinate, hasObstacleIndex;
 
+    public RDFNode null_node = null;
     /**
      * cache to speed the information retrieve process.
      *
@@ -135,8 +136,8 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
         polygon.addPoint(3, 6);
         Obstacle obs = new Obstacle(polygon, 0);
         float[] coord = new float[2];
-        coord[0]=2;
-        coord[1]=3;
+        coord[0] = 2;
+        coord[1] = 3;
         Threat threat = new Threat(0, coord, 0, 3);
         threat.setSpeed(2);
         threat.setTarget_type(0);
@@ -144,15 +145,15 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
         threat.setThreat_range(2);
         threat.setEnabled(false);
         kb.addThreat(threat);
-        
-        float[] coord1=new float[2];
-        coord1[0]=1;
-        coord1[0]=2;
-        Threat threat1=new Threat(1,coord1,2,4);
+
+        float[] coord1 = new float[2];
+        coord1[0] = 1;
+        coord1[0] = 2;
+        Threat threat1 = new Threat(1, coord1, 2, 4);
         threat1.setEnabled(false);
         kb.addThreat(threat1);
         kb.removeThreat(threat1);
-        ArrayList<Threat> threats=kb.getThreats();
+        ArrayList<Threat> threats = kb.getThreats();
         logger.debug("size=" + kb.getThreats().size());
 //        OntologyBasedKnowledge.printStatements(kb.ontology_based_knowledge);
         kb.addObstacle(obs);
@@ -617,8 +618,6 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
             if (smt_list_to_find_region.hasNext()) {
                 Resource region_individual = smt_list_to_find_region.nextStatement().getSubject();
 
-                RDFNode null_node = null;
-
                 StmtIterator smt_list_to_find_lower_bound = ontology_based_knowledge.listStatements(region_individual, has_lowerbound, null_node);
                 if (smt_list_to_find_lower_bound.hasNext()) {
                     Resource lower_bound_individual = smt_list_to_find_lower_bound.nextStatement().getSubject();
@@ -661,8 +660,7 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
 //            return false;
 //        }
 //    }
-    
-     @Override
+    @Override
     public boolean removeThreat(Threat threat) {
         Literal index = ontology_based_knowledge.createTypedLiteral(threat.getIndex());
         StmtIterator smt_list_to_find_threat_individual = ontology_based_knowledge.listStatements(null, hasThreatIndex, index);
