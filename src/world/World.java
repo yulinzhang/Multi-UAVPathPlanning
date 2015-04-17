@@ -88,9 +88,7 @@ public class World {
 
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(World.class);
 
-    /**
-     * initiate world,contain paint,number of
-     * attacker_num,scout_num,enemy_num...
+    /** intiate the world according to configuration object.
      *
      * @param init_config
      */
@@ -111,9 +109,8 @@ public class World {
         control_center.roleAssignForAttacker(-1, -1); //initialize role assignment
     }
 
-    /**
-     * init the parameter of battleground objects
-     *
+    /**initiate the parameter of battleground objects.
+     * 
      * @param init_config
      */
     public void initParameterFromInitConfig(NonStaticInitConfig init_config) {
@@ -149,8 +146,8 @@ public class World {
         }
     }
 
-    /**
-     * initialize the nuber of sounts and attackers and assign role for uavs
+    /**initialize the scouts and attackers.
+     * 
      */
     private void initScoutsAndAttackers() {
         float[] uav_base_coordinate = uav_base.getCoordinate();
@@ -161,18 +158,18 @@ public class World {
         uav_base_center[1] = uav_base_coordinate[1]; //+ uav_base_height / 2;
         for (int i = 0; i < attacker_num; i++) {
             Threat threat = this.getThreatsForUIRendering().get(i);
-            Attacker attacker = new Attacker(i, null, StaticInitConfig.ATTACKER, uav_base_center, null);
+            Attacker attacker = new Attacker(i, null, StaticInitConfig.ATTACKER, uav_base_center, null,Float.MAX_VALUE);
             attackers.add(attacker);
         }
 
         for (int i = 0; i < scout_num; i++) {
-            Scout scout = new Scout(i, StaticInitConfig.SCOUT, uav_base_center, uav_base_center, control_center);
+            Scout scout = new Scout(i, StaticInitConfig.SCOUT, uav_base_center, uav_base_center, control_center,Float.MAX_VALUE);
             scouts.add(scout);
         }
     }
 
-    /**
-     * initiate all uavs
+    /**initiate all uavs
+     * 
      */
     private void initUAVs() {
         this.scouts = new ArrayList<Scout>();
@@ -182,8 +179,8 @@ public class World {
 //        initEnemyUAV();
     }
 
-    /**
-     * path planning for attackers
+    /**path planning for attackers, which are not destroyed.
+     * 
      */
     private void planPathForAllAttacker() {
         for (Attacker attacker : this.attackers) {
@@ -193,16 +190,21 @@ public class World {
         }
     }
 
-    /**
+    /** check whether the uav is too close to others. If too close, then the uav should replan.
      *
      */
     private void checkConflict() {
         for (int i = 0; i < this.attacker_num; i++) {
             Attacker attacker1 = World.attackers.get(i);
+            if(attacker1.getTarget_indicated_by_role()==null)//check whether the attacker is in the uav base. If it is in the uav base, then it will not conflict with others.
+            {
+                continue;
+            }
             float[] attacker1_coord = attacker1.getCenter_coordinates();
             for (int j = i + 1; j < this.attacker_num; j++) {
                 Attacker attacker2 = World.attackers.get(j);
-                if (attacker2.isTarget_reached()) {
+                if(attacker2.getTarget_indicated_by_role()==null)
+                {
                     continue;
                 }
                 float[] attacker2_coord = attacker2.getCenter_coordinates();
@@ -232,16 +234,14 @@ public class World {
                 if (DistanceUtil.distanceBetween(attacker_coord, target_coord) < (attacker.getUav_radar().getRadius())) {
                     attacker.setTarget_indicated_by_role(null);
                     attacker.setNeed_to_replan(false);
-                    attacker.setTarget_reached(false);
                     break;
                 }
 
-                if (attacker.isTarget_reached() || !attacker.isMoved_at_last_time()) {
+                if ( !attacker.isMoved_at_last_time()) {
                     float[] dummy_threat_coord = World.randomGoalForAvailableUAV(attacker.getCenter_coordinates(), obstacles_in_the_world);
                     Threat dummy_threat = new Threat(-1, dummy_threat_coord, 0, 0);
                     attacker.setTarget_indicated_by_role(dummy_threat);
                     attacker.setNeed_to_replan(true);
-                    attacker.setTarget_reached(false);
                     attacker.setSpeed(StaticInitConfig.SPEED_OF_ATTACKER_IDLE);
                 }
                 continue;
@@ -255,7 +255,6 @@ public class World {
                         threat.setEnabled(false);
                         this.control_center.updateThreat(threat);
                         this.num_of_threat_remained--;
-                        attacker.setTarget_reached(false);
                         this.control_center.setNeed_to_assign_role(true);
                         float[] dummy_threat_coord = World.randomGoalForAvailableUAV(attacker.getCenter_coordinates(), obstacles_in_the_world);
                         Threat dummy_threat = new Threat(-1, dummy_threat_coord, 0, 0);
@@ -501,7 +500,7 @@ public class World {
         logger.debug("replanning check over");
         checkThreatReached();
         logger.debug("threat terminate check over");
-//        checkConflict();
+        checkConflict();
         updateConflict();
         logger.debug("conflict update over");
         if (this.time_step % 10 == 0) {
@@ -585,7 +584,6 @@ public class World {
                     attacker.setTarget_indicated_by_role(dummy_threat);
                     attacker.setNeed_to_replan(true);
                     attacker.setSpeed(StaticInitConfig.SPEED_OF_ATTACKER_IDLE);
-                    attacker.setTarget_reached(false);
                 }
             } else {
                 attacker.setNeed_to_replan(false);

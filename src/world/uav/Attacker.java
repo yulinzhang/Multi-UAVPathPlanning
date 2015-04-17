@@ -46,7 +46,6 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
     private UAVPath history_path;
     private boolean need_to_replan = true;
     private boolean replanned_at_current_time_step = false;
-    private boolean target_reached = false;
     private boolean moved_at_last_time = false;
     private boolean within_uav_base=true;
 
@@ -63,13 +62,12 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
      * @param target
      * @param center_coordinates
      */
-    public Attacker(int index, Target target, int uav_type, float[] center_coordinates, ArrayList<Obstacle> obstacles) {
-        super(index, target, uav_type, center_coordinates);
+    public Attacker(int index, Target target, int uav_type, float[] center_coordinates, ArrayList<Obstacle> obstacles,float remained_energy) {
+        super(index, target, uav_type, center_coordinates,remained_energy);
         this.uav_radar = new Circle(center_coordinates[0], center_coordinates[1], attacker_radar_radius);
         this.path_planned_at_current_time_step = new UAVPath();
         this.history_path = new UAVPath();
         setPreviousWaypoint();
-        this.setTarget_reached(false);
         this.kb = new OntologyBasedKnowledge();//OntologyBasedKnowledge();WorldKnowledge
         this.kb.setObstacles(obstacles);
         this.speed = StaticInitConfig.SPEED_OF_ATTACKER_ON_TASK;
@@ -334,20 +332,12 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
         return this.history_path.getLastWaypoint().toFloatArray();
     }
 
-    public boolean isTarget_reached() {
-        return target_reached;
-    }
-
     public boolean isMoved_at_last_time() {
         return moved_at_last_time;
     }
 
     public void setMoved_at_last_time(boolean moved_at_last_time) {
         this.moved_at_last_time = moved_at_last_time;
-    }
-
-    public void setTarget_reached(boolean target_reached) {
-        this.target_reached = target_reached;
     }
 
     public LinkedList<Point> getPath_prefound() {

@@ -26,9 +26,12 @@ public class UAV extends Unit {
     protected double max_angle =Math.PI / 4;
     protected int speed = 5;
     protected boolean visible=true;
-
-    public UAV(int index, Target target_indicated_by_role, int uav_type, float[] center_coordinates) {
+    protected float remained_energy=2000;
+    
+    
+    public UAV(int index, Target target_indicated_by_role, int uav_type, float[] center_coordinates,float remained_energy) {
         super(index, target_indicated_by_role, uav_type, center_coordinates);
+        this.remained_energy=remained_energy;
     }
 
     /**

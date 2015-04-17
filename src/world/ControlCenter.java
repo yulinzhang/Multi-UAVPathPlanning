@@ -224,7 +224,6 @@ public class ControlCenter implements KnowledgeAwareInterface {
                     if (assigned_attacker_index == attacker.getIndex()) {
                         attacker.setTarget_indicated_by_role(threat);
                         attacker.setSpeed(StaticInitConfig.SPEED_OF_ATTACKER_ON_TASK);
-                        attacker.setTarget_reached(false);
                         attacker.setNeed_to_replan(true);
                         assigned_attacker.add(assigned_attacker_index);
                         break;
@@ -255,7 +254,6 @@ public class ControlCenter implements KnowledgeAwareInterface {
                 assigned_attacker.add(attacker_index_to_assign);
                 attacker_to_assign.setTarget_indicated_by_role(threat);
                 attacker_to_assign.setSpeed(StaticInitConfig.SPEED_OF_ATTACKER_ON_TASK);
-                attacker_to_assign.setTarget_reached(false);
                 attacker_to_assign.setNeed_to_replan(true);
             }
         }
@@ -268,7 +266,6 @@ public class ControlCenter implements KnowledgeAwareInterface {
                 current_attacker.setTarget_indicated_by_role(dummy_threat);
                 current_attacker.setNeed_to_replan(true);
                 current_attacker.setSpeed(StaticInitConfig.SPEED_OF_ATTACKER_IDLE);
-                current_attacker.setTarget_reached(false);
             }
         }
         need_to_assign_role = false;
@@ -305,7 +302,6 @@ public class ControlCenter implements KnowledgeAwareInterface {
                 if (attacker.getIndex() == assigned_attacker_index && threat.getIndex() == assigned_role_index) {
                     attacker.setTarget_indicated_by_role(threat);
                     attacker.setSpeed(StaticInitConfig.SPEED_OF_ATTACKER_ON_TASK);
-                    attacker.setTarget_reached(false);
                     attacker.setNeed_to_replan(true);
                     assigned_threats.add(assigned_attacker_index);
                     break;
@@ -323,7 +319,6 @@ public class ControlCenter implements KnowledgeAwareInterface {
                 assigned_threats.add(threat_index_to_assign);
                 attacker.setTarget_indicated_by_role(threat_to_assign);
                 attacker.setSpeed(StaticInitConfig.SPEED_OF_ATTACKER_ON_TASK);
-                attacker.setTarget_reached(false);
                 attacker.setNeed_to_replan(true);
             }else if(attacker.getTarget_indicated_by_role()!=null){
                 float[] dummy_threat_coord = World.randomGoalForAvailableUAV(attacker.getCenter_coordinates(), obstacles);
@@ -331,7 +326,6 @@ public class ControlCenter implements KnowledgeAwareInterface {
                 attacker.setTarget_indicated_by_role(dummy_threat);
                 attacker.setNeed_to_replan(true);
                 attacker.setSpeed(StaticInitConfig.SPEED_OF_ATTACKER_IDLE);
-                attacker.setTarget_reached(false);
             }
         }
         need_to_assign_role = false;

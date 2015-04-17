@@ -19,6 +19,7 @@ public class UAVPath implements Serializable{
 
     private LinkedList<Point> waypoints;
     private float path_length = 0;
+    
 
     public UAVPath() {
         this.waypoints = new LinkedList<Point>();
