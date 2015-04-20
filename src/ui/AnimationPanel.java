@@ -390,6 +390,7 @@ public class AnimationPanel extends JPanel implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
+        StaticInitConfig.SIMULATION_ON=false;
         if (e.getButton() == MouseEvent.BUTTON3) {
             int chosen_attacker_index = findChosenAttacker(e.getPoint());
             if (chosen_attacker_index == -1) {
@@ -400,6 +401,7 @@ public class AnimationPanel extends JPanel implements MouseListener {
             my_popup_menu.show(this, e.getX(), e.getY());
             StaticInitConfig.SIMULATION_ON = false;
         }
+        StaticInitConfig.SIMULATION_ON=true;
     }
 
     @Override

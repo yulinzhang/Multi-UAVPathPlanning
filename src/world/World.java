@@ -47,7 +47,7 @@ public class World {
     private int inforshare_algorithm = 0; //distinction between information-sharing algrithm
 
     //robot coordinates, robot_coordinates[1][0], robot_coordinates[1][1] represents the x, y coordinate of robot 1
-    private static UAVBase uav_base;
+    public static UAVBase uav_base;
     /**
      * * internal variables
      *
@@ -234,6 +234,7 @@ public class World {
                 if (DistanceUtil.distanceBetween(attacker_coord, target_coord) < (attacker.getUav_radar().getRadius())) {
                     attacker.setTarget_indicated_by_role(null);
                     attacker.setNeed_to_replan(false);
+                    this.control_center.setNeed_to_assign_role(true);
                     break;
                 }
 
@@ -242,6 +243,7 @@ public class World {
                     Threat dummy_threat = new Threat(-1, dummy_threat_coord, 0, 0);
                     attacker.setTarget_indicated_by_role(dummy_threat);
                     attacker.setNeed_to_replan(true);
+                    this.control_center.setNeed_to_assign_role(true);
                     attacker.setSpeed(StaticInitConfig.SPEED_OF_ATTACKER_IDLE);
                 }
                 continue;
@@ -250,6 +252,10 @@ public class World {
             ArrayList<Threat> threats_in_world = this.threats;
             for (int j = 0; j < threats_in_world.size(); j++) {
                 Threat threat = threats_in_world.get(j);
+                if(!threat.isEnabled())
+                {
+                    continue;
+                }
                 if (threat_index == threat.getIndex()) {
                     if (DistanceUtil.distanceBetween(attacker.getCenter_coordinates(), threat.getCoordinates()) < (attacker.getUav_radar().getRadius())) {
                         threat.setEnabled(false);
@@ -535,9 +541,6 @@ public class World {
     private void updateThreatCoordinateInControlCenter() {
         ArrayList<Threat> threats_in_control_center = this.control_center.getThreats();
         for (Threat threat_in_control_center : threats_in_control_center) {
-//            float[] old_coord = new float[2];
-//            old_coord[0] = threat_in_control_center.getCoordinates()[0];
-//            old_coord[1] = threat_in_control_center.getCoordinates()[1];
             for (Threat threat : this.threats) {
                 if (threat_in_control_center.getIndex() == threat.getIndex()) {
                     threat_in_control_center.setCoordinates(threat.getCoordinates());
@@ -556,7 +559,7 @@ public class World {
 
     private void roleAssignmentInControlCenter() {
         if (this.control_center.isNeed_to_assign_role()) {
-            this.control_center.roleAssignForAttacker(-1, -1);
+            this.control_center.roleAssignForAttackerV3(-1, -1);
         }
         this.control_center.setNeed_to_assign_role(false);
     }

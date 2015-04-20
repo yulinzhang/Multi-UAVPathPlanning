@@ -238,6 +238,18 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
         }
     }
 
+    public boolean isEnduranceCapReachable(Target potential_target)
+    {
+        float dist_to_potential_target=DistanceUtil.distanceBetween(this.center_coordinates, potential_target.getCoordinates());
+        float dist_from_potential_target_to_uav_base=DistanceUtil.distanceBetween(potential_target.getCoordinates(), World.uav_base.getCoordinate());
+        float path_parameter=1.5f;
+        if(path_parameter*(dist_to_potential_target+dist_from_potential_target_to_uav_base)>this.remained_energy)
+        {
+            return false;
+        }
+        return true;
+    }
+    
     private boolean checkMoved(float[] last_coord, float[] current_coord) {
         float dist = DistanceUtil.distanceBetween(last_coord, current_coord);
         if (dist < 1) {

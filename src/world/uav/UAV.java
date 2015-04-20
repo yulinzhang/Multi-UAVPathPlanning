@@ -8,6 +8,7 @@ package world.uav;
 import config.GraphicConfig;
 import java.awt.Color;
 import java.awt.Rectangle;
+import util.DistanceUtil;
 import util.RectangleUtil;
 import util.VectorUtil;
 import world.model.Target;
@@ -40,6 +41,8 @@ public class UAV extends Unit {
      * @param center_coordinate_y
      */
     public void moveTo(float center_coordinate_x, float center_coordinate_y) {
+        float moved_dist=DistanceUtil.distanceBetween(this.center_coordinates, new float[]{center_coordinate_x,center_coordinate_y});
+        this.remained_energy-=moved_dist;
         uav_center.setCoordinate(center_coordinate_x, center_coordinate_y);
         uav_radar.setCoordinate(center_coordinate_x, center_coordinate_y);
         this.setCenter_coordinates(uav_radar.getCenter_coordinates());
