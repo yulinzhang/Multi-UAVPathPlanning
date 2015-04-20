@@ -47,7 +47,6 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
     private boolean need_to_replan = true;
     private boolean replanned_at_current_time_step = false;
     private boolean moved_at_last_time = false;
-    private boolean within_uav_base=true;
 
     //variables for conflict planning
     private KnowledgeInterface kb;
@@ -249,14 +248,7 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
         }
         return true;
     }
-    
-    private boolean checkMoved(float[] last_coord, float[] current_coord) {
-        float dist = DistanceUtil.distanceBetween(last_coord, current_coord);
-        if (dist < 1) {
-            return false;
-        }
-        return true;
-    }
+   
 
     public UAVPath getPath_planned_at_last_time_step() {
         return path_planned_at_last_time_step;
@@ -296,7 +288,6 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
         int msg_type = msg.getMsg_type();
         if (msg_type == Message.CONFLICT_MSG) {
             Conflict conflict = (Conflict) msg;
-            //TODO:
             this.addConflict(conflict);
             this.setNeed_to_replan(true);
         } else if (msg_type == Message.OBSTACLE_MSG) {

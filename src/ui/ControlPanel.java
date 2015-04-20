@@ -189,7 +189,6 @@ public class ControlPanel extends javax.swing.JPanel {
      * @param evt
      */
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        // TODO add your handling code here:
         if (this.speed_times - speed_delta_times > 0) {
             this.speed_times -= speed_delta_times;
             setSimulationDelayWithSpeed(this.speed_times);
@@ -202,13 +201,11 @@ public class ControlPanel extends javax.swing.JPanel {
      * @param evt
      */
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        // TODO add your handling code here:
         this.speed_times += speed_delta_times;
         setSimulationDelayWithSpeed(this.speed_times);
     }//GEN-LAST:event_jButton7ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
         StaticInitConfig.SHOW_PLANNED_TREE = !StaticInitConfig.SHOW_PLANNED_TREE; //per click take non-operation
         if (StaticInitConfig.SHOW_PLANNED_TREE) {
             this.jButton4.setText("关闭" + this.show_planned_tree_text);
@@ -218,7 +215,6 @@ public class ControlPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
         StaticInitConfig.SHOW_PLANNED_PATH = !StaticInitConfig.SHOW_PLANNED_PATH; //per click take non-operation
         if (StaticInitConfig.SHOW_PLANNED_PATH) {
             this.jButton3.setText("关闭" + this.shown_planned_path_text);
@@ -228,7 +224,6 @@ public class ControlPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
         StaticInitConfig.SIMULATION_ON = !StaticInitConfig.SIMULATION_ON; //per click take non-operation
         if (StaticInitConfig.SIMULATION_ON) {
             this.jButton1.setText(simulation_stop);
@@ -238,7 +233,6 @@ public class ControlPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jFormattedTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFormattedTextField1ActionPerformed
-        // TODO add your handling code here:
     }//GEN-LAST:event_jFormattedTextField1ActionPerformed
 
     private void setSimulationDelayWithSpeed(float speed_times) {

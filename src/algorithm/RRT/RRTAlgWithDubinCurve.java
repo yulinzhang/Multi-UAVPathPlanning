@@ -37,8 +37,6 @@ public class RRTAlgWithDubinCurve extends RRTAlg {
 
         float[] random_goal;
         RRTNode nearest_node;
-        RRTNode new_node = null;
-        double radius = 9999;
 
         for (int time_step = 1; time_step <= k_step;) {
             //random choose a direction or goal
@@ -54,7 +52,6 @@ public class RRTAlgWithDubinCurve extends RRTAlg {
             Point z_new = traj.getEndPoint();
 
             if (!ConflictCheckUtil.checkTrajectoryInObstacles(obstacles, traj)) {
-                RRTNode min_point_toward_z_new = nearest_node;
                 ArrayList<RRTNode> nearestNodesToNewNodeSet = neareSortedNodesToNode(G, z_new.toFloatArray(), Math.E * 2 * Math.log(G.getNodeCount() + 1));
                 float c_min = nearest_node.getPath_lenght_from_root() + (float) traj.getCost();
                 RRTNode z_min = nearest_node;
@@ -118,7 +115,6 @@ public class RRTAlgWithDubinCurve extends RRTAlg {
         float[] random_goal;
         ArrayList<RRTNode> near_node_set;
         RRTNode nearest_node = null;
-        RRTNode new_node = null;
         double radius = 9999;
 
         for (int time_step = 1; time_step <= k_step;) {

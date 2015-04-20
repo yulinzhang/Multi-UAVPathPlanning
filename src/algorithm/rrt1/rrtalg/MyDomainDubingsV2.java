@@ -91,7 +91,6 @@ public class MyDomainDubingsV2 implements Domain<Point, DubinsCurve> {
         if (min_dc == null) {
             return null;
         }
-        final Trajectory traj = min_dc.getTraj();
         Extension<Point, DubinsCurve> extension = new Extension<Point, DubinsCurve>(from, to, min_dc, min_dc.getLength(), min_dc.isExact());//S source, S target, E edge, double cost, boolean exact
         return extension;
     }

@@ -37,7 +37,6 @@ public class World {
     public static int bound_height = 600;
 
     private int scout_num; //The number of our scouts
-    private int enemy_num;  //The number of enemy uavs
     private int threat_num; //The number of enemy threats_in_world
     private int attacker_num; //The number of our attackers
 
@@ -62,7 +61,6 @@ public class World {
 
     private int num_of_threat_remained;
     private int no_threat_time_step = Integer.MAX_VALUE;
-    private int not_threat_time_found = 0;
     private boolean scout_scaned_over = true;
 
     private ArrayList<Conflict> conflicts;
@@ -120,7 +118,6 @@ public class World {
 
         this.attacker_num = init_config.getAttacker_num();
         this.scout_num = init_config.getScout_num();
-        this.enemy_num = init_config.getEnemy_num();
         this.threat_num = init_config.getThreat_num();
 
         this.threat_radius = init_config.getThreat_radius();
@@ -151,13 +148,11 @@ public class World {
      */
     private void initScoutsAndAttackers() {
         float[] uav_base_coordinate = uav_base.getCoordinate();
-        int uav_base_height = uav_base.getBase_height();
-        int uav_base_width = uav_base.getBase_width();
+
         float[] uav_base_center = new float[2];
         uav_base_center[0] = uav_base_coordinate[0];// + uav_base_width / 2;
         uav_base_center[1] = uav_base_coordinate[1]; //+ uav_base_height / 2;
         for (int i = 0; i < attacker_num; i++) {
-            Threat threat = this.getThreatsForUIRendering().get(i);
             Attacker attacker = new Attacker(i, null, StaticInitConfig.ATTACKER, uav_base_center, null,Float.MAX_VALUE);
             attackers.add(attacker);
         }
@@ -532,10 +527,6 @@ public class World {
                 }
             }
         }
-
-        if (scout_scaned_over) {
-            this.not_threat_time_found++;
-        }
     }
 
     private void updateThreatCoordinateInControlCenter() {
@@ -566,10 +557,6 @@ public class World {
 
     private void updateScoutInControlCenter() {
         this.control_center.updateScoutCoordinate();
-    }
-
-    private void updateControlCenterKnowledge() {
-        this.control_center.setThreats(threats);
     }
 
     private void checkReplanningAccordingToAttackerMovement() {

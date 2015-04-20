@@ -80,7 +80,6 @@ public class AnimationPanel extends JPanel implements MouseListener {
 
     private static ArrayList<Attacker> attackers;
     private ArrayList<Scout> scouts;
-    private ArrayList<Attacker> enemy_uavs;
     private UAVBase uav_base;
     private ControlCenter control_center;
 
@@ -206,7 +205,6 @@ public class AnimationPanel extends JPanel implements MouseListener {
 
         this.scouts = world.getScouts();
         this.attackers = world.getAttackers();
-        this.enemy_uavs = world.getEnemy_uavs();
         this.uav_base = world.getUav_base();
 
     }

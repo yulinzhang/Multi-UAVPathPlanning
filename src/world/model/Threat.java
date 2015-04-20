@@ -33,13 +33,9 @@ public class Threat extends Target implements Serializable {
     protected float threat_range = 0;
     protected String threat_cap = "";
     protected UAVPath path_planned_at_current_time_step;
-
-    private RRTAlg rrt_alg;
-    private RRTTree rrt_tree;
     private float current_angle = 0;
     private float[] goal;
     private int current_index_of_planned_path = 0;
-    private World world;
     
 
     public Threat(int index, float[] coordinates, int target_type, float speed) {

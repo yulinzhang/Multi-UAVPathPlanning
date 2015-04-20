@@ -111,13 +111,11 @@ public class ScoutAndAttackerInitPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jSpinner2StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner2StateChanged
-        // TODO add your handling code here:
         JSpinner source = (JSpinner) evt.getSource();
         StaticInitConfig.SCOUT_NUM = (Integer) source.getValue();
     }//GEN-LAST:event_jSpinner2StateChanged
 
     private void jSpinner3StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner3StateChanged
-        // TODO add your handling code here:
         JSpinner source = (JSpinner) evt.getSource();
         StaticInitConfig.ATTACKER_NUM = (Integer) source.getValue();
     }//GEN-LAST:event_jSpinner3StateChanged

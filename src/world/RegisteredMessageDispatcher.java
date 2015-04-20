@@ -50,7 +50,6 @@ public class RegisteredMessageDispatcher extends MessageDispatcher {
         List<Threat> threats = intelligent_unit.getThreats();
         int threat_num = threats.size();
         List<Conflict> conflicts = intelligent_unit.getConflicts();
-        int conflict_num = conflicts.size();
 
         List<Attacker> attackers = World.getAttackers();
         int attacker_num = attackers.size();

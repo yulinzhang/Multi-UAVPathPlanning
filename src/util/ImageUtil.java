@@ -22,6 +22,7 @@ import javax.swing.ImageIcon;
  * @author Yulin_Zhang
  */
 public class ImageUtil {
+    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ImageUtil.class);
 
     public static BufferedImage retrieveImage(String img_path) throws IOException {
         return toBufferedImage(ImageIO.read(ImageUtil.class.getResourceAsStream(img_path)));
@@ -57,6 +58,7 @@ public class ImageUtil {
          image.getWidth(null), image.getHeight(null), transparency);
      } catch (HeadlessException e) {
         // The system does not have a screen
+         logger.error(e);
      }
  
     if (bimage == null) {

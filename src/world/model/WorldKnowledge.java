@@ -32,6 +32,9 @@ public class WorldKnowledge extends KnowledgeInterface {
 //        init();
     }
 
+    /** Just used for unit test.
+     * 
+     */
     private void init() {
         Obstacle obstacle1 = new Obstacle(null, 0);
         Obstacle obstacle2 = new Obstacle(null, 1);

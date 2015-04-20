@@ -106,9 +106,7 @@ public class RRTAlg implements Serializable {
         RRTNode new_node = null;
 
         int time_step = 0;
-        int num_of_trap = 0;
-//        while (true) {
-        for (; time_step <= k_step;) {
+        for (time_step = 0; time_step <= k_step;time_step++) {
             //random choose a direction or goal
             random_goal = randGoal(this.goal_coordinate, probability, bound_width, bound_height, obstacles);
             //choose the nearest node to extend
@@ -142,7 +140,7 @@ public class RRTAlg implements Serializable {
                 }
 //                time_step++;
             }
-            time_step++;
+            
 //            num_of_trap++;
 //            if (idle_uav && num_of_trap > 2 * k_step) {
 //                new_node = nearest_node;
@@ -179,7 +177,7 @@ public class RRTAlg implements Serializable {
             new_node = extendTowardGoalWithDynamics(nearest_node, random_goal, this.max_delta_distance, max_angle);
 
             boolean conflicted = ConflictCheckUtil.checkNodeInObstacles(obstacles, new_node);
-            boolean within_bound = BoundUtil.withinBound(new_node, bound_width, bound_height);
+//            boolean within_bound = BoundUtil.withinBound(new_node, bound_width, bound_height);
             //if not conflicted,add the child to the tree
             if (!conflicted && true) {
                 //
@@ -311,12 +309,9 @@ public class RRTAlg implements Serializable {
      * @return
      */
     protected RRTNode extendTowardGoalWithoutDynamics(RRTNode nearest_node, float[] random_goal_coordinate, float max_length, double max_angle) {
-        double current_angle = nearest_node.getCurrent_angle();
         float[] nearest_coordinate = nearest_node.getCoordinate();
         double toward_goal_angle = VectorUtil.getAngleOfTwoVector(random_goal_coordinate, nearest_coordinate);
-        double delta_angle = toward_goal_angle - current_angle;
 
-        float total_dist_from_nearest_to_goal = DistanceUtil.distanceBetween(nearest_coordinate, random_goal_coordinate);
 
         float[] new_node_coord = new float[2];
 

@@ -39,7 +39,6 @@ public class Conflict extends Message implements Serializable {
 
     public void sort() {
         int path_len = path_prefound.size();
-        Point temp;
         for (int i = 0; i < path_len; i++) {
             Point point1 = path_prefound.get(i);
             for (int j = i + 1; j < path_len; j++) {
