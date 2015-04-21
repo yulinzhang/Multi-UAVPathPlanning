@@ -42,7 +42,7 @@ public class StaticInitConfig {
     public static Threat NON_ROLE = null;
 
     //Extend towards the goal with probability
-    public static float rrt_goal_toward_probability = 0.6f;
+    public static float rrt_goal_toward_probability = 0.5f;
     public static int rrt_iteration_times = 8000;
     //Set a safe distance from the target point
     public static int SAFE_DISTANCE_FOR_TARGET=5;
