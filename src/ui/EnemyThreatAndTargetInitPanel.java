@@ -5,6 +5,7 @@
  */
 package ui;
 
+import config.NonStaticInitConfig;
 import config.StaticInitConfig;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
@@ -20,15 +21,12 @@ public class EnemyThreatAndTargetInitPanel extends javax.swing.JPanel {
      */
     public EnemyThreatAndTargetInitPanel() {
         initComponents();
-//        initSpinnerValue();
+        initSpinnerValue();
     }
 
-//    private void initSpinnerValue() {
-//        this.jSpinner1.setModel(new SpinnerNumberModel(StaticInitConfig.ENEMY_UAV_NUM, StaticInitConfig.MIN_SPINNER_VALUE, StaticInitConfig.MAX_SPINNER_VALUE, StaticInitConfig.STEP_SIZE_OF_SPINNER));
-//        this.jSpinner4.setModel(new SpinnerNumberModel(StaticInitConfig.THREAT_NUM, StaticInitConfig.MIN_SPINNER_VALUE, StaticInitConfig.MAX_SPINNER_VALUE, StaticInitConfig.STEP_SIZE_OF_SPINNER));
-//        this.jSpinner5.setModel(new SpinnerNumberModel(StaticInitConfig.THREAT_NUM, StaticInitConfig.MIN_SPINNER_VALUE, StaticInitConfig.MAX_SPINNER_VALUE, StaticInitConfig.STEP_SIZE_OF_SPINNER));
-//    }
-
+    private void initSpinnerValue() {
+        this.jSpinner1.setModel(new SpinnerNumberModel(StaticInitConfig.THREAT_NUM, StaticInitConfig.MIN_SPINNER_VALUE, StaticInitConfig.MAX_SPINNER_VALUE, StaticInitConfig.STEP_SIZE_OF_SPINNER));
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -45,7 +43,7 @@ public class EnemyThreatAndTargetInitPanel extends javax.swing.JPanel {
         jSpinner1 = new javax.swing.JSpinner();
         jToolBar2 = new javax.swing.JToolBar();
         jLabel2 = new javax.swing.JLabel();
-        jSpinner2 = new javax.swing.JSpinner();
+        jComboBox1 = new javax.swing.JComboBox();
 
         setPreferredSize(new java.awt.Dimension(180, 100));
 
@@ -55,25 +53,33 @@ public class EnemyThreatAndTargetInitPanel extends javax.swing.JPanel {
 
         jToolBar1.setRollover(true);
 
-        jLabel1.setText("静态威胁数量");
+        jLabel1.setText("威胁数量");
         jToolBar1.add(jLabel1);
 
         jSpinner1.setMaximumSize(new java.awt.Dimension(82, 32767));
         jSpinner1.setMinimumSize(new java.awt.Dimension(82, 28));
         jSpinner1.setPreferredSize(new java.awt.Dimension(82, 28));
+        jSpinner1.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jSpinner1StateChanged(evt);
+            }
+        });
         jToolBar1.add(jSpinner1);
 
         jSplitPane1.setTopComponent(jToolBar1);
 
         jToolBar2.setRollover(true);
 
-        jLabel2.setText("动态威胁数量");
+        jLabel2.setText("信息支撑算法");
         jToolBar2.add(jLabel2);
 
-        jSpinner2.setMaximumSize(new java.awt.Dimension(82, 32767));
-        jSpinner2.setMinimumSize(new java.awt.Dimension(82, 28));
-        jSpinner2.setPreferredSize(new java.awt.Dimension(82, 28));
-        jToolBar2.add(jSpinner2);
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "广播", "无信息共享", "智能信息共享" }));
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
+        jToolBar2.add(jComboBox1);
 
         jSplitPane1.setRightComponent(jToolBar2);
 
@@ -89,12 +95,25 @@ public class EnemyThreatAndTargetInitPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        // TODO add your handling code here:
+        int index = this.jComboBox1.getSelectedIndex();
+        NonStaticInitConfig.inforshare_algorithm = index;
+
+    }//GEN-LAST:event_jComboBox1ActionPerformed
+
+    private void jSpinner1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner1StateChanged
+        // TODO add your handling code here:
+        JSpinner source = (JSpinner) evt.getSource();
+        StaticInitConfig.THREAT_NUM = (Integer) source.getValue();
+    }//GEN-LAST:event_jSpinner1StateChanged
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JSpinner jSpinner1;
-    private javax.swing.JSpinner jSpinner2;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JToolBar jToolBar2;

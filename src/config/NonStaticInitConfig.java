@@ -19,52 +19,54 @@ import world.model.Threat;
  */
 public class NonStaticInitConfig {
 
-
     private int enemy_num; //The number of enemy uavs
     private int threat_num; //The number of enemy threats
     private int attacker_num; //The number of our attackers
     private int scout_num; //The number of our scouts
+    
+    private int bound_width=800;
+    private int bound_height=600;
 
     private ArrayList<Obstacle> obstacles;
     private ArrayList<Threat> threats;
 
     private UAVBase uav_base;
-    private int inforshare_algorithm=0;
-    
+    public static int inforshare_algorithm = StaticInitConfig.BROADCAST_INFOSHARE;
 
     //robot coordinates, robot_coordinates[1][0], robot_coordinates[1][1] represents the x, y coordinate of robot 1
     private float attacker_patrol_range = 100;
     private float threat_radius = 100;
 
-    private int bound_width = 800;
-    private int bound_height = 600;
-    
-    public static int obstacle_num=21;
-    
-    public NonStaticInitConfig(int enemy_num, int threat_num, int attacker_num, int scout_num, UAVBase uav_base,int inforshare_algorithm) {
+
+    public static int obstacle_num = 21;
+
+    public NonStaticInitConfig(int enemy_num, int threat_num, int attacker_num, int scout_num, UAVBase uav_base, int inforshare_algorithm) {
         this.enemy_num = enemy_num;
         this.threat_num = threat_num;
         this.attacker_num = attacker_num;
         this.scout_num = scout_num;
         this.uav_base = uav_base;
-        this.inforshare_algorithm=inforshare_algorithm;
+        this.inforshare_algorithm = inforshare_algorithm;
     }
-    
-    public NonStaticInitConfig()
-    {
-        this.enemy_num=0;
-        this.threat_num=5;
-        this.attacker_num=5;
-        this.scout_num=10;
-        this.inforshare_algorithm=StaticInitConfig.REGISTER_BASED_INFORSHARE;
-        float[] coordinate=new float[]{0,0};
-        UAVBase uav_base=new UAVBase(coordinate,100,100);
-        this.uav_base=uav_base;
+
+    public NonStaticInitConfig() {
+        if (!StaticInitConfig.UI_PARAMETER_CONFIG) {
+            this.enemy_num = 0;
+            this.threat_num = 10;
+            this.attacker_num = 10;
+            this.scout_num = 1;
+        } else {
+            this.threat_num = StaticInitConfig.THREAT_NUM;
+            this.attacker_num = StaticInitConfig.ATTACKER_NUM;
+            this.scout_num = StaticInitConfig.SCOUT_NUM;
+        }
+        float[] coordinate = new float[]{0, 0};
+        UAVBase uav_base = new UAVBase(coordinate, 100, 100);
+        this.uav_base = uav_base;
         initObstacles();
         initThreats();
     }
 
-    
     public void initThreats() {
         threats = new ArrayList<Threat>();
         Random random = new Random(System.currentTimeMillis());
@@ -73,11 +75,11 @@ public class NonStaticInitConfig {
             float coordinate_y = 0;
             boolean found = false;
             while (!found) {
-                coordinate_x = random.nextFloat()*(bound_width-2*attacker_patrol_range)+attacker_patrol_range;
-                coordinate_y = random.nextFloat()*(bound_height-2*attacker_patrol_range)+attacker_patrol_range;
-                found = !ConflictCheckUtil.checkPointInObstacles(obstacles,coordinate_x, coordinate_y);
+                coordinate_x = random.nextFloat() * (bound_width - 2 * attacker_patrol_range) + attacker_patrol_range;
+                coordinate_y = random.nextFloat() * (bound_height - 2 * attacker_patrol_range) + attacker_patrol_range;
+                found = !ConflictCheckUtil.checkPointInObstacles(obstacles, coordinate_x, coordinate_y);
             }
-            Threat threat = new Threat(i, new float[]{coordinate_x, coordinate_y},StaticInitConfig.STATIC_THREAT_TYPE,5);
+            Threat threat = new Threat(i, new float[]{coordinate_x, coordinate_y}, StaticInitConfig.STATIC_THREAT_TYPE, 5);
             threats.add(threat);
         }
     }
@@ -88,19 +90,19 @@ public class NonStaticInitConfig {
         this.enemy_num = StaticInitConfig.ENEMY_UAV_NUM;
         this.threat_num = StaticInitConfig.THREAT_NUM;
     }
-    
+
     /**
-     * Get file path of KML,and that file storages the polygons represented obstacles
+     * Get file path of KML,and that file storages the polygons represented
+     * obstacles
      */
     public void initObstacles() {
         if (StaticInitConfig.EXTERNAL_KML_FILE_PATH == null) {
-            String obs_path="/resources/Obstacle"+NonStaticInitConfig.obstacle_num+".kml";
+            String obs_path = "/resources/Obstacle" + NonStaticInitConfig.obstacle_num + ".kml";
             obstacles = ObtacleUtil.readObstacleFromResourceKML(obs_path); //get obstacle from kml
         } else {
             obstacles = ObtacleUtil.readObstacleFromExternalKML(StaticInitConfig.EXTERNAL_KML_FILE_PATH);
         }
     }
-
 
     public int getEnemy_num() {
         return enemy_num;
@@ -134,7 +136,6 @@ public class NonStaticInitConfig {
         this.obstacles = obstacles;
     }
 
- 
     public UAVBase getUav_base() {
         return uav_base;
     }

@@ -41,10 +41,6 @@ public class Obstacle extends Message implements Serializable {
         return shape;
     }
 
-    public void setShape(Polygon shape) {
-        this.shape = shape;
-    }
-
     public int getIndex() {
         return index;
     }
@@ -55,10 +51,6 @@ public class Obstacle extends Message implements Serializable {
 
     public Rectangle getMbr() {
         return mbr;
-    }
-
-    public void setMbr(Rectangle mbr) {
-        this.mbr = mbr;
     }
 
     @Override

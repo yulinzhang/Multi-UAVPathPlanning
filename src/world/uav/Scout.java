@@ -33,7 +33,7 @@ public class Scout extends UAV {
 
     public Scout(int index, int uav_type, float[] center_coordinates, float[] base_coordinate, ControlCenter control_center, float remained_energy) {
         super(index, null, uav_type, center_coordinates,remained_energy);
-        this.uav_radar = new Circle(center_coordinates[0], center_coordinates[1], scout_radar_radius);
+        this.uav_radar = new Circle(center_coordinates[0], center_coordinates[1], StaticInitConfig.scout_radar_radius);
         this.base_coordinate = base_coordinate;
         this.control_center = control_center;
         this.move_at_y_coordinate_task = new LinkedList<Float>();

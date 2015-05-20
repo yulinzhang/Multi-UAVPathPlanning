@@ -24,10 +24,11 @@ public class UAV extends Unit {
     protected Color radar_color; //the radar color in world
     protected Circle uav_radar;
     protected double current_angle = 0;
-    protected double max_angle =Math.PI / 4;
+    protected double max_angle =0;
     protected int speed = 5;
     protected boolean visible=true;
     protected float remained_energy=2000;
+    
     
     
     public UAV(int index, Target target_indicated_by_role, int uav_type, float[] center_coordinates,float remained_energy) {

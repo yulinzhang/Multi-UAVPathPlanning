@@ -51,13 +51,13 @@ public class ControlCenter implements KnowledgeAwareInterface {
         int scout_num = this.scouts.size();
 
         float average_region_height = World.bound_height * 1.0f / scout_num;
-        int task_num = (int) Math.ceil(average_region_height / (Unit.scout_radar_radius * 2));
+        int task_num = (int) Math.ceil(average_region_height / (StaticInitConfig.scout_radar_radius * 2));
         for (int i = 0; i < scout_num; i++) {
             Scout scout = this.scouts.get(i);
             LinkedList<Float> move_at_y_coordinate_task = new LinkedList<Float>();
-            float init_y_coord = average_region_height * i + Unit.scout_radar_radius;
+            float init_y_coord = average_region_height * i + StaticInitConfig.scout_radar_radius;
             for (int task_index = 0; task_index < task_num; task_index++) {
-                float coord_y = init_y_coord + task_index * Unit.scout_radar_radius * 2;
+                float coord_y = init_y_coord + task_index * StaticInitConfig.scout_radar_radius * 2;
                 if (coord_y - init_y_coord > average_region_height) {
                     coord_y = init_y_coord + average_region_height;
                 }

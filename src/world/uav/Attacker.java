@@ -40,7 +40,7 @@ import world.model.shape.Trajectory;
  */
 public class Attacker extends UAV implements KnowledgeAwareInterface {
 
-    private UAVPath path_planned_at_current_time_step;
+    private volatile UAVPath path_planned_at_current_time_step;
     private int current_index_of_planned_path = 0; //index of waypoint
     private UAVPath path_planned_at_last_time_step;
     private UAVPath history_path;
@@ -50,20 +50,25 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
 
     //variables for conflict planning
     private KnowledgeInterface kb;
-
+    
+    private int fly_mode=0;
+    private int hovered_time_step=0;
+    
     private RRTAlg rrt_alg;
     private RRTTree rrt_tree;
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Attacker.class);
 
+    public static int TRACK_MODE=0;
+    public static int HOVER_MODE=1;
     /**
      *
      * @param index
      * @param target
      * @param center_coordinates
      */
-    public Attacker(int index, Target target, int uav_type, float[] center_coordinates, ArrayList<Obstacle> obstacles,float remained_energy) {
-        super(index, target, uav_type, center_coordinates,remained_energy);
-        this.uav_radar = new Circle(center_coordinates[0], center_coordinates[1], attacker_radar_radius);
+    public Attacker(int index, Target target, int uav_type, float[] center_coordinates, ArrayList<Obstacle> obstacles, float remained_energy) {
+        super(index, target, uav_type, center_coordinates, remained_energy);
+        this.uav_radar = new Circle(center_coordinates[0], center_coordinates[1], StaticInitConfig.attacker_radar_radius);
         this.path_planned_at_current_time_step = new UAVPath();
         this.history_path = new UAVPath();
         setPreviousWaypoint();
@@ -161,7 +166,7 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
             boolean available_path_found = false;
             int nums_of_trap = 0;
             for (int i = 0; i <= planning_times; i++) {
-                this.runRRT(false);
+                this.runRRT();
                 available_path_found = available_path_found || this.path_planned_at_current_time_step.pathReachEndPoint(this.target_indicated_by_role.getCoordinates());
                 if (!available_path_found && nums_of_trap < 10) {
                     i--;
@@ -174,11 +179,10 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
                 }
             }
             if (shortest_path != null) {
-                Point path_dest=shortest_path.getLastWaypoint();
-                if(path_dest.getX()==this.center_coordinates[0]&&path_dest.getY()==this.center_coordinates[1])
-                {
+                Point path_dest = shortest_path.getLastWaypoint();
+                if (path_dest.getX() == this.center_coordinates[0] && path_dest.getY() == this.center_coordinates[1]) {
                     this.setVisible(false);
-                    logger.error("-----------------------------------------------------------");
+                    logger.debug("not able to plan path for this uav " + this.getIndex());
                 }
                 this.path_planned_at_current_time_step = shortest_path;
             } else {
@@ -196,12 +200,12 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
         }
     }
 
-    private void runRRT(boolean idle_uav) {
+    private void runRRT() {
         rrt_alg.setMax_delta_distance(this.speed);
         rrt_alg.setObstacles(this.getObstacles());
         rrt_alg.setGoal_coordinate(target_indicated_by_role.getCoordinates());
         rrt_alg.setInit_coordinate(center_coordinates);
-        rrt_tree = rrt_alg.buildRRT(center_coordinates, current_angle, idle_uav);
+        rrt_tree = rrt_alg.buildRRT(center_coordinates, current_angle);
         this.setPath_prefound(rrt_tree.getPath_found());
         this.resetCurrentIndexOfPath();
     }
@@ -237,31 +241,29 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
         }
     }
 
-    public boolean isEnduranceCapReachable(Target potential_target)
-    {
-        float dist_to_potential_target=DistanceUtil.distanceBetween(this.center_coordinates, potential_target.getCoordinates());
-        float dist_from_potential_target_to_uav_base=DistanceUtil.distanceBetween(potential_target.getCoordinates(), World.uav_base.getCoordinate());
-        float path_parameter=1.5f;
-        if(path_parameter*(dist_to_potential_target+dist_from_potential_target_to_uav_base)>this.remained_energy)
-        {
+    public boolean isEnduranceCapReachable(Target potential_target) {
+        float dist_to_potential_target = DistanceUtil.distanceBetween(this.center_coordinates, potential_target.getCoordinates());
+        float dist_from_potential_target_to_uav_base = DistanceUtil.distanceBetween(potential_target.getCoordinates(), World.uav_base.getCoordinate());
+        float path_parameter = 1.5f;
+        if (path_parameter * (dist_to_potential_target + dist_from_potential_target_to_uav_base) > this.remained_energy) {
             return false;
         }
         return true;
     }
-   
 
     public UAVPath getPath_planned_at_last_time_step() {
         return path_planned_at_last_time_step;
     }
 
     public UAVPath getFuturePath() {
-        if(!this.isVisible())
-        {
+        if (!this.isVisible()) {
             return null;
         }
         UAVPath future_path = new UAVPath();
-        for (int i = current_index_of_planned_path; i < path_planned_at_current_time_step.getWaypointNum(); i++) {
-            future_path.addWaypointToEnd(path_planned_at_current_time_step.getWaypoint(i));
+        synchronized (path_planned_at_current_time_step) {
+            for (int i = current_index_of_planned_path; i < path_planned_at_current_time_step.getWaypointNum(); i++) {
+                future_path.addWaypointToEnd(path_planned_at_current_time_step.getWaypoint(i));
+            }
         }
         return future_path;
     }
@@ -405,7 +407,7 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
             if (threat.getIndex() == current_threat.getIndex()) {
                 this.kb.removeThreat(current_threat);
                 this.addThreat(threat);
-                if (this.target_indicated_by_role!=null && threat.getIndex() == this.target_indicated_by_role.getIndex()) {
+                if (this.target_indicated_by_role != null && threat.getIndex() == this.target_indicated_by_role.getIndex()) {
                     this.target_indicated_by_role = threat;
                 }
                 return;

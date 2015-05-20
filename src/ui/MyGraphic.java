@@ -30,11 +30,13 @@ import world.uav.UAVPath;
  * @author Yulin_Zhang
  */
 public class MyGraphic {
+
     private static int uav_base_line_width = 3;
 //    public void clearUAVShadowInUAVImage(Graphics2D graphics,Attacker uav) {
 //        graphics.setComposite(AlphaComposite.Clear);
 //        graphics.fill(uav.getUav_radar());
 //    }
+
     public void drawUAVInFogOfWarInLevel3(Graphics2D graphics, UAV uav) {
         if (!uav.isVisible()) {
             return;
@@ -53,20 +55,44 @@ public class MyGraphic {
         graphics.fillRect((int) threat.getCoordinates()[0] - GraphicConfig.threat_width / 2, (int) threat.getCoordinates()[1] - GraphicConfig.threat_height / 2, GraphicConfig.threat_width, GraphicConfig.threat_height);
     }
 
+//    public void drawUAVInUAVImage(Graphics2D graphics, UAV uav, Color uav_highlight_color) {
+//        if (!uav.isVisible()) {
+//            return;
+//        }
+//        graphics.setComposite(AlphaComposite.SrcOver);
+//        graphics.setColor(uav.getRadar_color());
+//        Circle uav_radar_outter = uav.getUav_radar();
+//        graphics.fill(uav_radar_outter);
+//        graphics.setColor(uav.getCenter_color());
+//        graphics.fillPolygon(uav.getUav_center());
+//        if (uav_highlight_color != null) {
+//            graphics.setColor(uav_highlight_color);
+//            graphics.draw(uav_radar_outter);
+//        }
+//    }
     public void drawUAVInUAVImage(Graphics2D graphics, UAV uav, Color uav_highlight_color) {
         if (!uav.isVisible()) {
             return;
         }
         graphics.setComposite(AlphaComposite.SrcOver);
         graphics.setColor(uav.getRadar_color());
-        Circle uav_radar = uav.getUav_radar();
-        graphics.fill(uav_radar);
+        
+        Color uav_radar_color_inner=uav.getRadar_color();
+        Color uav_radar_color_outter=new Color(uav_radar_color_inner.getRed(),uav_radar_color_inner.getGreen(),uav_radar_color_inner.getBlue(),uav_radar_color_inner.getAlpha()/2);
+        Circle uav_radar_outter = uav.getUav_radar();
+        graphics.setColor(uav_radar_color_outter);
+        graphics.fill(uav_radar_outter);
+
+        Circle uav_radar_inner=new Circle(uav_radar_outter.getCenter_coordinates()[0],uav_radar_outter.getCenter_coordinates()[1],uav_radar_outter.getRadius()/2);
+        graphics.setColor(uav_radar_color_inner);
+        graphics.fill(uav_radar_inner);
+        
         graphics.setColor(uav.getCenter_color());
         graphics.fillPolygon(uav.getUav_center());
-        if (uav_highlight_color != null) {
-            graphics.setColor(uav_highlight_color);
-            graphics.draw(uav_radar);
-        }
+//        if (uav_highlight_color != null) {
+//            graphics.setColor(uav_highlight_color);
+//            graphics.draw(uav_radar_outter);
+//        }
     }
 
     public void drawUAVHistoryPath(Graphics2D graphics, Attacker uav, Color uav_history_path_color) {
@@ -182,10 +208,9 @@ public class MyGraphic {
         graphics.drawString(StaticInitConfig.THREAT_NAME + target.getIndex(), target.getCoordinates()[0] - 10, target.getCoordinates()[1] - 15);
         graphics.drawRect((int) target.getCoordinates()[0] - GraphicConfig.threat_width / 2, (int) target.getCoordinates()[1] - GraphicConfig.threat_height / 2, GraphicConfig.threat_width, GraphicConfig.threat_height);
     }
-    
-    public void drawUAVBase(Graphics2D graphics, UAVBase uav_base)
-    {
-         graphics.setColor(Color.white);
+
+    public void drawUAVBase(Graphics2D graphics, UAVBase uav_base) {
+        graphics.setColor(Color.white);
         graphics.setStroke(new BasicStroke(uav_base_line_width));
         graphics.drawRect((int) uav_base.getCoordinate()[0], (int) uav_base.getCoordinate()[1], uav_base.getBase_width(), uav_base.getBase_height());
         graphics.setColor(GraphicConfig.uav_base_color);

@@ -20,6 +20,8 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JPanel;
 import world.uav.Attacker;
 import world.uav.UAVBase;
@@ -174,6 +176,24 @@ public class AnimationPanel extends JPanel implements MouseListener {
         //drive the world and ui
         StaticInitConfig.SIMULATION_WITH_UI_TIMER = new javax.swing.Timer((int) (StaticInitConfig.INIT_SIMULATION_DELAY / StaticInitConfig.SPEED_TIMES), new animatorListener(this));
         StaticInitConfig.SIMULATION_WITH_UI_TIMER.start();
+//        this.runTask();
+    }
+
+    public void runTask() {
+
+        Thread t = new Thread() {
+            public void run() {
+                while (true) {
+                    world.updateAll();
+                    try {
+                        Thread.sleep((int) (StaticInitConfig.INIT_SIMULATION_DELAY / StaticInitConfig.SPEED_TIMES));
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(AnimationPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        };
+        t.start();
     }
 
     public static void setHighlightUAV(int uav_index) {
@@ -278,7 +298,9 @@ public class AnimationPanel extends JPanel implements MouseListener {
             return;
         }
         for (Attacker attacker : this.attackers) {
-            virtualizer.drawUAVHistoryPath(uav_history_path_image_graphics, attacker, GraphicConfig.side_a_center_color);
+            if (attacker.isVisible() && attacker.getTarget_indicated_by_role() != null) {
+                virtualizer.drawUAVHistoryPath(uav_history_path_image_graphics, attacker, GraphicConfig.side_a_center_color);
+            }
         }
     }
 
@@ -290,7 +312,9 @@ public class AnimationPanel extends JPanel implements MouseListener {
             return;
         }
         for (Attacker attacker : this.attackers) {
-            virtualizer.drawUAVPlannedTree(uav_planned_tree_image_graphics, attacker, GraphicConfig.uav_planned_path_color);
+            if (attacker.getTarget_indicated_by_role() != null) {
+                virtualizer.drawUAVPlannedTree(uav_planned_tree_image_graphics, attacker, GraphicConfig.uav_planned_path_color);
+            }
         }
     }
 
@@ -309,7 +333,9 @@ public class AnimationPanel extends JPanel implements MouseListener {
             return;
         }
         for (Attacker attacker : this.attackers) {
-            virtualizer.drawUAVPlannedPath(uav_planned_path_image_graphics, attacker, GraphicConfig.uav_planned_path_color);
+            if (attacker.getTarget_indicated_by_role() != null) {
+                virtualizer.drawUAVPlannedPath(uav_planned_path_image_graphics, attacker, GraphicConfig.uav_planned_path_color);
+            }
         }
     }
 
@@ -388,7 +414,7 @@ public class AnimationPanel extends JPanel implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        StaticInitConfig.SIMULATION_ON=false;
+        StaticInitConfig.SIMULATION_ON = false;
         if (e.getButton() == MouseEvent.BUTTON3) {
             int chosen_attacker_index = findChosenAttacker(e.getPoint());
             if (chosen_attacker_index == -1) {
@@ -399,7 +425,7 @@ public class AnimationPanel extends JPanel implements MouseListener {
             my_popup_menu.show(this, e.getX(), e.getY());
             StaticInitConfig.SIMULATION_ON = false;
         }
-        StaticInitConfig.SIMULATION_ON=true;
+        StaticInitConfig.SIMULATION_ON = true;
     }
 
     @Override

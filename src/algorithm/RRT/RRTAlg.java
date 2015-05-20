@@ -48,7 +48,7 @@ public class RRTAlg implements Serializable {
      */
     protected int k_step = 20;
     protected float max_delta_distance = 5;
-    protected float max_angle = (float) Math.PI / 12;
+    protected float max_angle = (float) Math.PI / 6;
     /**
      * less than goal_range_for_delta means goal reached
      *
@@ -86,7 +86,7 @@ public class RRTAlg implements Serializable {
         this.uav_index = uav_index;
     }
 
-    public RRTTree buildRRT(float[] init_coordinate, double current_angle, boolean idle_uav) {
+    public RRTTree buildRRT(float[] init_coordinate, double current_angle) {
 
         this.setInit_coordinate(init_coordinate);
         RRTTree G = new RRTTree();

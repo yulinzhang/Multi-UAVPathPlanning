@@ -22,7 +22,7 @@ public class GraphicConfig {
     public static Color side_b_radar_color = new Color(128, 128, 236, 150);
     public static Color transparent_color = new Color(0, 0, 0, 0);
     public static Color threat_color = Color.blue;
-    public static Color fog_of_war_color = Color.black;;//Color.black;;;//Color.black;
+    public static Color fog_of_war_color = new Color(0,0,0,220);//Color.black;;//Color.black;;;//Color.black;
     public static Color uav_base_color = new Color(236, 128, 128, 150);
     public static Color uav_planned_path_color = Color.black;
 

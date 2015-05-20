@@ -9,6 +9,7 @@ import config.StaticInitConfig;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import static ui.UserParameterConfigFrame.user_parameter_config_frame;
 
 /**
  *
@@ -88,10 +89,13 @@ public class InitControlParameterPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        UserParameterConfigFrame.user_parameter_config_frame.setVisible(false);
+        StaticInitConfig.UI_PARAMETER_CONFIG=true;
+        MainFrame.showMainFrame();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        JButton button=(JButton)evt.getSource();
+        JButton button = (JButton) evt.getSource();
         String path = null;
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
@@ -106,7 +110,7 @@ public class InitControlParameterPanel extends javax.swing.JPanel {
         if (path != null) {
             StaticInitConfig.EXTERNAL_KML_FILE_PATH = path;
             button.setText("地图已选择");
-        } else{
+        } else {
             button.setText("打开地图(KML)");
         }
     }//GEN-LAST:event_jButton1ActionPerformed

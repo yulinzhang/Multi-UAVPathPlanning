@@ -30,8 +30,7 @@ public class Unit {
      */
     protected Triangle uav_center;
 
-    public static int scout_radar_radius = 30; //The scout range of radar
-    public static int attacker_radar_radius = 20;
+
     public static int center_height = 10;
     public static int center_width = 8;
 

@@ -10,7 +10,7 @@ package ui;
  * @author boluo
  */
 public class UserParameterConfigFrame extends javax.swing.JFrame {
-
+    public static UserParameterConfigFrame user_parameter_config_frame;
     /**
      * Creates new form UserParameterConfigFrame
      */
@@ -79,7 +79,8 @@ public class UserParameterConfigFrame extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new UserParameterConfigFrame().setVisible(true);
+                user_parameter_config_frame=new UserParameterConfigFrame();
+                user_parameter_config_frame.setVisible(true);
             }
         });
     }

@@ -16,10 +16,10 @@ public class StaticInitConfig {
 
     public static boolean SIMULATION_ON = true; //enable simulation
 
-    public static Integer ATTACKER_NUM =3; //The number of our attackers
+    public static Integer ATTACKER_NUM =10; //The number of our attackers
     public static Integer SCOUT_NUM = 1; //The number of our attackers
     public static Integer ENEMY_UAV_NUM = 0; //The number of enemy uavs
-    public static Integer THREAT_NUM = 3; //The number of enemy threats
+    public static Integer THREAT_NUM = 20; //The number of enemy threats
 
     public static boolean VIEW_OBSTACLE = false; //Determine whether an obstacle is detected
     public static boolean VIEW_THREAT = false; //Determine whether a threat is detected
@@ -42,8 +42,8 @@ public class StaticInitConfig {
     public static Threat NON_ROLE = null;
 
     //Extend towards the goal with probability
-    public static float rrt_goal_toward_probability = 0.5f;
-    public static int rrt_iteration_times = 8000;
+    public static float rrt_goal_toward_probability = 0.7f;
+    public static int rrt_iteration_times = 3000;
     //Set a safe distance from the target point
     public static int SAFE_DISTANCE_FOR_TARGET=5;
     public static int SAFE_DISTANCE_FOR_CONFLICT=2;
@@ -51,9 +51,12 @@ public class StaticInitConfig {
     public static int rrt_planning_times_for_scout=1;
 
     //how much time it takes to drive the simulaiton to next time step
-    public static int INIT_SIMULATION_DELAY = 100; //milliseconds,this value will be set according to the user's simulation speed
+    public static int INIT_SIMULATION_DELAY = 400; //milliseconds,this value will be set according to the user's simulation speed
     public static Timer SIMULATION_WITH_UI_TIMER; //simulation Timer
-    public static float SPEED_TIMES=10;
+    public static float SPEED_TIMES=1;
+    
+    public static int scout_radar_radius = 50; //The scout range of radar
+    public static int attacker_radar_radius = 20;
 
     public static boolean SHOW_PLANNED_PATH = true;
     public static boolean SHOW_PLANNED_TREE = true;
@@ -81,7 +84,9 @@ public class StaticInitConfig {
     public static int NONE_INFORSHARE=1;
     public static int REGISTER_BASED_INFORSHARE=2;
     
-    public static int SPEED_OF_ATTACKER_ON_TASK=5;
-    public static int SPEED_OF_SCOUT=1;
-    public static int SPEED_OF_ATTACKER_IDLE=2;
+    public static int SPEED_OF_ATTACKER_ON_TASK=8;
+    public static int SPEED_OF_SCOUT=4;
+    public static int SPEED_OF_ATTACKER_IDLE=4;
+    
+    public static boolean UI_PARAMETER_CONFIG=false;
 }
