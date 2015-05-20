@@ -23,8 +23,10 @@ public class Target extends Message implements Serializable {
 
     protected float[] coordinates;
     protected float speed;
-    protected int index;
+    protected int index;//index=-1 means the UAVBase
     protected boolean enabled = true;
+    
+    public static int UAV_BASE_INDEX=-1;
 
     public Target(int index, float[] coordinates) {
         this.index = index;

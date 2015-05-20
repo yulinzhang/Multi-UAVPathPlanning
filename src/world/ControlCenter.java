@@ -185,7 +185,7 @@ public class ControlCenter implements KnowledgeAwareInterface {
         for (int j = 0; j < attacker_num; j++) {
             Attacker current_attacker = this.attackers.get(j);
             if (!assigned_attacker.contains(current_attacker.getIndex()) && current_attacker.getTarget_indicated_by_role() != null) {
-                float[] dummy_threat_coord = World.randomGoalForAvailableUAV(current_attacker.getCenter_coordinates(), obstacles);
+                float[] dummy_threat_coord = World.assignUAVBase(current_attacker.getCenter_coordinates(), obstacles);
                 Threat dummy_threat = new Threat(-1, dummy_threat_coord, 0, 0);
                 current_attacker.setTarget_indicated_by_role(dummy_threat);
                 current_attacker.setNeed_to_replan(true);
@@ -258,7 +258,7 @@ public class ControlCenter implements KnowledgeAwareInterface {
         for (int j = 0; j < attacker_num; j++) {
             Attacker current_attacker = this.attackers.get(j);
             if (!assigned_attacker.contains(current_attacker.getIndex()) && current_attacker.getTarget_indicated_by_role() != null) {
-                float[] dummy_threat_coord = World.randomGoalForAvailableUAV(current_attacker.getCenter_coordinates(), obstacles);
+                float[] dummy_threat_coord = World.assignUAVBase(current_attacker.getCenter_coordinates(), obstacles);
                 Threat dummy_threat = new Threat(-1, dummy_threat_coord, 0, 0);
                 current_attacker.setTarget_indicated_by_role(dummy_threat);
                 current_attacker.setNeed_to_replan(true);
@@ -318,7 +318,7 @@ public class ControlCenter implements KnowledgeAwareInterface {
                 attacker.setSpeed(StaticInitConfig.SPEED_OF_ATTACKER_ON_TASK);
                 attacker.setNeed_to_replan(true);
             } else if (attacker.getTarget_indicated_by_role() != null) {
-                float[] dummy_threat_coord = World.randomGoalForAvailableUAV(attacker.getCenter_coordinates(), obstacles);
+                float[] dummy_threat_coord = World.assignUAVBase(attacker.getCenter_coordinates(), obstacles);
                 Threat dummy_threat = new Threat(-1, dummy_threat_coord, 0, 0);
                 attacker.setTarget_indicated_by_role(dummy_threat);
                 attacker.setNeed_to_replan(true);

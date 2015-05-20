@@ -155,8 +155,8 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
         if (this.need_to_replan && this.target_indicated_by_role != null) {
             this.path_planned_at_last_time_step = this.path_planned_at_current_time_step;
             int planning_times = 0;
-            if (this.target_indicated_by_role.getIndex() == -1) {
-                logger.debug("find path for idle uav");
+            if (this.target_indicated_by_role.getIndex() == Threat.UAV_BASE_INDEX) {
+                logger.debug("find path for retunning uav");
             } else {
                 logger.debug("find path for busy uav");
             }
