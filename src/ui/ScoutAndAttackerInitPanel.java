@@ -68,7 +68,7 @@ public class ScoutAndAttackerInitPanel extends javax.swing.JPanel {
 
         jToolBar1.setRollover(true);
 
-        jLabel1.setText("侦察机数量");
+        jLabel1.setText("Scout Num");
         jToolBar1.add(jLabel1);
 
         jSpinner2.setMaximumSize(new java.awt.Dimension(82, 32767));
@@ -84,7 +84,7 @@ public class ScoutAndAttackerInitPanel extends javax.swing.JPanel {
 
         jToolBar2.setRollover(true);
 
-        jLabel2.setText("歼击机数量");
+        jLabel2.setText("Attacker Num");
         jToolBar2.add(jLabel2);
 
         jSpinner3.setMaximumSize(new java.awt.Dimension(82, 32767));

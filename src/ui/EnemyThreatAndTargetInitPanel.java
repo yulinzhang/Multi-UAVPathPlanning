@@ -53,7 +53,7 @@ public class EnemyThreatAndTargetInitPanel extends javax.swing.JPanel {
 
         jToolBar1.setRollover(true);
 
-        jLabel1.setText("威胁数量");
+        jLabel1.setText("Threat Num");
         jToolBar1.add(jLabel1);
 
         jSpinner1.setMaximumSize(new java.awt.Dimension(82, 32767));
@@ -70,10 +70,10 @@ public class EnemyThreatAndTargetInitPanel extends javax.swing.JPanel {
 
         jToolBar2.setRollover(true);
 
-        jLabel2.setText("信息支撑算法");
+        jLabel2.setText("Algorithm");
         jToolBar2.add(jLabel2);
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "广播", "无信息共享", "智能信息共享" }));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Broadcast", "NoInfoShare", "HeuristicInfoShare" }));
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox1ActionPerformed(evt);

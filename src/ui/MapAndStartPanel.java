@@ -37,7 +37,7 @@ public class MapAndStartPanel extends javax.swing.JPanel {
         jSplitPane1.setDividerLocation(80);
         jSplitPane1.setDividerSize(1);
 
-        jButton3.setText("打开地图");
+        jButton3.setText("Open Map");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
@@ -45,14 +45,14 @@ public class MapAndStartPanel extends javax.swing.JPanel {
         });
         jSplitPane1.setLeftComponent(jButton3);
 
-        jButton1.setText("开始");
+        jButton1.setText("Start");
         jSplitPane1.setRightComponent(jButton1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 160, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

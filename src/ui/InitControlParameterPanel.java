@@ -58,7 +58,7 @@ public class InitControlParameterPanel extends javax.swing.JPanel {
         jSplitPane2.setDividerLocation(175);
         jSplitPane2.setDividerSize(1);
 
-        jButton1.setText("打开地图(KML)");
+        jButton1.setText("Open Map(KML)");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -66,7 +66,7 @@ public class InitControlParameterPanel extends javax.swing.JPanel {
         });
         jSplitPane2.setLeftComponent(jButton1);
 
-        jButton2.setText("开始实验");
+        jButton2.setText("Start");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);

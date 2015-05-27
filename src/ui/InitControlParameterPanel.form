@@ -79,7 +79,7 @@
           <SubComponents>
             <Component class="javax.swing.JButton" name="jButton1">
               <Properties>
-                <Property name="text" type="java.lang.String" value="&#x6253;&#x5f00;&#x5730;&#x56fe;(KML)"/>
+                <Property name="text" type="java.lang.String" value="Open Map(KML)"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
@@ -92,7 +92,7 @@
             </Component>
             <Component class="javax.swing.JButton" name="jButton2">
               <Properties>
-                <Property name="text" type="java.lang.String" value="&#x5f00;&#x59cb;&#x5b9e;&#x9a8c;"/>
+                <Property name="text" type="java.lang.String" value="Start"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton2ActionPerformed"/>

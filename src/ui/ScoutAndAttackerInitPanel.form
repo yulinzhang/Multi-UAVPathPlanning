@@ -61,7 +61,7 @@
           <SubComponents>
             <Component class="javax.swing.JLabel" name="jLabel1">
               <Properties>
-                <Property name="text" type="java.lang.String" value="&#x4fa6;&#x5bdf;&#x673a;&#x6570;&#x91cf;"/>
+                <Property name="text" type="java.lang.String" value="Scout Num"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JSpinner" name="jSpinner2">
@@ -93,7 +93,7 @@
           <SubComponents>
             <Component class="javax.swing.JLabel" name="jLabel2">
               <Properties>
-                <Property name="text" type="java.lang.String" value="&#x6b7c;&#x51fb;&#x673a;&#x6570;&#x91cf;"/>
+                <Property name="text" type="java.lang.String" value="Attacker Num"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JSpinner" name="jSpinner3">
