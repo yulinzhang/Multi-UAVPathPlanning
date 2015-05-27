@@ -25,6 +25,15 @@ public class BoundUtil {
         return withinBound(coordinate[0],coordinate[1],bound_width,bound_height);
     }
     
+    public static boolean withinRelaxedBound(float coord_x,float coord_y,int bound_width, int bound_height)
+    {
+        if(coord_x>bound_width-100||coord_x<100||coord_y>bound_height-100||coord_y<100)
+        {
+            return false;
+        }
+        return true;
+    }
+    
     public static boolean withinBound(float coord_x,float coord_y,int bound_width, int bound_height)
     {
         if(coord_x>bound_width||coord_x<0||coord_y>bound_height||coord_y<0)

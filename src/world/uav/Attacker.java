@@ -7,17 +7,14 @@ package world.uav;
 
 import algorithm.RRT.RRTAlg;
 import algorithm.RRT.RRTTree;
-import algorithm.rrt1.rrtalg.Edge;
-import algorithm.rrt1.rrtalg.MyDomain;
-import algorithm.rrt1.rrtalg.MyDomainDubingsV2;
-import algorithm.rrt1.rrtalg.MyRRTStar;
-import algorithm.rrt1.rrtalg.MyRRTStarDubin;
+import config.NonStaticInitConfig;
 import config.StaticInitConfig;
 import java.util.LinkedList;
 import java.util.ArrayList;
-import java.util.List;
-import org.jgrapht.GraphPath;
+import util.BoundUtil;
+import util.ConflictCheckUtil;
 import util.DistanceUtil;
+import util.VectorUtil;
 import world.Message;
 
 import world.model.shape.Circle;
@@ -50,16 +47,22 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
 
     //variables for conflict planning
     private KnowledgeInterface kb;
-    
-    private int fly_mode=0;
-    private int hovered_time_step=0;
+
+    private int fly_mode = 0;
+    private int hovered_time_step = 0;
+    private float[] goal_for_each_iteration;
+    private int stucked_times=0;//when the flying angle and radar radius are not large enough, the uav could be stucked in front of the obstacle and not able to be moved.
+    private int max_stucked_times=4;
     
     private RRTAlg rrt_alg;
     private RRTTree rrt_tree;
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Attacker.class);
 
-    public static int TRACK_MODE=0;
-    public static int HOVER_MODE=1;
+    public static int FLYING_MODE = 0;
+    public static int TARGET_LOCKED_MODE = 1;
+
+
+
     /**
      *
      * @param index
@@ -110,51 +113,30 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
         this.resetCurrentIndexOfPath();
     }
 
-    public void pathPlanV2() {
-        float[] goal_coord = this.getTarget_indicated_by_role().getCoordinates();
-        Point goal = new Point(goal_coord[0], goal_coord[1], 0);
-        Point initialState = new Point(this.center_coordinates[0], this.center_coordinates[1], this.current_angle);
-        MyDomain my_domain = new MyDomain(this.kb.getObstacles(), initialState, goal, 0.8);
-        MyRRTStar rrt = new MyRRTStar(my_domain, initialState, 500, 0, DistanceUtil.distanceBetween(goal_coord, initialState.toFloatArray()));
-        GraphPath<Point, Edge> rrt_path = rrt.plan(5000);
-        List<Edge> edges = rrt_path.getEdgeList();
-        UAVPath path = new UAVPath();
-        for (Edge edge : edges) {
-            List<Point> waypoints = edge.getWaypoints(10);
-            for (Point point : waypoints) {
-                path.addWaypointToEnd(point);
-            }
-        }
-        this.setPath_prefound(path);
-        this.resetCurrentIndexOfPath();
-    }
-
-    public void pathPlanV3() {
-        float[] goal_coord = this.getTarget_indicated_by_role().getCoordinates();
-        Point goal = new Point(goal_coord[0], goal_coord[1], 0);
-        Point initialState = new Point(this.center_coordinates[0], this.center_coordinates[1], this.current_angle);
-        MyDomainDubingsV2 my_domain = new MyDomainDubingsV2(this.kb.getObstacles(), initialState, goal, 0.4);
-        MyRRTStarDubin rrt = new MyRRTStarDubin(my_domain, initialState, 500, 0, DistanceUtil.distanceBetween(goal_coord, initialState.toFloatArray()));
-        GraphPath<Point, DubinsCurve> rrt_path = rrt.plan(50000);
-        List<DubinsCurve> edges = rrt_path.getEdgeList();
-        UAVPath path = new UAVPath();
-        for (DubinsCurve edge : edges) {
-            Point[] waypoints = edge.getTraj().getPoints();
-            for (Point point : waypoints) {
-                path.addWaypointToEnd(point);
-            }
-        }
-        this.setPath_prefound(path);
-        this.resetCurrentIndexOfPath();
-    }
-
     /**
      * path planning
      */
     public void pathPlan() {
+        //if the attacker need to replan and it has target
         if (this.need_to_replan && this.target_indicated_by_role != null) {
             this.path_planned_at_last_time_step = this.path_planned_at_current_time_step;
             int planning_times = 0;
+            this.goal_for_each_iteration = target_indicated_by_role.getCoordinates();
+            if (this.fly_mode == Attacker.TARGET_LOCKED_MODE && this.target_indicated_by_role.getIndex() != Threat.UAV_BASE_INDEX) {
+                this.goal_for_each_iteration = this.genRandomHoveringGoal(goal_for_each_iteration, NonStaticInitConfig.threat_range_from_obstacles/2, this.getObstacles());
+                this.speed=StaticInitConfig.SPEED_OF_ATTACKER_ON_DESTROYING_THREAT;
+                this.rrt_alg.setMax_angle((float) Math.PI / 3);
+            }else if(this.fly_mode== Attacker.FLYING_MODE && this.target_indicated_by_role.getIndex() == Threat.UAV_BASE_INDEX)
+            {
+                this.speed=StaticInitConfig.SPEED_OF_ATTACKER_IDLE;
+                this.rrt_alg.setMax_angle((float) Math.PI / 6);
+            }else if(this.fly_mode== Attacker.FLYING_MODE && this.target_indicated_by_role.getIndex() != Threat.UAV_BASE_INDEX)
+            {
+                this.speed=StaticInitConfig.SPEED_OF_ATTACKER_ON_TASK;
+                this.rrt_alg.setMax_angle((float) Math.PI / 6);
+            }
+            
+            
             if (this.target_indicated_by_role.getIndex() == Threat.UAV_BASE_INDEX) {
                 logger.debug("find path for retunning uav");
             } else {
@@ -181,8 +163,15 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
             if (shortest_path != null) {
                 Point path_dest = shortest_path.getLastWaypoint();
                 if (path_dest.getX() == this.center_coordinates[0] && path_dest.getY() == this.center_coordinates[1]) {
-                    this.setVisible(false);
+                    stucked_times++;
+                    if(this.stucked_times>this.max_stucked_times)
+                    {
+                        this.setVisible(false);
+                    }
+                    this.setNeed_to_replan(true);
                     logger.debug("not able to plan path for this uav " + this.getIndex());
+                }else{
+                    stucked_times=0;
                 }
                 this.path_planned_at_current_time_step = shortest_path;
             } else {
@@ -203,7 +192,7 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
     private void runRRT() {
         rrt_alg.setMax_delta_distance(this.speed);
         rrt_alg.setObstacles(this.getObstacles());
-        rrt_alg.setGoal_coordinate(target_indicated_by_role.getCoordinates());
+        rrt_alg.setGoal_coordinate(goal_for_each_iteration);
         rrt_alg.setInit_coordinate(center_coordinates);
         rrt_tree = rrt_alg.buildRRT(center_coordinates, current_angle);
         this.setPath_prefound(rrt_tree.getPath_found());
@@ -211,7 +200,7 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
     }
 
     public void resetCurrentIndexOfPath() {
-        this.current_index_of_planned_path = -1;
+        this.current_index_of_planned_path = 0;
     }
 
     /**
@@ -224,7 +213,7 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
             current_index_of_planned_path++;
             if (path_planned_at_current_time_step.getWaypointNum() == 0 || current_index_of_planned_path >= path_planned_at_current_time_step.getWaypointNum()) {
                 this.moved_at_last_time = false;
-                this.need_to_replan = true;
+                this.setNeed_to_replan(true);
                 return false;
             }
             Point current_waypoint = this.path_planned_at_current_time_step.getWaypoint(current_index_of_planned_path);
@@ -233,10 +222,15 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
             moveTo(coordinate[0], coordinate[1]);
             this.current_angle = (float) current_waypoint.getYaw();
             this.moved_at_last_time = true;
-            this.need_to_replan = false;
+            this.setNeed_to_replan(false);
+            if(path_planned_at_current_time_step.getWaypointNum() == 0 || current_index_of_planned_path == path_planned_at_current_time_step.getWaypointNum())
+            {
+                this.setNeed_to_replan(true);
+            }
             return this.moved_at_last_time;
         } else {
             this.moved_at_last_time = false;
+            this.setNeed_to_replan(true);
             return moved_at_last_time;
         }
     }
@@ -323,6 +317,10 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
      */
     public void setNeed_to_replan(boolean need_to_replan) {
         this.need_to_replan = need_to_replan;
+    }
+
+    public void increaseHovered_time_step() {
+        this.hovered_time_step++;
     }
 
     public boolean isReplanned_at_current_time_step() {
@@ -419,6 +417,52 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
         this.kb.addThreat(threat);
     }
 
+    private float[] genRandomHoveringGoalV1(float[] threat_location, float hover_radius, ArrayList<Obstacle> obstacles) {
+        float[] random_goal_coordinate = new float[2];
+        double random_theta = Math.random() * Math.PI * 2;
+        random_goal_coordinate[0] = threat_location[0] + (float) Math.cos(random_theta) * hover_radius;
+        random_goal_coordinate[1] = threat_location[1] + (float) Math.sin(random_theta) * hover_radius;
+        boolean collisioned = true;
+        boolean withinBound = BoundUtil.withinBound(random_goal_coordinate[0], random_goal_coordinate[1], World.bound_width, World.bound_height);
+        while (collisioned || !withinBound) {
+            random_goal_coordinate[0] = threat_location[0] + (float) Math.cos(random_theta) * hover_radius;
+            random_goal_coordinate[1] = threat_location[1] + (float) Math.sin(random_theta) * hover_radius;
+            if (!ConflictCheckUtil.checkPointInObstacles(obstacles, random_goal_coordinate[0], random_goal_coordinate[1])) {
+                collisioned = false;
+            } else {
+                random_theta = Math.random() * Math.PI * 2;
+            }
+            withinBound = BoundUtil.withinBound(random_goal_coordinate[0], random_goal_coordinate[1], World.bound_width, World.bound_height);
+            logger.debug("find hovering goal for attackers");
+        }
+        return random_goal_coordinate;
+    }
+
+    private float[] genRandomHoveringGoal(float[] threat_location, float hover_radius, ArrayList<Obstacle> obstacles) {
+        double random_center_angle = VectorUtil.getAngleOfVectorRelativeToXCoordinate(threat_location[0]-this.center_coordinates[0], threat_location[1]-this.center_coordinates[1]);
+        float[] random_goal_coordinate = new float[2];
+
+        boolean collisioned = true;
+        boolean withinBound = false;
+        while (collisioned || !withinBound) {
+            random_goal_coordinate[0] = threat_location[0] + (float) Math.cos(random_center_angle) * hover_radius;
+            random_goal_coordinate[1] = threat_location[1] + (float) Math.sin(random_center_angle) * hover_radius;
+            withinBound = BoundUtil.withinBound(random_goal_coordinate[0], random_goal_coordinate[1], World.bound_width, World.bound_height);
+            collisioned=ConflictCheckUtil.checkPointInObstacles(obstacles, random_goal_coordinate[0], random_goal_coordinate[1]);
+            int total_segment_num=4;
+            for(int i=1;i<=total_segment_num;i++)
+            {
+                float[] temp_goal_coord=new float[2];
+                temp_goal_coord[0]=threat_location[0] + (float) Math.cos(random_center_angle) * hover_radius*i/(total_segment_num+1);
+                temp_goal_coord[1]=threat_location[1] + (float) Math.sin(random_center_angle) * hover_radius*i/(total_segment_num+1);
+                collisioned=collisioned && ConflictCheckUtil.checkPointInObstacles(obstacles, random_goal_coordinate[0], random_goal_coordinate[1]);
+            }
+            random_center_angle+=Math.PI/36;
+            logger.debug("find hovering goal for attackers");
+        }
+        return random_goal_coordinate;
+    }
+
     public KnowledgeInterface getKb() {
         return kb;
     }
@@ -433,6 +477,22 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
 
     public void setSpeed(int speed) {
         this.speed = speed;
+    }
+
+    public int getFly_mode() {
+        return fly_mode;
+    }
+
+    public void setFly_mode(int fly_mode) {
+        this.fly_mode = fly_mode;
+    }
+
+    public int getHovered_time_step() {
+        return hovered_time_step;
+    }
+
+    public void setHovered_time_step(int hovered_time_step) {
+        this.hovered_time_step = hovered_time_step;
     }
 
     public UAVPath getHistory_path() {

@@ -47,7 +47,7 @@ public class RRTAlg implements Serializable {
      *
      */
     protected int k_step = 20;
-    protected float max_delta_distance = 5;
+    protected float max_delta_distance = 3;
     protected float max_angle = (float) Math.PI / 6;
     /**
      * less than goal_range_for_delta means goal reached
@@ -93,6 +93,15 @@ public class RRTAlg implements Serializable {
         RRTNode start_node = new RRTNode(init_coordinate[0], init_coordinate[1]);
         start_node.setCurrent_angle(current_angle);
         G.addNode(start_node, null);
+        
+        if (DistanceUtil.distanceBetween(init_coordinate, goal_coordinate) < this.max_delta_distance) {
+            Point goal_point = new Point(goal_coordinate[0], goal_coordinate[1], 0);
+            G.generatePath();
+            G.getPath_found().addWaypointToEnd(goal_point);
+            logger.debug("already near threat");
+            return G;
+        }
+        
         float probability = goal_probability;
 //        if(idle_uav)
 //        {
@@ -105,12 +114,16 @@ public class RRTAlg implements Serializable {
         RRTNode nearest_node = null;
         RRTNode new_node = null;
 
+
         int time_step = 0;
-        for (time_step = 0; time_step <= k_step;time_step++) {
+        for (time_step = 0; time_step <= k_step; time_step++) {
             //random choose a direction or goal
             random_goal = randGoal(this.goal_coordinate, probability, bound_width, bound_height, obstacles);
             //choose the nearest node to extend
             nearest_node = nearestVertex(random_goal, G);
+            if (nearest_node == null) {
+                continue;
+            }
             //extend the child node and validate its confliction 
             new_node = extendTowardGoalWithDynamics(nearest_node, random_goal, this.max_delta_distance, max_angle);
             new_node.setExpected_time_step(nearest_node.getExpected_time_step() + 1);
@@ -140,7 +153,7 @@ public class RRTAlg implements Serializable {
                 }
 //                time_step++;
             }
-            
+
 //            num_of_trap++;
 //            if (idle_uav && num_of_trap > 2 * k_step) {
 //                new_node = nearest_node;
@@ -151,72 +164,6 @@ public class RRTAlg implements Serializable {
         G.generatePath();
 //        G.setPath_found(null);
         return G;
-    }
-
-   
-
-    @Deprecated
-    public RRTTree buildRRTStar1(float[] init_coordinate, float current_angle) {
-        this.setInit_coordinate(init_coordinate);
-        RRTTree G = new RRTTree();
-        RRTNode start_node = new RRTNode(init_coordinate[0], init_coordinate[1]);
-        start_node.setCurrent_angle(current_angle);
-        G.addNode(start_node, null);
-
-        float[] random_goal;
-        RRTNode nearest_node;
-        RRTNode new_node = null;
-        double radius = 9999;
-
-        for (int time_step = 1; time_step <= k_step;) {
-            //random choose a direction or goal
-            random_goal = randGoal(this.goal_coordinate, goal_probability, bound_width, bound_height, obstacles);
-            //choose the nearest node to extend
-            nearest_node = nearestVertex(random_goal, G);
-            //extend the child node and validate its confliction
-            new_node = extendTowardGoalWithDynamics(nearest_node, random_goal, this.max_delta_distance, max_angle);
-
-            boolean conflicted = ConflictCheckUtil.checkNodeInObstacles(obstacles, new_node);
-//            boolean within_bound = BoundUtil.withinBound(new_node, bound_width, bound_height);
-            //if not conflicted,add the child to the tree
-            if (!conflicted && true) {
-                //
-                if (distanceBetween(new_node.getCoordinate(), goal_coordinate) < goal_range_for_delta) {
-                    G.addNode(new_node, nearest_node);
-//                    G.generatePath(new_node);
-                    G.generatePath();
-                    return G;
-                }
-                int max_num = 200;//(int) (2 * Math.E * Math.log(G.getNodeCount()));
-                ArrayList<RRTNode> nearestNodesToNewNodeSet = neareSortedNodesToNode(G, new_node.getCoordinate(), radius);
-                if (nearestNodesToNewNodeSet.size() > max_num) {
-                    radius = DistanceUtil.distanceBetween(new_node.getCoordinate(), nearestNodesToNewNodeSet.get(max_num).getCoordinate());
-                }
-                G.addNode(new_node, nearest_node);
-                for (RRTNode near_node : nearestNodesToNewNodeSet) {
-                    rewireRRTStar(G, near_node, new_node);
-                }
-                for (RRTNode near_node : nearestNodesToNewNodeSet) {
-                    rewireRRTStar(G, new_node, near_node);
-                }
-                time_step++;
-            }
-        }
-//        G.generatePath(new_node);
-        G.generatePath();
-        return G;
-    }
-
-    protected void rewireRRTStar(RRTTree G, RRTNode potential_parent, RRTNode new_node) {
-        float[] new_node_coordinate = new_node.getCoordinate();
-        float[] potential_parent_coordinate = potential_parent.getCoordinate();
-        if (!ConflictCheckUtil.checkLineInObstacles(obstacles, potential_parent_coordinate, new_node_coordinate)) {
-            float min_path_length = new_node.getPath_lenght_from_root();
-            float distance_between_two_nodes = DistanceUtil.distanceBetween(potential_parent_coordinate, new_node_coordinate);
-            if (potential_parent.getPath_lenght_from_root() + distance_between_two_nodes < min_path_length) {
-                G.changeParent(new_node, potential_parent);
-            }
-        }
     }
 
     /**
@@ -312,7 +259,6 @@ public class RRTAlg implements Serializable {
         float[] nearest_coordinate = nearest_node.getCoordinate();
         double toward_goal_angle = VectorUtil.getAngleOfTwoVector(random_goal_coordinate, nearest_coordinate);
 
-
         float[] new_node_coord = new float[2];
 
         new_node_coord[0] = nearest_coordinate[0] + (float) Math.cos(toward_goal_angle) * max_length;
@@ -342,7 +288,7 @@ public class RRTAlg implements Serializable {
         double toward_goal_angle = VectorUtil.getAngleOfVectorRelativeToXCoordinate(random_goal_coordinate[0] - nearest_coordinate[0], random_goal_coordinate[1] - nearest_coordinate[1]);
         double delta_angle = VectorUtil.getBetweenAngle(toward_goal_angle, current_angle);
         float[] new_node_coord = new float[2];
-        float len=max_length;
+        float len = max_length;
         if (delta_angle > max_angle) {
             double temp_goal_angle1 = VectorUtil.getNormalAngle(current_angle - max_angle);
             double delta_angle_1 = VectorUtil.getBetweenAngle(toward_goal_angle, temp_goal_angle1);
@@ -355,7 +301,7 @@ public class RRTAlg implements Serializable {
             } else {
                 toward_goal_angle = temp_goal_angle2;
             }
-            len=Math.min(len, DistanceUtil.distanceBetween(nearest_coordinate, random_goal_coordinate));
+            len = Math.min(len, DistanceUtil.distanceBetween(nearest_coordinate, random_goal_coordinate));
         }
         new_node_coord[0] = nearest_coordinate[0] + (float) (Math.cos(toward_goal_angle) * max_length);
         new_node_coord[1] = nearest_coordinate[1] + (float) (Math.sin(toward_goal_angle) * max_length);
@@ -390,6 +336,14 @@ public class RRTAlg implements Serializable {
 
     public void setObstacles(ArrayList<Obstacle> obstacles) {
         this.obstacles = obstacles;
+    }
+
+    public float getMax_angle() {
+        return max_angle;
+    }
+
+    public void setMax_angle(float max_angle) {
+        this.max_angle = max_angle;
     }
 
 }

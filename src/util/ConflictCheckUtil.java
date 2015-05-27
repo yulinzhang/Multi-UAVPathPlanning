@@ -6,15 +6,14 @@
 package util;
 
 import algorithm.RRT.RRTNode;
-import config.StaticInitConfig;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import ui.AnimationPanel;
 import world.model.Conflict;
 import world.model.Obstacle;
+import world.model.Threat;
 import world.model.shape.Point;
 import world.model.shape.Trajectory;
-import world.uav.UAVPath;
 
 /**
  *
@@ -43,7 +42,7 @@ public class ConflictCheckUtil {
                     logger.debug("error index"+obstacle.getIndex());
                     logger.error(e);
                 }
-                //increase a little bit bound to keep a visible safe distance from obstacle and make it looks less dangerous.
+                //increase a little bit obs_mbr to keep a visible safe distance from obstacle and make it looks less dangerous.
                 bound.setBounds(bound.x - 2, bound.y - 2, bound.width + 4, bound.height + 4);
                
                 if (bound.contains(coordinate_x, coordinate_y)) {
@@ -54,6 +53,35 @@ public class ConflictCheckUtil {
         return false;
     }
 
+    /**if conflicted then return true, otherwise return false;
+     * 
+     * @param obstacles
+     * @param threat
+     * @return
+     */
+    public static boolean checkThreatInObstacles(ArrayList<Obstacle> obstacles, Rectangle threat_mbr) {
+        if (obstacles != null) {
+            for (Obstacle obstacle : obstacles) {
+                
+                Rectangle obs_mbr=null;
+                try{
+                 obs_mbr= obstacle.getShape().getBounds();
+                }catch(Exception e)
+                {
+                    logger.debug("error index"+obstacle.getIndex());
+                    logger.error(e);
+                }
+                //increase a little bit obs_mbr to keep a visible safe distance from obstacle and make it looks less dangerous.
+                obs_mbr.setBounds(obs_mbr.x - 2, obs_mbr.y - 2, obs_mbr.width + 4, obs_mbr.height + 4);
+               
+                if (obs_mbr.intersects(threat_mbr)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
     /** returns true if conflicted
      * 
      * @param uav_future_path

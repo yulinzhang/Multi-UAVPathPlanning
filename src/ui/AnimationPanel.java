@@ -81,6 +81,7 @@ public class AnimationPanel extends JPanel implements MouseListener {
     private MyGraphic virtualizer;
 
     private static ArrayList<Attacker> attackers;
+    private ArrayList<Threat> threats_from_god_view;
     private ArrayList<Scout> scouts;
     private UAVBase uav_base;
     private ControlCenter control_center;
@@ -155,10 +156,14 @@ public class AnimationPanel extends JPanel implements MouseListener {
             this.scouts = world.getScouts();
             this.attackers = world.getAttackers();
             this.control_center = world.getControl_center();
+            this.uav_base = world.getUav_base();
+            this.threats_from_god_view = world.getThreatsForUIRendering();
 
             //initiate obstacles in level 2
             this.initObstaclesInObstacleImageInLevel2(world.getObstaclesForUIRendering());
 //            this.updateTargetInUAVImageLevel(world.getThreatsForUIRendering());
+
+            this.initFogOfWarImage();
 
             //initiate parameters according to world
             this.initParameterFromInitConfig(world);
@@ -174,7 +179,7 @@ public class AnimationPanel extends JPanel implements MouseListener {
 
     public void start() {
         //drive the world and ui
-        StaticInitConfig.SIMULATION_WITH_UI_TIMER = new javax.swing.Timer((int) (StaticInitConfig.INIT_SIMULATION_DELAY / StaticInitConfig.SPEED_TIMES), new animatorListener(this));
+        StaticInitConfig.SIMULATION_WITH_UI_TIMER = new javax.swing.Timer((int) (StaticInitConfig.INIT_SIMULATION_DELAY / StaticInitConfig.SIMULATION_SPEED), new animatorListener(this));
         StaticInitConfig.SIMULATION_WITH_UI_TIMER.start();
 //        this.runTask();
     }
@@ -186,7 +191,7 @@ public class AnimationPanel extends JPanel implements MouseListener {
                 while (true) {
                     world.updateAll();
                     try {
-                        Thread.sleep((int) (StaticInitConfig.INIT_SIMULATION_DELAY / StaticInitConfig.SPEED_TIMES));
+                        Thread.sleep((int) (StaticInitConfig.INIT_SIMULATION_DELAY / StaticInitConfig.SIMULATION_SPEED));
                     } catch (InterruptedException ex) {
                         Logger.getLogger(AnimationPanel.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -287,9 +292,14 @@ public class AnimationPanel extends JPanel implements MouseListener {
                 continue;
             }
             if (threat.getIndex() == AnimationPanel.highlight_threat_index) {
-                virtualizer.drawTarget(threat_image_graphics, threat, GraphicConfig.threat_color, GraphicConfig.highlight_threat_color);
+                virtualizer.drawThreat(threat_image_graphics, threat, GraphicConfig.threat_color, GraphicConfig.highlight_threat_color);
+            } else {
+                virtualizer.drawThreat(threat_image_graphics, threat, GraphicConfig.threat_color, null);
             }
-            virtualizer.drawTarget(threat_image_graphics, threat, GraphicConfig.threat_color, null);
+            int threat_index=threat.getIndex();
+            if (this.threats_from_god_view.get(threat_index).getMode() == Threat.LOCKED_MODE) {
+                virtualizer.drawCombatSymbol(threat_image_graphics, threat.getCoordinates(), Threat.threat_width * 3 / 2, Color.red);
+            }
         }
     }
 
@@ -341,15 +351,19 @@ public class AnimationPanel extends JPanel implements MouseListener {
 
     private void updateUAVImageInLevel4() {
         for (Scout scout : this.scouts) {
-            virtualizer.drawUAVInUAVImage(uav_image_graphics, scout, null);
+            virtualizer.drawUAVInUAVImage(uav_image_graphics, this.uav_base, scout, null);
         }
         for (Attacker attacker : this.attackers) {
             if (attacker.getIndex() == this.highlight_uav_index) {
-                virtualizer.drawUAVInUAVImage(uav_image_graphics, attacker, GraphicConfig.highlight_uav_color);
+                virtualizer.drawUAVInUAVImage(uav_image_graphics, this.uav_base, attacker, GraphicConfig.highlight_uav_color);
             }
-            virtualizer.drawUAVInUAVImage(uav_image_graphics, attacker, null);
+            virtualizer.drawUAVInUAVImage(uav_image_graphics, this.uav_base, attacker, null);
 
         }
+    }
+
+    private void initFogOfWarImage() {
+        virtualizer.drawUAVBaseInFogOfWar(fog_of_war_graphics, this.uav_base);
     }
 
     private void updateFogOfWarImageInLevel3() {

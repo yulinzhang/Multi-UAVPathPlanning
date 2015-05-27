@@ -5,21 +5,17 @@
  */
 package world.model;
 
-import algorithm.RRT.RRTAlg;
-import algorithm.RRT.RRTTree;
 import config.StaticInitConfig;
+import java.awt.Rectangle;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import util.ConflictCheckUtil;
 import world.Message;
-import world.World;
 import world.model.shape.Point;
 import world.uav.UAVPath;
 
@@ -36,25 +32,20 @@ public class Threat extends Target implements Serializable {
     private float current_angle = 0;
     private float[] goal;
     private int current_index_of_planned_path = 0;
+    private Rectangle threat_mbr;
     
-
+    public static int threat_width = 20;
+    public static int threat_height = 20;
+    
     public Threat(int index, float[] coordinates, int target_type, float speed) {
         super(index, coordinates);
         this.target_type = target_type;
         this.msg_type = Message.THREAT_MSG;
         this.speed = speed;
         this.path_planned_at_current_time_step = new UAVPath();
+        threat_mbr=new Rectangle((int) coordinates[0] - Threat.threat_width / 2, (int) coordinates[1] - Threat.threat_height / 2, Threat.threat_width, Threat.threat_height);
 //        rrt_alg = new RRTAlg(coordinates, null, StaticInitConfig.rrt_goal_toward_probability, World.bound_width, World.bound_height, StaticInitConfig.rrt_iteration_times, speed, null, null, -1);
     }
-
-
-//    private void runRRT() {
-//        rrt_alg.setGoal_coordinate(goal);
-//        rrt_alg.setInit_coordinate(coordinates);
-//        rrt_tree = rrt_alg.buildRRT(coordinates, current_angle);
-//        this.setPath_planned_at_current_time_step(rrt_tree.getPath_found());
-//        this.resetCurrentIndexOfPath();
-//    }
 
     public void resetCurrentIndexOfPath() {
         this.current_index_of_planned_path = -1;
@@ -83,6 +74,7 @@ public class Threat extends Target implements Serializable {
     public void moveTo(float center_coordinate_x, float center_coordinate_y) {
         float[] coordinate = new float[]{center_coordinate_x, center_coordinate_y};
         this.setCoordinates(coordinate);
+        this.threat_mbr=new Rectangle((int) coordinates[0] - Threat.threat_width / 2, (int) coordinates[1] - Threat.threat_height / 2, Threat.threat_width, Threat.threat_height);
     }
 
     @Override
@@ -134,6 +126,10 @@ public class Threat extends Target implements Serializable {
         return path_planned_at_current_time_step;
     }
 
+    public Rectangle getThreat_mbr() {
+        return threat_mbr;
+    }
+
     public void setPath_planned_at_current_time_step(UAVPath path_planned_at_current_time_step) {
         this.path_planned_at_current_time_step = path_planned_at_current_time_step;
         this.resetCurrentIndexOfPath();
@@ -165,4 +161,5 @@ public class Threat extends Target implements Serializable {
         }
         return null;
     }
+    
 }

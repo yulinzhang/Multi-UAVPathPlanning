@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
-import java.util.Vector;
 import util.DistanceUtil;
 import world.model.Conflict;
 import world.model.KnowledgeAwareInterface;
@@ -21,7 +21,6 @@ import world.model.Threat;
 import world.model.shape.Point;
 import world.uav.Attacker;
 import world.uav.Scout;
-import world.uav.Unit;
 
 /**
  *
@@ -40,11 +39,14 @@ public class ControlCenter implements KnowledgeAwareInterface {
     private boolean scout_scanned_over = false;
     private int sub_team_size = 2;
 
+    public Map<Integer, Set<Integer>> locked_threat;
+
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ControlCenter.class);
 
     public ControlCenter(KnowledgeInterface kb) {
         this.kb = kb;
         way_point_for_uav = new HashMap<Integer, LinkedList<Point>>();
+        locked_threat = new HashMap<Integer, Set<Integer>>();
     }
 
     public void roleAssignForScouts() {
@@ -107,22 +109,34 @@ public class ControlCenter implements KnowledgeAwareInterface {
      * @param assigned_attacker_index
      * @param assigned_role_index
      */
-    public void roleAssignForAttackerV3(int assigned_attacker_index, int assigned_role_index) {
+    public void roleAssignForAttackerWithSubTeam(int assigned_attacker_index, int assigned_role_index) {
         TreeSet<Integer> assigned_attacker = new TreeSet<Integer>();
         ArrayList<Threat> threats = kb.getThreats();
         int threat_num = threats.size();
         int attacker_num = attackers.size();
-        ArrayList<Obstacle> obstacles = this.getObstacles();
 
         for (int i = 0; i < threat_num; i++) {
             Threat threat = threats.get(i);
             if (!threat.isEnabled()) {
                 continue;
             }
+            Set<Integer> attackers_locked=this.locked_threat.get(threat.getIndex());
+            if(attackers_locked==null)
+            {
+                attackers_locked=new TreeSet<Integer>();
+            }
+            assigned_attacker.addAll(attackers_locked);
+            //mannaually assign
             if (threat.getIndex() == assigned_role_index) {
                 for (int j = 0; j < attacker_num; j++) {
                     Attacker attacker = this.attackers.get(j);
+                    if (!attacker.isVisible()) {
+                        continue;
+                    }
                     if (assigned_attacker_index == attacker.getIndex()) {
+                        if (attacker.getTarget_indicated_by_role() == null || attacker.getTarget_indicated_by_role().getIndex() != threat.getIndex()) {
+                            attacker.setFly_mode(Attacker.FLYING_MODE);
+                        }
                         attacker.setTarget_indicated_by_role(threat);
                         attacker.setSpeed(StaticInitConfig.SPEED_OF_ATTACKER_ON_TASK);
                         attacker.setNeed_to_replan(true);
@@ -132,6 +146,8 @@ public class ControlCenter implements KnowledgeAwareInterface {
                 }
                 continue;
             }
+            
+            int remained_team_size=this.sub_team_size-attackers_locked.size();
             ArrayList<Attacker> attacker_arr_to_assign = new ArrayList<Attacker>();
             ArrayList<Float> attacker_dist_to_assign = new ArrayList<Float>();
             for (int j = 0; j < attacker_num; j++) {
@@ -143,6 +159,9 @@ public class ControlCenter implements KnowledgeAwareInterface {
                     continue;
                 }
                 if (!current_attacker.isVisible()) {
+                    continue;
+                }
+                if (attackers_locked.contains(j)) {
                     continue;
                 }
                 if (assigned_attacker.contains(current_attacker.getIndex())) {
@@ -163,169 +182,86 @@ public class ControlCenter implements KnowledgeAwareInterface {
                     attacker_dist_to_assign.add(index_to_insert, dist_between_uav_and_role);
                     attacker_arr_to_assign.add(index_to_insert, current_attacker);
 
-                    if (attacker_dist_to_assign.size() > this.sub_team_size) {
-                        attacker_dist_to_assign.remove(this.sub_team_size);
-                        attacker_arr_to_assign.remove(this.sub_team_size);
+                    if (attacker_dist_to_assign.size() > remained_team_size) {
+                        attacker_dist_to_assign.remove(remained_team_size);
+                        attacker_arr_to_assign.remove(remained_team_size);
                     }
-                } else if (attacker_dist_to_assign.size() < this.sub_team_size) {
+                } else if (attacker_dist_to_assign.size() < remained_team_size) {
                     attacker_dist_to_assign.add(dist_between_uav_and_role);
                     attacker_arr_to_assign.add(current_attacker);
                 }
             }
-            if (attacker_arr_to_assign.size() >= this.sub_team_size) {
+            
+            if (attacker_arr_to_assign.size() >= remained_team_size) {
                 for (Attacker attacker : attacker_arr_to_assign) {
+                    if (attacker.getFly_mode() == Attacker.TARGET_LOCKED_MODE) {
+                        continue;
+                    }
                     assigned_attacker.add(attacker.getIndex());
                     attacker.setTarget_indicated_by_role(threat);
+
                     attacker.setSpeed(StaticInitConfig.SPEED_OF_ATTACKER_ON_TASK);
                     attacker.setNeed_to_replan(true);
+                    attacker.setFly_mode(Attacker.FLYING_MODE);
                 }
             }
         }
 
         for (int j = 0; j < attacker_num; j++) {
             Attacker current_attacker = this.attackers.get(j);
-            if (!assigned_attacker.contains(current_attacker.getIndex()) && current_attacker.getTarget_indicated_by_role() != null) {
-                float[] dummy_threat_coord = World.assignUAVBase(current_attacker.getCenter_coordinates(), obstacles);
+            if(current_attacker.getFly_mode()==Attacker.TARGET_LOCKED_MODE)
+            {
+                continue;
+            }
+            if (!assigned_attacker.contains(current_attacker.getIndex()) && current_attacker.getTarget_indicated_by_role() != null && current_attacker.getTarget_indicated_by_role().getIndex() != -1) {
+                float[] dummy_threat_coord = World.assignUAVBase(current_attacker.getIndex());
                 Threat dummy_threat = new Threat(-1, dummy_threat_coord, 0, 0);
                 current_attacker.setTarget_indicated_by_role(dummy_threat);
                 current_attacker.setNeed_to_replan(true);
                 current_attacker.setSpeed(StaticInitConfig.SPEED_OF_ATTACKER_IDLE);
+                current_attacker.setFly_mode(Attacker.FLYING_MODE);
             }
         }
         need_to_assign_role = false;
     }
 
-    /**
-     * assign role for uavs. Special case: attacker i should be assigned with
-     * role j. Other role should be assigned to the nearest uav
-     *
-     *
-     * @param assigned_attacker_index
-     * @param assigned_role_index
-     */
-    public void roleAssignForAttackerV2(int assigned_attacker_index, int assigned_role_index) {
-        TreeSet<Integer> assigned_attacker = new TreeSet<Integer>();
-        ArrayList<Threat> threats = kb.getThreats();
-        int threat_num = threats.size();
-        int attacker_num = attackers.size();
-        ArrayList<Obstacle> obstacles = this.getObstacles();
-
-        for (int i = 0; i < threat_num; i++) {
-            Threat threat = threats.get(i);
-            if (!threat.isEnabled()) {
-                continue;
-            }
-            if (threat.getIndex() == assigned_role_index) {
-                for (int j = 0; j < attacker_num; j++) {
-                    Attacker attacker = this.attackers.get(j);
-                    if (assigned_attacker_index == attacker.getIndex()) {
-                        attacker.setTarget_indicated_by_role(threat);
-                        attacker.setSpeed(StaticInitConfig.SPEED_OF_ATTACKER_ON_TASK);
-                        attacker.setNeed_to_replan(true);
-                        assigned_attacker.add(assigned_attacker_index);
-                        break;
-                    }
-                }
-                continue;
-            }
-            float min_dist = Float.MAX_VALUE;
-            int attacker_index_to_assign = -1;
-            Attacker attacker_to_assign = null;
-            for (int j = 0; j < attacker_num; j++) {
-                Attacker current_attacker = this.attackers.get(j);
-                if (!current_attacker.isVisible()) {
-                    continue;
-                }
-                if (assigned_attacker.contains(current_attacker.getIndex())) {
-                    continue;
-                }
-
-                float dist_between_uav_and_role = DistanceUtil.distanceBetween(current_attacker.getCenter_coordinates(), threat.getCoordinates());
-                if (dist_between_uav_and_role < min_dist) {
-                    min_dist = dist_between_uav_and_role;
-                    attacker_index_to_assign = current_attacker.getIndex();
-                    attacker_to_assign = current_attacker;
-                }
-            }
-            if (attacker_index_to_assign != -1) {
-                assigned_attacker.add(attacker_index_to_assign);
-                attacker_to_assign.setTarget_indicated_by_role(threat);
-                attacker_to_assign.setSpeed(StaticInitConfig.SPEED_OF_ATTACKER_ON_TASK);
-                attacker_to_assign.setNeed_to_replan(true);
-            }
+    public void lockAttackerToThreat(Integer attacker_index, Integer threat_index) {
+        Set<Integer> attackers_locked = this.locked_threat.get(threat_index);
+        if (attackers_locked == null) {
+            attackers_locked = new TreeSet<Integer>();
         }
-
-        for (int j = 0; j < attacker_num; j++) {
-            Attacker current_attacker = this.attackers.get(j);
-            if (!assigned_attacker.contains(current_attacker.getIndex()) && current_attacker.getTarget_indicated_by_role() != null) {
-                float[] dummy_threat_coord = World.assignUAVBase(current_attacker.getCenter_coordinates(), obstacles);
-                Threat dummy_threat = new Threat(-1, dummy_threat_coord, 0, 0);
-                current_attacker.setTarget_indicated_by_role(dummy_threat);
-                current_attacker.setNeed_to_replan(true);
-                current_attacker.setSpeed(StaticInitConfig.SPEED_OF_ATTACKER_IDLE);
-            }
-        }
-        need_to_assign_role = false;
+        attackers_locked.add(attacker_index);
+        this.locked_threat.put(threat_index, attackers_locked);
     }
 
-    /**
-     * assign role for uavs. Special case: attacker i should be assigned with
-     * role j. Other role should be assigned to the nearest uav
-     *
-     * @param assigned_attacker_index
-     * @param assigned_role_index
-     */
-    public void roleAssignForAttacker(int assigned_attacker_index, int assigned_role_index) {
-        TreeSet<Integer> assigned_threats = new TreeSet<Integer>();
-        ArrayList<Threat> threats = kb.getThreats();
-        int threat_num = threats.size();
-        int attacker_num = attackers.size();
-        ArrayList<Obstacle> obstacles = this.getObstacles();
-
-        for (int i = 0; i < attacker_num; i++) {
-            Attacker attacker = this.attackers.get(i);
-            if (!attacker.isVisible()) {
-                continue;
-            }
-            float min_dist = Float.MAX_VALUE;
-            int threat_index_to_assign = -1;
-            Threat threat_to_assign = null;
-            for (int j = 0; j < threat_num; j++) {
-                Threat threat = threats.get(j);
-                if (!threat.isEnabled() || assigned_threats.contains(threat.getIndex())) {
-                    continue;
-                }
-
-                if (attacker.getIndex() == assigned_attacker_index && threat.getIndex() == assigned_role_index) {
-                    attacker.setTarget_indicated_by_role(threat);
-                    attacker.setSpeed(StaticInitConfig.SPEED_OF_ATTACKER_ON_TASK);
-                    attacker.setNeed_to_replan(true);
-                    assigned_threats.add(assigned_attacker_index);
-                    break;
-                }
-
-                float dist_between_uav_and_role = DistanceUtil.distanceBetween(attacker.getCenter_coordinates(), threat.getCoordinates());
-                if (dist_between_uav_and_role < min_dist) {
-                    min_dist = dist_between_uav_and_role;
-                    threat_index_to_assign = threat.getIndex();
-                    threat_to_assign = threat;
-                }
-            }
-
-            if (threat_index_to_assign != -1) {
-                assigned_threats.add(threat_index_to_assign);
-                attacker.setTarget_indicated_by_role(threat_to_assign);
-                attacker.setSpeed(StaticInitConfig.SPEED_OF_ATTACKER_ON_TASK);
-                attacker.setNeed_to_replan(true);
-            } else if (attacker.getTarget_indicated_by_role() != null) {
-                float[] dummy_threat_coord = World.assignUAVBase(attacker.getCenter_coordinates(), obstacles);
-                Threat dummy_threat = new Threat(-1, dummy_threat_coord, 0, 0);
-                attacker.setTarget_indicated_by_role(dummy_threat);
-                attacker.setNeed_to_replan(true);
-                attacker.setSpeed(StaticInitConfig.SPEED_OF_ATTACKER_IDLE);
-            }
+    public void unlockAttacerFromThreat(Integer attacker_index, Integer threat_index) {
+        Set<Integer> attackers_locked = this.locked_threat.get(threat_index);
+        if (attackers_locked != null) {
+            attackers_locked.remove(attacker_index);
         }
-        need_to_assign_role = false;
+        if (attackers_locked == null) {
+            this.locked_threat.remove(threat_index);
+        } else {
+            this.locked_threat.put(threat_index, attackers_locked);
+        }
+    }
+
+    public void threatDestroyedAndUnlocked(Integer threat_index) {
+        Set<Integer> assigned_attackers = this.locked_threat.remove(threat_index);
+        if (assigned_attackers == null) {
+            return;
+        }
+        for (Integer attacker_index : assigned_attackers) {
+            Attacker attacker = this.attackers.get(attacker_index);
+            attacker.setFly_mode(Attacker.FLYING_MODE);
+            float[] dummy_threat_coord = World.assignUAVBase(attacker.getIndex());
+            Threat dummy_threat = new Threat(Threat.UAV_BASE_INDEX, dummy_threat_coord, 0, 0);
+            attacker.setTarget_indicated_by_role(dummy_threat);
+            attacker.setNeed_to_replan(true);
+            attacker.setSpeed(StaticInitConfig.SPEED_OF_ATTACKER_IDLE);
+            attacker.setFly_mode(Attacker.FLYING_MODE);
+            attacker.setHovered_time_step(0);
+        }
     }
 
     @Override

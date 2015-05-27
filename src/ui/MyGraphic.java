@@ -7,7 +7,6 @@ package ui;
 
 import algorithm.RRT.RRTNode;
 import algorithm.RRT.RRTTree;
-import config.GraphicConfig;
 import config.StaticInitConfig;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -37,6 +36,11 @@ public class MyGraphic {
 //        graphics.fill(uav.getUav_radar());
 //    }
 
+    public void drawUAVBaseInFogOfWar(Graphics2D graphics, UAVBase uav_base) {
+        graphics.setComposite(AlphaComposite.Clear);
+        graphics.fill(uav_base.getBase_shape());
+    }
+
     public void drawUAVInFogOfWarInLevel3(Graphics2D graphics, UAV uav) {
         if (!uav.isVisible()) {
             return;
@@ -52,47 +56,40 @@ public class MyGraphic {
 
     public void showThreatInFogOfWar(Graphics2D graphics, Threat threat) {
         graphics.setComposite(AlphaComposite.Clear);
-        graphics.fillRect((int) threat.getCoordinates()[0] - GraphicConfig.threat_width / 2, (int) threat.getCoordinates()[1] - GraphicConfig.threat_height / 2, GraphicConfig.threat_width, GraphicConfig.threat_height);
+        graphics.fillRect((int) threat.getCoordinates()[0] - Threat.threat_width / 2, (int) threat.getCoordinates()[1] - Threat.threat_height / 2, Threat.threat_width, Threat.threat_height);
     }
 
-//    public void drawUAVInUAVImage(Graphics2D graphics, UAV uav, Color uav_highlight_color) {
-//        if (!uav.isVisible()) {
-//            return;
-//        }
-//        graphics.setComposite(AlphaComposite.SrcOver);
-//        graphics.setColor(uav.getRadar_color());
-//        Circle uav_radar_outter = uav.getUav_radar();
-//        graphics.fill(uav_radar_outter);
-//        graphics.setColor(uav.getCenter_color());
-//        graphics.fillPolygon(uav.getUav_center());
-//        if (uav_highlight_color != null) {
-//            graphics.setColor(uav_highlight_color);
-//            graphics.draw(uav_radar_outter);
-//        }
-//    }
-    public void drawUAVInUAVImage(Graphics2D graphics, UAV uav, Color uav_highlight_color) {
+    public void drawUAVInUAVImage(Graphics2D graphics, UAVBase uav_base, UAV uav, Color uav_highlight_color) {
         if (!uav.isVisible()) {
             return;
         }
+
+        boolean draw_radar_or_not = true;
+//        draw_radar_or_not = !uav_base.getBase_shape().contains(uav.getCenter_coordinates()[0], uav.getCenter_coordinates()[1]);
+
         graphics.setComposite(AlphaComposite.SrcOver);
         graphics.setColor(uav.getRadar_color());
-        
-        Color uav_radar_color_inner=uav.getRadar_color();
-        Color uav_radar_color_outter=new Color(uav_radar_color_inner.getRed(),uav_radar_color_inner.getGreen(),uav_radar_color_inner.getBlue(),uav_radar_color_inner.getAlpha()/2);
-        Circle uav_radar_outter = uav.getUav_radar();
-        graphics.setColor(uav_radar_color_outter);
-        graphics.fill(uav_radar_outter);
 
-        Circle uav_radar_inner=new Circle(uav_radar_outter.getCenter_coordinates()[0],uav_radar_outter.getCenter_coordinates()[1],uav_radar_outter.getRadius()/2);
-        graphics.setColor(uav_radar_color_inner);
-        graphics.fill(uav_radar_inner);
-        
+        Color uav_radar_color_inner = uav.getRadar_color();
+        Color uav_radar_color_outter = new Color(uav_radar_color_inner.getRed(), uav_radar_color_inner.getGreen(), uav_radar_color_inner.getBlue(), uav_radar_color_inner.getAlpha() / 2);
+        Circle uav_radar_outter = uav.getUav_radar();
+        Circle uav_radar_inner = new Circle(uav_radar_outter.getCenter_coordinates()[0], uav_radar_outter.getCenter_coordinates()[1], uav_radar_outter.getRadius() / 2);
+
+        if (draw_radar_or_not) {
+
+            graphics.setColor(uav_radar_color_outter);
+            graphics.fill(uav_radar_outter);
+
+            graphics.setColor(uav_radar_color_inner);
+            graphics.fill(uav_radar_inner);
+        }
         graphics.setColor(uav.getCenter_color());
         graphics.fillPolygon(uav.getUav_center());
-//        if (uav_highlight_color != null) {
-//            graphics.setColor(uav_highlight_color);
-//            graphics.draw(uav_radar_outter);
-//        }
+
+        if (uav_highlight_color != null) {
+            graphics.setColor(uav_highlight_color);
+            graphics.draw(uav_radar_outter);
+        }
     }
 
     public void drawUAVHistoryPath(Graphics2D graphics, Attacker uav, Color uav_history_path_color) {
@@ -197,7 +194,39 @@ public class MyGraphic {
         graphics.draw(obstacle.getShape());
     }
 
-    public void drawTarget(Graphics2D graphics, Threat target, Color target_color, Color target_highlight_color) {
+    public void drawTankTarget(Graphics2D graphics, int[] upper_left_point, int width, int height) {
+        graphics.drawRect(upper_left_point[0], upper_left_point[1], width, height);
+        int oval_width = width * 3 / 4;
+        int oval_height = height / 2;
+        graphics.drawOval(upper_left_point[0] + width / 2 - oval_width / 2, upper_left_point[1] + height / 2 - oval_height / 2, oval_width, oval_height);
+    }
+
+    public void drawCombatSymbol(Graphics2D graphics, float[] combat_center, int combat_cross_len, Color combat_color) {
+        graphics.setComposite(AlphaComposite.SrcOver);
+        graphics.setColor(combat_color);
+        double angle = Math.PI / 4;
+        double[] upper_left_coord = new double[2];
+        double[] upper_right_coord = new double[2];
+        double[] lower_left_coord = new double[2];
+        double[] lower_right_coord = new double[2];
+
+        upper_left_coord[0] = combat_center[0] - Math.cos(angle) * combat_cross_len / 2;
+        upper_left_coord[1] = combat_center[1] - Math.sin(angle) * combat_cross_len / 2;
+
+        upper_right_coord[0] = combat_center[0] + Math.cos(angle) * combat_cross_len / 2;
+        upper_right_coord[1] = combat_center[1] - Math.sin(angle) * combat_cross_len / 2;
+
+        lower_left_coord[0] = combat_center[0] - Math.cos(angle) * combat_cross_len / 2;
+        lower_left_coord[1] = combat_center[1] + Math.sin(angle) * combat_cross_len / 2;
+
+        lower_right_coord[0] = combat_center[0] + Math.cos(angle) * combat_cross_len / 2;
+        lower_right_coord[1] = combat_center[1] + Math.sin(angle) * combat_cross_len / 2;
+
+        graphics.drawLine((int) upper_left_coord[0], (int) upper_left_coord[1], (int) lower_right_coord[0], (int) lower_right_coord[1]);
+        graphics.drawLine((int) upper_right_coord[0], (int) upper_right_coord[1], (int) lower_left_coord[0], (int) lower_left_coord[1]);
+    }
+
+    public void drawThreat(Graphics2D graphics, Threat threat, Color target_color, Color target_highlight_color) {
         graphics.setComposite(AlphaComposite.SrcOver);
         if (target_highlight_color != null) {
             graphics.setColor(target_highlight_color);
@@ -205,16 +234,22 @@ public class MyGraphic {
             graphics.setColor(target_color);
         }
         graphics.setStroke(new BasicStroke(3.0f));//Set the width of the stroke
-        graphics.drawString(StaticInitConfig.THREAT_NAME + target.getIndex(), target.getCoordinates()[0] - 10, target.getCoordinates()[1] - 15);
-        graphics.drawRect((int) target.getCoordinates()[0] - GraphicConfig.threat_width / 2, (int) target.getCoordinates()[1] - GraphicConfig.threat_height / 2, GraphicConfig.threat_width, GraphicConfig.threat_height);
+        graphics.drawString(StaticInitConfig.THREAT_NAME + threat.getIndex(), threat.getCoordinates()[0] - 10, threat.getCoordinates()[1] - 15);
+        int[] upper_left_point = new int[2];
+        upper_left_point[0] = (int) threat.getCoordinates()[0] - Threat.threat_width / 2;
+        upper_left_point[1] = (int) threat.getCoordinates()[1] - Threat.threat_height / 2;
+        this.drawTankTarget(graphics, upper_left_point, Threat.threat_width, Threat.threat_height);
+//        graphics.drawRect((int) threat.getCoordinates()[0] - Threat.threat_width / 2, (int) threat.getCoordinates()[1] - Threat.threat_height / 2, Threat.threat_width, Threat.threat_height);
+
     }
 
     public void drawUAVBase(Graphics2D graphics, UAVBase uav_base) {
         graphics.setColor(Color.white);
         graphics.setStroke(new BasicStroke(uav_base_line_width));
-        graphics.drawRect((int) uav_base.getCoordinate()[0], (int) uav_base.getCoordinate()[1], uav_base.getBase_width(), uav_base.getBase_height());
-        graphics.setColor(GraphicConfig.uav_base_color);
-        graphics.fillRect((int) uav_base.getCoordinate()[0], (int) uav_base.getCoordinate()[1], uav_base.getBase_width(), uav_base.getBase_height());
-        graphics.drawImage(uav_base.getImage(), (int) uav_base.getCoordinate()[0], (int) uav_base.getCoordinate()[1], uav_base.getBase_width() * 2 / 3, uav_base.getBase_height() * 2 / 3, null);
+        graphics.draw(uav_base.getBase_shape());
+//        graphics.drawRect((int) uav_base.getCoordinate()[0], (int) uav_base.getCoordinate()[1], uav_base.getBase_width(), uav_base.getBase_height());
+//        graphics.setColor(GraphicConfig.uav_base_color);
+//        graphics.fillRect((int) uav_base.getCoordinate()[0], (int) uav_base.getCoordinate()[1], uav_base.getBase_width(), uav_base.getBase_height());
+        graphics.drawImage(uav_base.getImage(), (int) uav_base.getCoordinate()[0], (int) uav_base.getCoordinate()[1], (int) uav_base.getBase_shape().getRadius() * 2 / 3, (int) uav_base.getBase_shape().getRadius() * 2 / 3, null);
     }
 }

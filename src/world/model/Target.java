@@ -25,9 +25,12 @@ public class Target extends Message implements Serializable {
     protected float speed;
     protected int index;//index=-1 means the UAVBase
     protected boolean enabled = true;
+    protected int mode=0;
     
     public static int UAV_BASE_INDEX=-1;
-
+    public static int SAFE_MODE=0;
+    public static int LOCKED_MODE=1;
+    
     public Target(int index, float[] coordinates) {
         this.index = index;
         this.coordinates = coordinates;
@@ -47,6 +50,14 @@ public class Target extends Message implements Serializable {
 
     public void setIndex(int index) {
         this.index = index;
+    }
+
+    public int getMode() {
+        return mode;
+    }
+
+    public void setMode(int mode) {
+        this.mode = mode;
     }
 
     @Override

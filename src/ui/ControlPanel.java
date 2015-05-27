@@ -26,7 +26,7 @@ public class ControlPanel extends javax.swing.JPanel {
      */
     public ControlPanel() {
         initComponents();
-        this.jLabel1.setText(this.simulation_speed_text + StaticInitConfig.SPEED_TIMES);
+        this.jLabel1.setText(this.simulation_speed_text + StaticInitConfig.SIMULATION_SPEED);
     }
     
     public static void setTotalHistoryPathLen(float path_len)
@@ -236,7 +236,7 @@ public class ControlPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jFormattedTextField1ActionPerformed
 
     private void setSimulationDelayWithSpeed(float speed_times) {
-        StaticInitConfig.SPEED_TIMES=speed_times;
+        StaticInitConfig.SIMULATION_SPEED=speed_times;
         this.jLabel1.setText(this.simulation_speed_text + speed_times);
         int delay = (int) (StaticInitConfig.INIT_SIMULATION_DELAY / speed_times); //unpdate sychronously simulation delay 
         StaticInitConfig.SIMULATION_WITH_UI_TIMER.setDelay(delay);

@@ -5,13 +5,14 @@
  */
 package ui;
 
-import config.NonStaticInitConfig;
+import javax.swing.JSplitPane;
 
 /**
  *
  * @author boluo
  */
 public class MainFrame extends javax.swing.JFrame {
+
 
     /**
      * Creates new form MainFrame
@@ -31,7 +32,6 @@ public class MainFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         jSplitPane1 = new javax.swing.JSplitPane();
-        animationPanel1 = new ui.AnimationPanel();
         rightControlPanel1 = new ui.RightControlPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -44,21 +44,9 @@ public class MainFrame extends javax.swing.JFrame {
         jSplitPane1.setMaximumSize(new java.awt.Dimension(1000, 603));
         jSplitPane1.setMinimumSize(new java.awt.Dimension(1000, 603));
         jSplitPane1.setPreferredSize(new java.awt.Dimension(1000, 603));
+        this.animationPanel1=new AnimationPanel();
 
-        animationPanel1.setPreferredSize(new java.awt.Dimension(800, 603));
-
-        javax.swing.GroupLayout animationPanel1Layout = new javax.swing.GroupLayout(animationPanel1);
-        animationPanel1.setLayout(animationPanel1Layout);
-        animationPanel1Layout.setHorizontalGroup(
-            animationPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        animationPanel1Layout.setVerticalGroup(
-            animationPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 601, Short.MAX_VALUE)
-        );
-
-        jSplitPane1.setLeftComponent(animationPanel1);
+        this.jSplitPane1.add(animationPanel1,  JSplitPane.LEFT);
         jSplitPane1.setRightComponent(rightControlPanel1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -115,8 +103,8 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private ui.AnimationPanel animationPanel1;
     private javax.swing.JSplitPane jSplitPane1;
+    private AnimationPanel animationPanel1;
     private ui.RightControlPanel rightControlPanel1;
     // End of variables declaration//GEN-END:variables
 }
