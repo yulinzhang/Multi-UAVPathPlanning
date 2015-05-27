@@ -31,10 +31,6 @@ import world.uav.UAVPath;
 public class MyGraphic {
 
     private static int uav_base_line_width = 3;
-//    public void clearUAVShadowInUAVImage(Graphics2D graphics,Attacker uav) {
-//        graphics.setComposite(AlphaComposite.Clear);
-//        graphics.fill(uav.getUav_radar());
-//    }
 
     public void drawUAVBaseInFogOfWar(Graphics2D graphics, UAVBase uav_base) {
         graphics.setComposite(AlphaComposite.Clear);
@@ -65,8 +61,7 @@ public class MyGraphic {
         }
 
         boolean draw_radar_or_not = true;
-//        draw_radar_or_not = !uav_base.getBase_shape().contains(uav.getCenter_coordinates()[0], uav.getCenter_coordinates()[1]);
-
+        
         graphics.setComposite(AlphaComposite.SrcOver);
         graphics.setColor(uav.getRadar_color());
 
@@ -155,7 +150,6 @@ public class MyGraphic {
         RRTNode root_node = rrt_tree.getNode(0);
         Queue<RRTNode> queue = new LinkedList<RRTNode>();
         queue.add(root_node);
-//            ArrayList<RRTNode> queue=rrt_tree.getChildren(root_node);
         while (!queue.isEmpty()) {
             RRTNode node_out_of_queue = queue.poll();
             current_waypoint = node_out_of_queue.getCoordinate();
@@ -239,8 +233,6 @@ public class MyGraphic {
         upper_left_point[0] = (int) threat.getCoordinates()[0] - Threat.threat_width / 2;
         upper_left_point[1] = (int) threat.getCoordinates()[1] - Threat.threat_height / 2;
         this.drawTankTarget(graphics, upper_left_point, Threat.threat_width, Threat.threat_height);
-//        graphics.drawRect((int) threat.getCoordinates()[0] - Threat.threat_width / 2, (int) threat.getCoordinates()[1] - Threat.threat_height / 2, Threat.threat_width, Threat.threat_height);
-
     }
 
     public void drawUAVBase(Graphics2D graphics, UAVBase uav_base) {

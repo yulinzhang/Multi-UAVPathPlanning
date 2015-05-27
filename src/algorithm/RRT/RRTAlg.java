@@ -10,7 +10,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
-import util.BoundUtil;
 import util.ConflictCheckUtil;
 import util.DistanceUtil;
 import static util.DistanceUtil.distanceBetween;

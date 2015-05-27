@@ -40,7 +40,6 @@ public class World {
     public static int bound_height = 300;
 
     private int scout_num; //The number of our scouts
-    private int enemy_num;  //The number of enemy uavs
     private int threat_num; //The number of enemy threats_in_world
     private int attacker_num; //The number of our attackers
 
@@ -56,7 +55,6 @@ public class World {
      *
      */
     public static ArrayList<Attacker> attackers;
-    private ArrayList<Attacker> enemy_uavs;
     private ArrayList<Scout> scouts;
     public static ControlCenter control_center;
 
@@ -65,7 +63,6 @@ public class World {
     private int num_of_attacker_remained = 0;
     private int num_of_threat_remained;
     private int no_threat_time_step = Integer.MAX_VALUE;
-    private int not_threat_time_found = 0;
     private boolean scout_scaned_over = false;
 
     private ArrayList<Conflict> conflicts;
@@ -77,9 +74,6 @@ public class World {
     private MessageDispatcher msg_dispatcher;
 
     private int conflict_times = 0;
-
-    private float theta_increase_for_enemy_uav = (float) Math.PI / 40;
-    private boolean experiment_over = false;
 
     public static String based_log_dir = "0";
 
@@ -106,8 +100,6 @@ public class World {
         this.control_center.setAttackers(attackers);
         this.control_center.setScouts(scouts);
         this.control_center.setScout_speed(5);
-//        this.control_center.setObstacles(obstacles_in_the_world);
-//        this.control_center.setThreats(threats_in_world);
         this.control_center.setConflicts(conflicts);
         this.control_center.roleAssignForScouts();
         control_center.roleAssignForAttackerWithSubTeam(-1, -1); //initialize role assignment
@@ -125,7 +117,6 @@ public class World {
 
         this.attacker_num = init_config.getAttacker_num();
         this.scout_num = init_config.getScout_num();
-        this.enemy_num = init_config.getEnemy_num();
         this.threat_num = init_config.getThreat_num();
 
         this.threat_radius = init_config.getThreat_radius();
@@ -184,7 +175,6 @@ public class World {
     private void initUAVs() {
         this.scouts = new ArrayList<Scout>();
         this.attackers = new ArrayList<Attacker>();
-        this.enemy_uavs = new ArrayList<Attacker>();
         initScoutsAndAttackers();
 //        initEnemyUAV();
     }
@@ -286,7 +276,7 @@ public class World {
                                 this.control_center.threatDestroyedAndUnlocked(threat.getIndex());
                                 this.num_of_threat_remained--;
                                 this.control_center.setNeed_to_assign_role(true);
-                                float[] dummy_threat_coord = World.assignUAVBase(attacker.getIndex());
+                                float[] dummy_threat_coord = World.assignUAVPortInBase(attacker.getIndex());
                                 Threat dummy_threat = new Threat(Threat.UAV_BASE_INDEX, dummy_threat_coord, 0, 0);
                                 attacker.setTarget_indicated_by_role(dummy_threat);
                                 attacker.setNeed_to_replan(true);
@@ -485,7 +475,6 @@ public class World {
             coord_x += speed * (float) Math.cos(threat_angle);
             coord_y += speed * (float) Math.sin(threat_angle);
             Rectangle threat_mbr = new Rectangle((int) coord_x - (Threat.threat_width + NonStaticInitConfig.threat_range_from_obstacles) / 2, (int) coord_y - (Threat.threat_height + NonStaticInitConfig.threat_range_from_obstacles) / 2, Threat.threat_width + NonStaticInitConfig.threat_range_from_obstacles, Threat.threat_height + NonStaticInitConfig.threat_range_from_obstacles);
-//            point_conflicted_with_obstacles = ConflictCheckUtil.checkPointInObstacles(obstacles, coord_x, coord_y);
             point_conflicted_with_obstacles = ConflictCheckUtil.checkThreatInObstacles(obstacles, threat_mbr)||World.uav_base.getBase_shape().intersects(threat_mbr);
             if (point_conflicted_with_obstacles || !BoundUtil.withinRelaxedBound(coord_x, coord_y, bound_width, bound_height) || DistanceUtil.distanceBetween(threat.getCoordinates(), new float[]{coord_x, coord_y}) > StaticInitConfig.maximum_threat_movement_length) {
                 coord_x -= speed * (float) Math.cos(threat_angle);
@@ -570,10 +559,6 @@ public class World {
                 }
             }
         }
-
-        if (scout_scaned_over) {
-            this.not_threat_time_found++;
-        }
     }
 
     private void checkUAVDestroyedAndNumberOfAttackerRemained() {
@@ -643,7 +628,7 @@ public class World {
                 attacker.setNeed_to_replan(true);
                 //returning to the base
                 if (attacker.getTarget_indicated_by_role().getIndex() == Threat.UAV_BASE_INDEX) {
-                    float[] dummy_threat_coord = World.assignUAVBase(attacker.getIndex());
+                    float[] dummy_threat_coord = World.assignUAVPortInBase(attacker.getIndex());
                     Threat dummy_threat = new Threat(Threat.UAV_BASE_INDEX, dummy_threat_coord, 0, 0);
                     attacker.setTarget_indicated_by_role(dummy_threat);
                     attacker.setNeed_to_replan(true);
@@ -739,75 +724,40 @@ public class World {
         return uav_base;
     }
 
-    public ArrayList<Attacker> getEnemy_uavs() {
-        return enemy_uavs;
-    }
-
-    public void setExperiment_over(boolean experiment_over) {
-        this.experiment_over = experiment_over;
-    }
-
     public ArrayList<Obstacle> getObstaclesForUIRendering() {
-//        return this.kb.getObstaclesForUIRendering();
         return this.obstacles;
     }
 
     public ArrayList<Threat> getThreatsForUIRendering() {
-//        return this.kb.getThreatsForUIRendering();
         return this.threats;
     }
 
     public ArrayList<Conflict> getConflictsForUIRendering() {
-//        return this.kb.getConflictsForUIRendering();
         return this.conflicts;
     }
 
     private void setObstacles(ArrayList<Obstacle> obstacles) {
-//        this.kb.setObstacles(obstacles_in_the_world);
         this.obstacles = obstacles;
     }
 
     private void setConflicts(ArrayList<Conflict> conflicts) {
-//        this.kb.setConflicts(conflicts);
         this.conflicts = conflicts;
     }
 
     private void setThreats(ArrayList<Threat> threats) {
-//        this.kb.setThreats(threats_in_world);
         this.threats = threats;
     }
 
     private void addObstacle(Obstacle obs) {
-//        this.kb.addObstacle(obs);
         this.obstacles.add(obs);
     }
 
     private void addConflict(Conflict conflict) {
-//        this.kb.addConflict(conflict);
         this.conflicts.add(conflict);
     }
 
-    public static float[] assignUAVBase(int attacker_index) {
-//        float[] random_goal_coordinate = new float[2];
-//        double random_theta = Math.random() * Math.PI * 2;
-//        random_goal_coordinate[0] = current_coord[0] + (float) Math.cos(random_theta) * 400;
-//        random_goal_coordinate[1] = current_coord[1] + (float) Math.sin(random_theta) * 400;
-//        boolean collisioned = true;
-//        boolean withinBound = BoundUtil.withinBound(random_goal_coordinate[0], random_goal_coordinate[1], World.bound_width, World.bound_height);
-//        while (collisioned && !withinBound) {
-//            random_goal_coordinate[0] = current_coord[0] + (float) Math.cos(random_theta) * 400;
-//            random_goal_coordinate[1] = current_coord[1] + (float) Math.sin(random_theta) * 400;
-//            if (!ConflictCheckUtil.checkPointInObstacles(obstacles_in_the_world, random_goal_coordinate[0], random_goal_coordinate[1])) {
-//                collisioned = false;
-//            } else {
-//                random_theta = Math.PI / 4 + Math.random() * Math.PI / 2;
-//            }
-//            withinBound = BoundUtil.withinBound(random_goal_coordinate[0], random_goal_coordinate[1], World.bound_width, World.bound_height);
-//            logger.debug("find random goal for uav");
-//        }
-//        return random_goal_coordinate;
+    public static float[] assignUAVPortInBase(int attacker_index) {
         return World.uav_base.assignUAVLocation(attacker_index);
-
     }
 
 }

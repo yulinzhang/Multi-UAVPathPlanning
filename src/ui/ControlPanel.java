@@ -15,11 +15,11 @@ public class ControlPanel extends javax.swing.JPanel {
 
     private float speed_times = 1;
     private float speed_delta_times = 0.5f;
-    private String simulation_speed_text = "仿真速度X";
-    private String show_planned_tree_text = "生成树";
-    private String shown_planned_path_text = "规划路径";
-    private String simulation_stop = "暂停";
-    private String simulation_start = "开始";
+    private String simulation_speed_text = "Speed X";
+    private String show_planned_tree_text = "Tree";
+    private String shown_planned_path_text = "Path";
+    private String simulation_stop = "Stop";
+    private String simulation_start = "Start";
 
     /**
      * Creates new form ControlPanel
@@ -31,7 +31,7 @@ public class ControlPanel extends javax.swing.JPanel {
     
     public static void setTotalHistoryPathLen(float path_len)
     {
-        ControlPanel.jLabel2.setText("总路径:"+(int)path_len);
+        ControlPanel.jLabel2.setText("Path Len:"+(int)path_len);
     }
 
     /**
@@ -75,7 +75,7 @@ public class ControlPanel extends javax.swing.JPanel {
         jSplitPane4.setPreferredSize(new java.awt.Dimension(95, 47));
 
         jButton3.setFont(new java.awt.Font("Songti SC", 0, 10)); // NOI18N
-        jButton3.setText("关闭规划路径");
+        jButton3.setText("Hide Path");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
@@ -102,10 +102,10 @@ public class ControlPanel extends javax.swing.JPanel {
         jSplitPane5.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         jButton2.setFont(new java.awt.Font("宋体", 0, 10)); // NOI18N
-        jButton2.setText("显示战争迷雾");
+        jButton2.setText("Show War Fog");
         jSplitPane5.setRightComponent(jButton2);
 
-        jButton1.setText("暂停");
+        jButton1.setText("Stop");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -126,7 +126,7 @@ public class ControlPanel extends javax.swing.JPanel {
         jSplitPane6.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("仿真速度X1");
+        jLabel1.setText("SpeedX1");
         jSplitPane6.setTopComponent(jLabel1);
 
         jSplitPane7.setDividerLocation(46);
@@ -156,7 +156,7 @@ public class ControlPanel extends javax.swing.JPanel {
         jSplitPane8.setDividerSize(1);
         jSplitPane8.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
-        jButton4.setText("显示生成树");
+        jButton4.setText("Show Tree");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
@@ -164,7 +164,7 @@ public class ControlPanel extends javax.swing.JPanel {
         });
         jSplitPane8.setTopComponent(jButton4);
 
-        jLabel2.setText("总路径:");
+        jLabel2.setText("Path Len:");
         jSplitPane8.setRightComponent(jLabel2);
 
         jSplitPane3.setRightComponent(jSplitPane8);
@@ -208,18 +208,18 @@ public class ControlPanel extends javax.swing.JPanel {
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         StaticInitConfig.SHOW_PLANNED_TREE = !StaticInitConfig.SHOW_PLANNED_TREE; //per click take non-operation
         if (StaticInitConfig.SHOW_PLANNED_TREE) {
-            this.jButton4.setText("关闭" + this.show_planned_tree_text);
+            this.jButton4.setText("Hide" + this.show_planned_tree_text);
         } else {
-            this.jButton4.setText("显示" + this.show_planned_tree_text);
+            this.jButton4.setText("Show" + this.show_planned_tree_text);
         }
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         StaticInitConfig.SHOW_PLANNED_PATH = !StaticInitConfig.SHOW_PLANNED_PATH; //per click take non-operation
         if (StaticInitConfig.SHOW_PLANNED_PATH) {
-            this.jButton3.setText("关闭" + this.shown_planned_path_text);
+            this.jButton3.setText("Hide" + this.shown_planned_path_text);
         } else {
-            this.jButton3.setText("显示" + this.shown_planned_path_text);
+            this.jButton3.setText("Show" + this.shown_planned_path_text);
         }
     }//GEN-LAST:event_jButton3ActionPerformed
 

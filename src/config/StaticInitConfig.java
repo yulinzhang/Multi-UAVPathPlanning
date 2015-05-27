@@ -42,11 +42,11 @@ public class StaticInitConfig {
 
     //Extend towards the goal with probability
     public static float rrt_goal_toward_probability = 0.7f;
-    public static int rrt_iteration_times = 4000;
+    public static int rrt_iteration_times = 3500;
     //Set a safe distance from the target point
     public static int SAFE_DISTANCE_FOR_TARGET = 3;
     public static int SAFE_DISTANCE_FOR_CONFLICT = 2;
-    public static int rrt_planning_times_for_attacker = 4;
+    public static int rrt_planning_times_for_attacker = 5;
     public static int rrt_planning_times_for_scout = 1;
 
     //how much time it takes to drive the simulaiton to next time step
@@ -69,14 +69,14 @@ public class StaticInitConfig {
 
     public static float maximum_threat_movement_length = 20;
 
-    public static String UAV_KNOWLEDGE = "UAV知识";
-    public static String THREAT_INFO = "威胁信息";
-    public static String CONFLICT_INFO = "冲突信息";
-    public static String OBSTACLE_INFO = "障碍信息";
+    public static String UAV_KNOWLEDGE = "UAV Knowledge";
+    public static String THREAT_INFO = "Threat Info";
+    public static String CONFLICT_INFO = "Conflict Info";
+    public static String OBSTACLE_INFO = "Obstacle Info";
 
-    public static String THREAT_NAME = "威胁";
-    public static String OBSTACLE_NAME = "障碍";
-    public static String CONFLICT_NAME = "冲突UAV";
+    public static String THREAT_NAME = "Threat";
+    public static String OBSTACLE_NAME = "Obstacle";
+    public static String CONFLICT_NAME = "Conflicted UAV";
 
     //Distinguish between types of information-sharing
     public static int BROADCAST_INFOSHARE = 0;

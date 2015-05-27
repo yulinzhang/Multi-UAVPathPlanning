@@ -214,7 +214,7 @@ public class ControlCenter implements KnowledgeAwareInterface {
                 continue;
             }
             if (!assigned_attacker.contains(current_attacker.getIndex()) && current_attacker.getTarget_indicated_by_role() != null && current_attacker.getTarget_indicated_by_role().getIndex() != -1) {
-                float[] dummy_threat_coord = World.assignUAVBase(current_attacker.getIndex());
+                float[] dummy_threat_coord = World.assignUAVPortInBase(current_attacker.getIndex());
                 Threat dummy_threat = new Threat(-1, dummy_threat_coord, 0, 0);
                 current_attacker.setTarget_indicated_by_role(dummy_threat);
                 current_attacker.setNeed_to_replan(true);
@@ -254,7 +254,7 @@ public class ControlCenter implements KnowledgeAwareInterface {
         for (Integer attacker_index : assigned_attackers) {
             Attacker attacker = this.attackers.get(attacker_index);
             attacker.setFly_mode(Attacker.FLYING_MODE);
-            float[] dummy_threat_coord = World.assignUAVBase(attacker.getIndex());
+            float[] dummy_threat_coord = World.assignUAVPortInBase(attacker.getIndex());
             Threat dummy_threat = new Threat(Threat.UAV_BASE_INDEX, dummy_threat_coord, 0, 0);
             attacker.setTarget_indicated_by_role(dummy_threat);
             attacker.setNeed_to_replan(true);
