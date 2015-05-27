@@ -79,7 +79,7 @@ public class NonStaticInitConfig {
                 coordinate_x = random.nextFloat() * (bound_width - 3*threat_range_from_obstacles) + 2*threat_range_from_obstacles;
                 coordinate_y = random.nextFloat() * (bound_height -3*threat_range_from_obstacles) +2*threat_range_from_obstacles;
                 Rectangle threat_mbr=new Rectangle((int)coordinate_x - (Threat.threat_width+threat_range_from_obstacles) / 2, (int) coordinate_y - (Threat.threat_height+threat_range_from_obstacles) / 2, Threat.threat_width+threat_range_from_obstacles, Threat.threat_height+threat_range_from_obstacles);
-                found = !ConflictCheckUtil.checkThreatInObstacles(obstacles, threat_mbr);
+                found = !ConflictCheckUtil.checkThreatInObstacles(obstacles, threat_mbr)&&!this.uav_base.getBase_shape().intersects(threat_mbr);
             }
             Threat threat = new Threat(i, new float[]{coordinate_x, coordinate_y}, StaticInitConfig.STATIC_THREAT_TYPE, 5);
             threats.add(threat);

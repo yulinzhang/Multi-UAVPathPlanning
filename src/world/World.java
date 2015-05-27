@@ -5,15 +5,13 @@
  */
 package world;
 
+import config.FilePathConfig;
 import world.model.Threat;
 import world.model.Obstacle;
 import config.NonStaticInitConfig;
 import config.StaticInitConfig;
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 import ui.RightControlPanel;
 import util.BoundUtil;
 import util.ConflictCheckUtil;
@@ -83,12 +81,11 @@ public class World {
     private float theta_increase_for_enemy_uav = (float) Math.PI / 40;
     private boolean experiment_over = false;
 
-    public static String exp_index = "D:\\kingsoft\\dissertation\\simulator\\result";
     public static String based_log_dir = "0";
 
     static {
         System.setProperty("LOGDIR", based_log_dir);
-        System.setProperty("EXP_INDEX", exp_index);
+        System.setProperty("EXP_INDEX", FilePathConfig.exp_index);
     }
 
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(World.class);
@@ -489,7 +486,7 @@ public class World {
             coord_y += speed * (float) Math.sin(threat_angle);
             Rectangle threat_mbr = new Rectangle((int) coord_x - (Threat.threat_width + NonStaticInitConfig.threat_range_from_obstacles) / 2, (int) coord_y - (Threat.threat_height + NonStaticInitConfig.threat_range_from_obstacles) / 2, Threat.threat_width + NonStaticInitConfig.threat_range_from_obstacles, Threat.threat_height + NonStaticInitConfig.threat_range_from_obstacles);
 //            point_conflicted_with_obstacles = ConflictCheckUtil.checkPointInObstacles(obstacles, coord_x, coord_y);
-            point_conflicted_with_obstacles = ConflictCheckUtil.checkThreatInObstacles(obstacles, threat_mbr);
+            point_conflicted_with_obstacles = ConflictCheckUtil.checkThreatInObstacles(obstacles, threat_mbr)||World.uav_base.getBase_shape().intersects(threat_mbr);
             if (point_conflicted_with_obstacles || !BoundUtil.withinRelaxedBound(coord_x, coord_y, bound_width, bound_height) || DistanceUtil.distanceBetween(threat.getCoordinates(), new float[]{coord_x, coord_y}) > StaticInitConfig.maximum_threat_movement_length) {
                 coord_x -= speed * (float) Math.cos(threat_angle);
                 coord_y -= speed * (float) Math.sin(threat_angle);

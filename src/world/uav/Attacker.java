@@ -125,7 +125,7 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
             if (this.fly_mode == Attacker.TARGET_LOCKED_MODE && this.target_indicated_by_role.getIndex() != Threat.UAV_BASE_INDEX) {
                 this.goal_for_each_iteration = this.genRandomHoveringGoal(goal_for_each_iteration, NonStaticInitConfig.threat_range_from_obstacles/2, this.getObstacles());
                 this.speed=StaticInitConfig.SPEED_OF_ATTACKER_ON_DESTROYING_THREAT;
-                this.rrt_alg.setMax_angle((float) Math.PI / 3);
+                this.rrt_alg.setMax_angle((float) Math.PI / 5);
             }else if(this.fly_mode== Attacker.FLYING_MODE && this.target_indicated_by_role.getIndex() == Threat.UAV_BASE_INDEX)
             {
                 this.speed=StaticInitConfig.SPEED_OF_ATTACKER_IDLE;

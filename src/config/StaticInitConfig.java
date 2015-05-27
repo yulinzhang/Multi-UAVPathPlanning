@@ -34,7 +34,6 @@ public class StaticInitConfig {
     public static Integer STEP_SIZE_OF_SPINNER = 1;
 
     public static String EXTERNAL_KML_FILE_PATH = null; //KML file path stored static obstacle
-    public static String ROBOT_ONTOLOGY_TEMPLATE_FILE_PATH = "D:\\KingSoft\\Dissertation\\Simulator\\ontology-owl\\robot_ontology_template.owl";
 
     public static int ATTACKER = 0;
     public static int SCOUT = 1;

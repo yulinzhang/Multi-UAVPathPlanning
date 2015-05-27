@@ -29,7 +29,7 @@ import com.hp.hpl.jena.rdf.model.SimpleSelector;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.util.PrintUtil;
-import config.StaticInitConfig;
+import config.FilePathConfig;
 import java.awt.Polygon;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -81,7 +81,7 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
         super();
         ontology_based_knowledge = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, null);
         try {
-            ontology_based_knowledge.read(new FileInputStream(StaticInitConfig.ROBOT_ONTOLOGY_TEMPLATE_FILE_PATH), null);
+            ontology_based_knowledge.read(new FileInputStream(FilePathConfig.ROBOT_ONTOLOGY_TEMPLATE_FILE_PATH), null);
         } catch (FileNotFoundException ex) {
             logger.error(ex);
         }
