@@ -49,12 +49,16 @@ public class RegisteredMessageDispatcher extends MessageDispatcher {
         int obstacle_num = obstacles.size();
         List<Threat> threats = intelligent_unit.getThreats();
         int threat_num = threats.size();
-        List<Conflict> conflicts = intelligent_unit.getConflicts();
+//        List<Conflict> conflicts = intelligent_unit.getConflicts();
 
         List<Attacker> attackers = World.getAttackers();
         int attacker_num = attackers.size();
         for (int i = 0; i < attacker_num; i++) {
             Attacker attacker = attackers.get(i);
+            if(!attacker.isVisible())
+            {
+                continue;
+            }
             KnowledgeInterface kb = attacker.getKb();
             int attacker_index = attacker.getIndex();
             Integer threat_index = this.target_registered.get(attacker_index);
@@ -62,15 +66,14 @@ public class RegisteredMessageDispatcher extends MessageDispatcher {
             {
                 continue;
             }
-            Rectangle gis_rect = this.gis_rect_registered.get(attacker_index);
-
             for (int j = 0; j < threat_num; j++) {
                 Threat threat = threats.get(j);
                 if (threat.getIndex() == threat_index) {
                     this.addRecvMessage(i, threat);
                 }
             }
-
+            
+            Rectangle gis_rect = this.gis_rect_registered.get(attacker_index);
             for (int j = 0; j < obstacle_num; j++) {
                 Obstacle obstacle = obstacles.get(j);
                 boolean gis_rect_covered = obstacle.getMbr().intersects(gis_rect);

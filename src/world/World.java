@@ -84,10 +84,9 @@ public class World {
 
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(World.class);
 
-    /**
-     * intiate the world according to configuration object.
+    /**intiate the world according to configuration object.
      *
-     * @param init_config
+     * @param init_config records the simulation parameter
      */
     public World(NonStaticInitConfig init_config) {
 //        World.kb = new WorldKnowledge();//OntologyBasedKnowledge();WorldKnowledge
@@ -99,18 +98,16 @@ public class World {
         initUAVs();
         this.control_center.setAttackers(attackers);
         this.control_center.setScouts(scouts);
-        this.control_center.setScout_speed(5);
+        this.control_center.setScout_speed(StaticInitConfig.SPEED_OF_SCOUT);
         this.control_center.setConflicts(conflicts);
         this.control_center.roleAssignForScouts();
         control_center.roleAssignForAttackerWithSubTeam(-1, -1); //initialize role assignment
     }
 
-    /**
-     * initiate the parameter of battleground objects.
-     *
+    /**initiate the parameter from init_config, which is called by World constructor.
      * @param init_config
      */
-    public void initParameterFromInitConfig(NonStaticInitConfig init_config) {
+    private void initParameterFromInitConfig(NonStaticInitConfig init_config) {
         World.bound_width = init_config.getBound_width();
         World.bound_height = init_config.getBound_height();
         this.inforshare_algorithm = init_config.getInforshare_algorithm();
@@ -147,9 +144,8 @@ public class World {
         }
     }
 
-    /**
-     * initialize the scouts and attackers.
-     *
+    /**initialize the scouts and attackers, which is called by World init functions.
+     * 
      */
     private void initScoutsAndAttackers() {
         float[] uav_base_coordinate = uav_base.getCoordinate();
@@ -168,19 +164,16 @@ public class World {
         }
     }
 
-    /**
-     * initiate all uavs
+    /**initiate all uavs, including scouts and attackers.
      *
      */
     private void initUAVs() {
         this.scouts = new ArrayList<Scout>();
         this.attackers = new ArrayList<Attacker>();
         initScoutsAndAttackers();
-//        initEnemyUAV();
     }
 
-    /**
-     * path planning for attackers, which are not destroyed.
+    /**path planning for attackers, which are not destroyed.
      *
      */
     private void planPathForAllAttacker() {
@@ -191,10 +184,8 @@ public class World {
         }
     }
 
-    /**
-     * check whether the uav is too close to others. If too close, then the uav
-     * should replan.
-     *
+    /**check whether the uav is too close to others and cause conflict. If too close, then the uav should replan.
+     * 
      */
     private void checkConflict() {
         for (int i = 0; i < this.attacker_num; i++) {
@@ -219,6 +210,9 @@ public class World {
         }
     }
 
+    /**check whether the target of the attacker is reached and update attacker's status: lock the target, destroy the target or normal fly status.
+     * 
+     */
     private void checkThreatReached() {
         ArrayList<Obstacle> obstacles_in_the_world = this.obstacles;
         for (int i = 0; i < this.attacker_num; i++) {
@@ -292,8 +286,8 @@ public class World {
         }
     }
 
-    /**
-     * undate coordinate of attackers
+    /**update coordinate of attackers.
+     * 
      */
     private void updateAttackerCoordinate() {
         for (int i = 0; i < this.attacker_num; i++) {
@@ -309,6 +303,10 @@ public class World {
         }
     }
 
+    /** The experiment is over in 2 cases: 1. there are no attackers; 2. the scouts are scaned over, no threats are remained and all attackers returned back to uav base.
+     * 
+     * @return true when experiment is over
+     */
     public boolean isExperiment_over() {
         if (this.num_of_attacker_remained == 0) {
             return true;
@@ -324,8 +322,8 @@ public class World {
         return true;
     }
 
-    /**
-     * During patrol,the uav detect event by radar or share information
+    /**During patrol,the attacker detect event by radar.
+     * 
      */
     private void detectAttackerEvent() {
         for (Attacker attacker : World.attackers) {
@@ -367,8 +365,8 @@ public class World {
         }
     }
 
-    /**
-     * During patrol,the uav detect event by radar or share information
+    /**During patrol,the scout detect event by radar.
+     * 
      */
     private void detectScoutEvent() {
         for (Scout scout : this.scouts) {
@@ -391,9 +389,8 @@ public class World {
         }
     }
 
-    /**
-     * register information requirement for attackers,this mothod is used to
-     * information sharing rapidly
+    /**register information requirement for attackers, according to its target and location.
+     * 
      */
     private void registerInfoRequirement() {
         for (int i = 0; i < this.attacker_num; i++) {
@@ -409,11 +406,11 @@ public class World {
         }
     }
 
-    /**
-     * information sharing
+    /**share information every 3 time step.
+     * 
      */
     private void shareInfoAfterRegistration() {
-        if (this.time_step % 10 == 0) {
+        if (this.time_step % 3 == 0) {
             this.msg_dispatcher.decideAndSumitMsgToSend();
             this.msg_dispatcher.dispatch();
         }
@@ -426,8 +423,8 @@ public class World {
         }
     }
 
-    /**
-     * unpdate conflict
+    /**update conflict.
+     * 
      */
     private void updateConflict() {
         for (int i = 0; i < this.attacker_num; i++) {
@@ -442,6 +439,9 @@ public class World {
         }
     }
 
+    /** update the coordinate of all threats, which are not destroyed (visible).
+     * 
+     */
     private void updateThreatCoordinate() {
         ArrayList<Threat> threats_in_world = this.getThreatsForUIRendering();
         for (int i = 0; i < threats_in_world.size(); i++) {
@@ -457,6 +457,10 @@ public class World {
         }
     }
 
+    /** plan path for given threat, the threat moves slowly and straightly(North, South, West, East) until it reaches an obstacle with distance NonStaticInitConfig.threat_range_from_obstacles.
+     * 
+     * @param threat 
+     */
     private void planPathForThreat(Threat threat) {
         if (threat.getSpeed() == 0) {
             return;
@@ -492,8 +496,9 @@ public class World {
         }
     }
 
-    /**
-     * undate all objects in world
+    /**This method is extremely important and it arranges all the procedures in the simulations. 
+     * It performs as the god and have the following important steps: 1. calls the control center to send out scouts 2. call control center to share the info it detects to the attackers; 
+     * 3.calls control center to assign role for each attacker. 4. call each attacker to plan path for itself. 5. check whether each threat is reached, locked or destroyed. 5. summarize and record all data we cared.
      */
     public void updateAll() {
         if (this.time_step == 0) {
@@ -529,7 +534,7 @@ public class World {
         logger.debug("replanning check over");
         checkThreatReached();
         logger.debug("threat terminate check over");
-        checkUAVDestroyedAndNumberOfAttackerRemained();
+        checkNumOfAttackerDestroyed();
         logger.debug("uav destroyed check over");
         checkConflict();
         updateConflict();
@@ -561,7 +566,10 @@ public class World {
         }
     }
 
-    private void checkUAVDestroyedAndNumberOfAttackerRemained() {
+    /**sumarize the number of attackers that is destroyed at current time step.
+     * 
+     */
+    private void checkNumOfAttackerDestroyed() {
         this.num_of_attacker_remained = this.attacker_num;
         for (Attacker attacker : World.attackers) {
             if (!attacker.isVisible()) {
@@ -583,6 +591,9 @@ public class World {
         }
     }
 
+    /** inform the control center about the coordinate of the threat.
+     * 
+     */
     private void updateThreatCoordinateInControlCenter() {
         ArrayList<Threat> threats_in_control_center = this.control_center.getThreats();
         for (Threat threat_in_control_center : threats_in_control_center) {
@@ -596,12 +607,18 @@ public class World {
         threats_in_control_center = this.control_center.getThreats();
     }
 
+    /** record all the date we cared in log file(log4j).
+     * 
+     */
     private void recordResultInLog() {
         this.total_path_len = (int) this.getTotalHistoryPathLen();
         this.total_msg_num = msg_dispatcher.getTotalNumOfMsgSent();
         logger.info(this.time_step + " " + this.total_path_len + " " + this.total_msg_num + " " + this.num_of_threat_remained + " " + this.num_of_attacker_remained);
     }
 
+    /** calls the control center to assign role for each attacker.
+     * 
+     */
     private void roleAssignmentInControlCenter() {
         if (this.control_center.isNeed_to_assign_role()) {
             this.control_center.roleAssignForAttackerWithSubTeam(-1, -1);
@@ -609,14 +626,16 @@ public class World {
         this.control_center.setNeed_to_assign_role(false);
     }
 
+    /** calls the control center to update the coordinates of the scouts it owned.
+     * 
+     */
     private void updateScoutInControlCenter() {
         this.control_center.updateScoutCoordinate();
     }
 
-    private void updateControlCenterKnowledge() {
-        this.control_center.setThreats(threats);
-    }
-
+    /** check whether the attacker should replan in  next time step. 
+     * 
+     */
     private void checkReplanningAccordingToAttackerMovement() {
         for (int i = 0; i < this.attacker_num; i++) {
             Attacker attacker = this.attackers.get(i);
@@ -636,12 +655,12 @@ public class World {
                     attacker.setFly_mode(Attacker.FLYING_MODE);
                 } else {//have target to destroy
                     float dist_to_target = DistanceUtil.distanceBetween(attacker.getCenter_coordinates(), attacker.getTarget_indicated_by_role().getCoordinates());
-                    logger.debug(attacker.getIndex() + " not moved and has target-------------start--------------");
-                    logger.debug("target index:" + attacker.getTarget_indicated_by_role().getIndex());
-                    logger.debug("target " + attacker.getTarget_indicated_by_role().getIndex() + " visible=" + this.getThreatsForUIRendering().get(attacker.getTarget_indicated_by_role().getIndex()).isEnabled());
-                    logger.debug("dist to target:" + dist_to_target);
-                    logger.debug("attacker mode:" + attacker.getFly_mode());
-                    logger.debug("not moved and has target-------------end--------------");
+//                    logger.debug(attacker.getIndex() + " not moved and has target-------------start--------------");
+//                    logger.debug("target index:" + attacker.getTarget_indicated_by_role().getIndex());
+//                    logger.debug("target " + attacker.getTarget_indicated_by_role().getIndex() + " visible=" + this.getThreatsForUIRendering().get(attacker.getTarget_indicated_by_role().getIndex()).isEnabled());
+//                    logger.debug("dist to target:" + dist_to_target);
+//                    logger.debug("attacker mode:" + attacker.getFly_mode());
+//                    logger.debug("not moved and has target-------------end--------------");
 
                     if (attacker.getFly_mode() == Attacker.TARGET_LOCKED_MODE) {
                         attacker.setNeed_to_replan(true);
@@ -663,10 +682,9 @@ public class World {
         }
     }
 
-    /**
-     * get total history path length
+    /** sumarize the total path length of all attackers.
      *
-     * @return
+     * @return the total path length.
      */
     private float getTotalHistoryPathLen() {
         float total_path_len = 0;

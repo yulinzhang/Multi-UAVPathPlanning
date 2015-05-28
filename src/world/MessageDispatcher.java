@@ -27,9 +27,22 @@ public abstract class MessageDispatcher {
     public MessageDispatcher(KnowledgeAwareInterface intelligent_unit) {
         this.intelligent_unit = intelligent_unit;
     }
+    /** register the information requirement according to its current location and target.
+     * 
+     * @param uav_index
+     * @param current_loc
+     * @param target 
+     */
     public abstract void register(Integer uav_index, float[] current_loc,Target target);
+    
+    /** make decision for information sharing.
+     * 
+     */
     public abstract void decideAndSumitMsgToSend();
 
+    /** dispatch the information to the receivers.
+     * 
+     */
     public void dispatch() {
         List<Attacker> attackers = World.getAttackers();
         int attacker_num = attackers.size();
@@ -52,24 +65,40 @@ public abstract class MessageDispatcher {
         this.clearRecvMsgList();
     }
 
+    /** return the number of msgs sent in this time step.
+     * 
+     * @return 
+     */
     public int getNumOfMsgLatestSent() {
         return this.num_of_msg_sent_this_time_step;
     }
 
+    /** return the total number msgs sent until now.
+     * 
+     * @return 
+     */
     public int getTotalNumOfMsgSent() {
         return this.num_of_msg_sent_total;
     }
 
+    /** clear the msg receive list.
+     * 
+     */
     public void clearRecvMsgList() {
         this.recv_msg_list.clear();
     }
 
-    public void addRecvMessage(Integer recv_uav_index, Message msg) {
-        LinkedList<Message> recv_list = this.recv_msg_list.get(recv_uav_index);
+    /** add the msg to the receive queue for give attacker
+     * 
+     * @param recv_attacker_index
+     * @param msg 
+     */
+    public void addRecvMessage(Integer recv_attacker_index, Message msg) {
+        LinkedList<Message> recv_list = this.recv_msg_list.get(recv_attacker_index);
         if (recv_list == null) {
             recv_list = new LinkedList<Message>();
         }
         recv_list.add(msg);
-        this.recv_msg_list.put(recv_uav_index, recv_list);
+        this.recv_msg_list.put(recv_attacker_index, recv_list);
     }
 }

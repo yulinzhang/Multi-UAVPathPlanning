@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import util.DistanceUtil;
 import world.model.shape.Point;
 
-/**
+/** This is the data structure to maintain the path for the uav.
  *
  * @author boluo
  */

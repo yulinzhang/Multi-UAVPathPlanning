@@ -16,7 +16,7 @@ import world.model.Target;
 import world.model.Threat;
 import world.uav.Attacker;
 
-/**
+/** This is a implementation for broadcast information sharing. It shares all the information the unit knows to all attackers.
  *
  * @author Yulin_Zhang
  */

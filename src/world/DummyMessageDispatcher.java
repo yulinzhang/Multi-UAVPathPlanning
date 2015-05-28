@@ -8,7 +8,7 @@ package world;
 import world.model.KnowledgeAwareInterface;
 import world.model.Target;
 
-/**
+/** This is a implementation of no information sharing. It has a dummy implementation and does nothing.
  *
  * @author boluo
  */

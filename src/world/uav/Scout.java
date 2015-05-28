@@ -10,7 +10,6 @@ import config.StaticInitConfig;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import util.BoundUtil;
 import util.ConflictCheckUtil;
 import util.VectorUtil;
 import world.ControlCenter;
@@ -43,6 +42,10 @@ public class Scout extends UAV {
         radar_color = new Color(center_color.getRed(), center_color.getGreen(), center_color.getBlue(), 128);
     }
 
+    /** to update the coordinate of the scout.
+     * 
+     * @return 
+     */
     public boolean moveToNextWaypoint() {
         if (current_y_coordinate_task == null && move_at_y_coordinate_task.size() > 0) {
             current_y_coordinate_task = move_at_y_coordinate_task.removeFirst();
@@ -104,25 +107,10 @@ public class Scout extends UAV {
         return true;
     }
 
-//    private float[] randomPoint(float[] current_coord) {
-//        float[] random_goal_coordinate = new float[2];
-//        double random_theta = Math.PI / 4 + Math.random() * Math.PI / 2;
-//        random_goal_coordinate[0] = current_coord[0] + (float) Math.cos(random_theta) * (this.speed);
-//        random_goal_coordinate[1] = current_coord[1] + (float) Math.sin(random_theta) * (this.speed);
-//        ArrayList<Obstacle> obstacles = control_center.getObstacles();
-//        boolean collisioned = true;
-//        while (collisioned) {
-//            random_goal_coordinate[0] = current_coord[0] + (float) Math.cos(random_theta) * (this.speed);
-//            random_goal_coordinate[1] = current_coord[1] + (float) Math.sin(random_theta) * (this.speed);
-//            if (BoundUtil.withinBound(random_goal_coordinate[0], random_goal_coordinate[1], World.bound_width, World.bound_height) && !ConflictCheckUtil.checkPointInObstacles(obstacles, random_goal_coordinate[0], random_goal_coordinate[1])) {
-//                collisioned = false;
-//            } else {
-//                random_theta = Math.PI / 4 + Math.random() * Math.PI / 2;
-//            }
-//        }
-//        return random_goal_coordinate;
-//    }
-
+    /** set the responsible y coordinate to be scanned by the scout. The scout will scan the line at y coordinate from one side to the other.
+     * 
+     * @param move_at_y_coordinate_task 
+     */
     public void setMove_at_y_coordinate_task(LinkedList<Float> move_at_y_coordinate_task) {
         this.move_at_y_coordinate_task = move_at_y_coordinate_task;
     }

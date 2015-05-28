@@ -14,12 +14,12 @@ import javax.swing.SpinnerNumberModel;
  *
  * @author boluo
  */
-public class EnemyThreatAndTargetInitPanel extends javax.swing.JPanel {
+public class ThreatAndTargetInitPanel extends javax.swing.JPanel {
 
     /**
      * Creates new form EnemyThreatAndTargetInitPanel
      */
-    public EnemyThreatAndTargetInitPanel() {
+    public ThreatAndTargetInitPanel() {
         initComponents();
         initSpinnerValue();
     }

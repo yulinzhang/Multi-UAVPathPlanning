@@ -14,7 +14,7 @@ import util.VectorUtil;
 import world.model.Target;
 import world.model.shape.Circle;
 
-/**
+/** UAV is the common features for both scouts and attackers.
  *
  * @author boluo
  */
@@ -36,7 +36,7 @@ public class UAV extends Unit {
         this.remained_energy=remained_energy;
     }
 
-    /**
+    /** update the coordinate of center and radar of the scout according to its new coordinate.
      *
      * @param center_coordinate_x
      * @param center_coordinate_y
@@ -49,6 +49,15 @@ public class UAV extends Unit {
         this.setCenter_coordinates(uav_radar.getCenter_coordinates());
     }
 
+    /** extend Toward Goad considering the dynamics of the uav.
+     * 
+     * @param current_coordinate
+     * @param current_angle
+     * @param random_goal_coordinate
+     * @param max_length
+     * @param max_angle
+     * @return 
+     */
     protected float[] extendTowardGoalWithDynamics(float[] current_coordinate, double current_angle, float[] random_goal_coordinate, float max_length, double max_angle) {
         double toward_goal_angle = VectorUtil.getAngleOfVectorRelativeToXCoordinate(random_goal_coordinate[0] - current_coordinate[0], random_goal_coordinate[1] - current_coordinate[1]);
         double delta_angle = VectorUtil.getBetweenAngle(toward_goal_angle, current_angle);
@@ -71,6 +80,11 @@ public class UAV extends Unit {
         return new_node_coord;
     }
 
+    /** check whether obstacle is in the rectangle, which is constructed by the current location of this uav and its target location.
+     * 
+     * @param obs_mbr
+     * @return 
+     */
     public boolean isObstacleInTargetMBR(Rectangle obs_mbr)
     {
         float[] target_coord=this.getTarget_indicated_by_role().getCoordinates();

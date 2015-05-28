@@ -36,7 +36,7 @@ public class InitControlParameterPanel extends javax.swing.JPanel {
         jSplitPane1 = new javax.swing.JSplitPane();
         jToolBar1 = new javax.swing.JToolBar();
         scoutAndAttackerInitPanel1 = new ui.ScoutAndAttackerInitPanel();
-        enemyThreatAndTargetInitPanel1 = new ui.EnemyThreatAndTargetInitPanel();
+        enemyThreatAndTargetInitPanel1 = new ui.ThreatAndTargetInitPanel();
         jSplitPane2 = new javax.swing.JSplitPane();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
@@ -117,7 +117,7 @@ public class InitControlParameterPanel extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private ui.EnemyThreatAndTargetInitPanel enemyThreatAndTargetInitPanel1;
+    private ui.ThreatAndTargetInitPanel enemyThreatAndTargetInitPanel1;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JSplitPane jSplitPane1;

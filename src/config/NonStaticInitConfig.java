@@ -42,15 +42,6 @@ public class NonStaticInitConfig {
 
     public static int obstacle_num = 17;
 
-    public NonStaticInitConfig(int enemy_num, int threat_num, int attacker_num, int scout_num, UAVBase uav_base, int inforshare_algorithm) {
-        this.enemy_num = enemy_num;
-        this.threat_num = threat_num;
-        this.attacker_num = attacker_num;
-        this.scout_num = scout_num;
-        this.uav_base = uav_base;
-        this.inforshare_algorithm = inforshare_algorithm;
-    }
-
     public NonStaticInitConfig() {
         if (!StaticInitConfig.UI_PARAMETER_CONFIG) {
             this.enemy_num = 0;

@@ -27,9 +27,7 @@ import world.model.OntologyBasedKnowledge;
 import world.model.Target;
 import world.model.Threat;
 import world.model.WorldKnowledge;
-import world.model.shape.DubinsCurve;
 import world.model.shape.Point;
-import world.model.shape.Trajectory;
 
 /**
  *
@@ -39,8 +37,8 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
 
     private volatile UAVPath path_planned_at_current_time_step;
     private int current_index_of_planned_path = 0; //index of waypoint
-    private UAVPath path_planned_at_last_time_step;
-    private UAVPath history_path;
+    private UAVPath path_planned_at_last_time_step;//the total path planned lately.
+    private UAVPath history_path;//the history path of the attacker
     private boolean need_to_replan = true;
     private boolean replanned_at_current_time_step = false;
     private boolean moved_at_last_time = false;
@@ -63,7 +61,7 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
 
 
 
-    /**
+    /** constructor
      *
      * @param index
      * @param target
@@ -86,35 +84,9 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
         initColor(index);
     }
 
-    public void ignoreEverythingAndTestDubinPath() {
-        Point start = new Point(this.getCenter_coordinates()[0], this.getCenter_coordinates()[1], this.current_angle);
-        Point end = new Point(target_indicated_by_role.getCoordinates()[0], target_indicated_by_role.getCoordinates()[1], 0);
-        DubinsCurve min_dc = null;
-        double min_len = Float.MAX_VALUE;
-        for (double angle = 0; angle < Math.PI * 2; angle += Math.PI / 12) {
-            end.setYaw(angle);
-            DubinsCurve dc = new DubinsCurve(start, end, 10, false, 10, 1);
-            if (dc.getLength() < min_len) {
-                min_dc = dc;
-                min_len = dc.getLength();
-            }
-        }
-        Trajectory traj = min_dc.getTraj();
-        logger.debug("total waypoint num:" + traj.getPoints().length);
-        logger.debug("total traj lenght:" + traj.getCost());
-        logger.debug("end node:" + traj.getEndPoint());
-        logger.debug("goal point:" + end);
-        UAVPath path = new UAVPath();
-        for (Point point : traj.getPoints()) {
-            path.addWaypointToEnd(point);
-        }
-
-        this.setPath_prefound(path);
-        this.resetCurrentIndexOfPath();
-    }
-
-    /**
-     * path planning
+ 
+    /** plan path for the attacker, with rrt path planning algorithm.
+     * 
      */
     public void pathPlan() {
         //if the attacker need to replan and it has target
@@ -189,6 +161,9 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
         }
     }
 
+    /** run rrt algorithm, which is called by planpath method.
+     * 
+     */
     private void runRRT() {
         rrt_alg.setMax_delta_distance(this.speed);
         rrt_alg.setObstacles(this.getObstacles());
@@ -199,12 +174,14 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
         this.resetCurrentIndexOfPath();
     }
 
+    /** reset the index of waypoint.
+     * 
+     */
     public void resetCurrentIndexOfPath() {
         this.current_index_of_planned_path = 0;
     }
 
-    /**
-     * Drive Attacker to next waypoint
+    /** move the attacker to the next waypoint it planned.
      *
      * @return
      */
@@ -235,6 +212,11 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
         }
     }
 
+    /** check whether the remained energy of the attacker is enough to destory the target and return back to the uav base.
+     * 
+     * @param potential_target
+     * @return 
+     */
     public boolean isEnduranceCapReachable(Target potential_target) {
         float dist_to_potential_target = DistanceUtil.distanceBetween(this.center_coordinates, potential_target.getCoordinates());
         float dist_from_potential_target_to_uav_base = DistanceUtil.distanceBetween(potential_target.getCoordinates(), World.uav_base.getCoordinate());
@@ -249,6 +231,10 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
         return path_planned_at_last_time_step;
     }
 
+    /** get path planning for the future timestep. This method is called by the UI, in order to rendering the future path of each attacker.
+     * 
+     * @return future path.
+     */
     public UAVPath getFuturePath() {
         if (!this.isVisible()) {
             return null;
@@ -262,6 +248,10 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
         return future_path;
     }
 
+    /** set the role of the attacker.
+     * 
+     * @param target_indicated_by_role 
+     */
     public void setTarget_indicated_by_role(Target target_indicated_by_role) {
         if (this.target_indicated_by_role == target_indicated_by_role) {
             return;
@@ -269,14 +259,16 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
         this.target_indicated_by_role = target_indicated_by_role;
     }
 
+    /** record the previous waypoint to the history waypoint queue.
+     * 
+     */
     private void setPreviousWaypoint() {
         Point previous_waypoint = new Point(this.getCenter_coordinates()[0], this.getCenter_coordinates()[1], this.current_angle);
         this.history_path.addWaypointToEnd(previous_waypoint);
     }
 
-    /**
-     * parsing the received information, and the information is converted into
-     * structures uav can understand.
+    /** parsing the received msgs, The received msgs are parsed into obstacle, threat, or conflict. 
+     * And the uav should replan when received new info.
      *
      * @param msg
      */
@@ -299,8 +291,7 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
         }
     }
 
-    /**
-     * receive message and parse message
+    /**receive message and parse message
      *
      * @param msg
      */
@@ -310,17 +301,15 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
         }
     }
 
-    /**
-     * To determine whether the need for re-planning
-     *
-     * @param need_to_replan
+    /** increase the time attacker hoverd on the target.
+     * 
      */
-    public void setNeed_to_replan(boolean need_to_replan) {
-        this.need_to_replan = need_to_replan;
-    }
-
     public void increaseHovered_time_step() {
         this.hovered_time_step++;
+    }
+    
+    public void setNeed_to_replan(boolean need_to_replan) {
+        this.need_to_replan = need_to_replan;
     }
 
     public boolean isReplanned_at_current_time_step() {

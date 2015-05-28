@@ -6,6 +6,9 @@
 package ui;
 
 import config.StaticInitConfig;
+import config.TextConfig;
+import static config.TextConfig.simulation_start_text;
+import static config.TextConfig.simulation_stop_text;
 
 /**
  *
@@ -15,23 +18,19 @@ public class ControlPanel extends javax.swing.JPanel {
 
     private float speed_times = 1;
     private float speed_delta_times = 0.5f;
-    private String simulation_speed_text = "Speed X";
-    private String show_planned_tree_text = "Tree";
-    private String shown_planned_path_text = "Path";
-    private String simulation_stop = "Stop";
-    private String simulation_start = "Start";
+
 
     /**
      * Creates new form ControlPanel
      */
     public ControlPanel() {
         initComponents();
-        this.jLabel1.setText(this.simulation_speed_text + StaticInitConfig.SIMULATION_SPEED);
+        this.jLabel1.setText(TextConfig.simulation_speed_text + StaticInitConfig.SIMULATION_SPEED);
     }
     
     public static void setTotalHistoryPathLen(float path_len)
     {
-        ControlPanel.jLabel2.setText("Path Len:"+(int)path_len);
+        ControlPanel.jLabel2.setText(TextConfig.path_len_summary_text+(int)path_len);
     }
 
     /**
@@ -208,27 +207,27 @@ public class ControlPanel extends javax.swing.JPanel {
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         StaticInitConfig.SHOW_PLANNED_TREE = !StaticInitConfig.SHOW_PLANNED_TREE; //per click take non-operation
         if (StaticInitConfig.SHOW_PLANNED_TREE) {
-            this.jButton4.setText("Hide" + this.show_planned_tree_text);
+            this.jButton4.setText(TextConfig.hide_action_text_on_path+ TextConfig.show_planned_tree_text);
         } else {
-            this.jButton4.setText("Show" + this.show_planned_tree_text);
+            this.jButton4.setText(TextConfig.show_action_text_on_path + TextConfig.show_planned_tree_text);
         }
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         StaticInitConfig.SHOW_PLANNED_PATH = !StaticInitConfig.SHOW_PLANNED_PATH; //per click take non-operation
         if (StaticInitConfig.SHOW_PLANNED_PATH) {
-            this.jButton3.setText("Hide" + this.shown_planned_path_text);
+            this.jButton3.setText(TextConfig.hide_action_text_on_path + TextConfig.shown_planned_path_text);
         } else {
-            this.jButton3.setText("Show" + this.shown_planned_path_text);
+            this.jButton3.setText(TextConfig.show_action_text_on_path + TextConfig.shown_planned_path_text);
         }
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         StaticInitConfig.SIMULATION_ON = !StaticInitConfig.SIMULATION_ON; //per click take non-operation
         if (StaticInitConfig.SIMULATION_ON) {
-            this.jButton1.setText(simulation_stop);
+            this.jButton1.setText(TextConfig.simulation_stop_text);
         } else {
-            this.jButton1.setText(simulation_start);
+            this.jButton1.setText(TextConfig.simulation_start_text);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -237,7 +236,7 @@ public class ControlPanel extends javax.swing.JPanel {
 
     private void setSimulationDelayWithSpeed(float speed_times) {
         StaticInitConfig.SIMULATION_SPEED=speed_times;
-        this.jLabel1.setText(this.simulation_speed_text + speed_times);
+        this.jLabel1.setText(TextConfig.simulation_speed_text + speed_times);
         int delay = (int) (StaticInitConfig.INIT_SIMULATION_DELAY / speed_times); //unpdate sychronously simulation delay 
         StaticInitConfig.SIMULATION_WITH_UI_TIMER.setDelay(delay);
     }

@@ -43,12 +43,19 @@ public class ControlCenter implements KnowledgeAwareInterface {
 
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ControlCenter.class);
 
+    /** constructor of the control center.
+     * 
+     * @param kb is the knowledge of the control center
+     */
     public ControlCenter(KnowledgeInterface kb) {
         this.kb = kb;
         way_point_for_uav = new HashMap<Integer, LinkedList<Point>>();
         locked_threat = new HashMap<Integer, Set<Integer>>();
     }
 
+    /** assign the area to be scaned by each scout.
+     * 
+     */
     public void roleAssignForScouts() {
         int scout_num = this.scouts.size();
 
@@ -69,6 +76,10 @@ public class ControlCenter implements KnowledgeAwareInterface {
         }
     }
 
+    /** update the threat in its knowledge.
+     * 
+     * @param threat 
+     */
     public void updateThreat(Threat threat) {
         ArrayList<Threat> threats = this.kb.getThreats();//remove threat with the same index
         for (Threat old_threat : threats) {
@@ -81,6 +92,9 @@ public class ControlCenter implements KnowledgeAwareInterface {
         this.kb.addThreat(threat);
     }
 
+    /** update the coordinate of each scout according to their responsible scanning area.
+     * 
+     */
     public void updateScoutCoordinate() {
         int scout_num = this.scouts.size();
         for (int i = 0; i < scout_num; i++) {
@@ -99,12 +113,9 @@ public class ControlCenter implements KnowledgeAwareInterface {
         }
     }
 
-    /**
-     * assign role for uavs with subteam (size=this.subteam_size). Special case:
+    /** assign role for uavs with subteam (size=this.subteam_size), considering the special case:
      * attacker i should be assigned with role j. Other role should be assigned
      * to the nearest uav
-     *
-     *
      *
      * @param assigned_attacker_index
      * @param assigned_role_index
@@ -225,6 +236,11 @@ public class ControlCenter implements KnowledgeAwareInterface {
         need_to_assign_role = false;
     }
 
+    /** lock the attacker to the threat. when attacker is close enough to the attacker, the method is called.
+     * 
+     * @param attacker_index
+     * @param threat_index 
+     */
     public void lockAttackerToThreat(Integer attacker_index, Integer threat_index) {
         Set<Integer> attackers_locked = this.locked_threat.get(threat_index);
         if (attackers_locked == null) {
@@ -234,6 +250,11 @@ public class ControlCenter implements KnowledgeAwareInterface {
         this.locked_threat.put(threat_index, attackers_locked);
     }
 
+    /** unlock the attacker to the threat. when attacker is destroyed, this method is called.
+     * 
+     * @param attacker_index
+     * @param threat_index 
+     */
     public void unlockAttacerFromThreat(Integer attacker_index, Integer threat_index) {
         Set<Integer> attackers_locked = this.locked_threat.get(threat_index);
         if (attackers_locked != null) {
@@ -246,6 +267,10 @@ public class ControlCenter implements KnowledgeAwareInterface {
         }
     }
 
+    /** unlock all the assigned attackers, when the threat is destroyed.
+     * 
+     * @param threat_index 
+     */
     public void threatDestroyedAndUnlocked(Integer threat_index) {
         Set<Integer> assigned_attackers = this.locked_threat.remove(threat_index);
         if (assigned_attackers == null) {

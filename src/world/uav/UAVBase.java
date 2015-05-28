@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 import util.ImageUtil;
 import world.model.shape.Circle;
 
-/**
+/** This is the base of all uavs.
  *
  * @author boluo
  */
@@ -39,12 +39,12 @@ public class UAVBase {
         initUAVPort();
     }
 
+    /** It initiate the places for all attackers.
+     * 
+     */
     public void initUAVPort() {
         uav_port_map = new HashMap<Integer, float[]>();
 
-//        int num_of_uav_in_loop_1 = (int) (2 * Math.PI * 2 / 2);
-//        int num_of_uav_in_loop_2 = (int) (2 * Math.PI * 4 / 2);
-//        int num_of_uav_in_loop_3 = (int) (2 * Math.PI * 6 / 2);
         int total_uav_port_num = 0;
         for (int loop_index = 1; loop_index <= 3; loop_index++) {
             int current_loop_num = (int) Math.floor(Math.PI * 2 * loop_index);
@@ -74,21 +74,6 @@ public class UAVBase {
         this.coordinate = coordinate;
     }
 
-//    public int getBase_width() {
-//        return base_width;
-//    }
-//
-//    public void setBase_width(int base_width) {
-//        this.base_width = base_width;
-//    }
-//
-//    public int getBase_height() {
-//        return base_radius;
-//    }
-//
-//    public void setBase_height(int base_height) {
-//        this.base_radius = base_height;
-//    }
     public BufferedImage getImage() {
         return image;
     }

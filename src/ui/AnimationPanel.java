@@ -91,6 +91,7 @@ public class AnimationPanel extends JPanel implements MouseListener {
     public static int highlight_threat_index = -1;
 
     private long simulation_time_in_milli_seconds = 0;
+    private int simulation_time_step = 0;
 
     private MyPopupMenu my_popup_menu;
 
@@ -296,7 +297,7 @@ public class AnimationPanel extends JPanel implements MouseListener {
             } else {
                 virtualizer.drawThreat(threat_image_graphics, threat, GraphicConfig.threat_color, null);
             }
-            int threat_index=threat.getIndex();
+            int threat_index = threat.getIndex();
             if (this.threats_from_god_view.get(threat_index).getMode() == Threat.LOCKED_MODE) {
                 virtualizer.drawCombatSymbol(threat_image_graphics, threat.getCoordinates(), Threat.threat_width * 3 / 2, Color.red);
             }
@@ -476,13 +477,18 @@ public class AnimationPanel extends JPanel implements MouseListener {
         public void actionPerformed(ActionEvent e) {
             clearUAVImageBeforeUpdate();
             if (StaticInitConfig.SIMULATION_ON) {
+                simulation_time_step++;
                 world.updateAll();
-                simulation_time_in_milli_seconds += StaticInitConfig.INIT_SIMULATION_DELAY;
-                long seconds = simulation_time_in_milli_seconds / 1000;
-                long hours = seconds / 3600;
-                long minimutes = (seconds - hours * 3600) / 60;
-                seconds = seconds - hours * 3600 - minimutes * 60;
-                String simulated_time_str = String.format("%1$02d:%2$02d:%3$02d", hours, minimutes, seconds);
+//                simulation_time_in_milli_seconds += StaticInitConfig.INIT_SIMULATION_DELAY;
+//                long seconds = simulation_time_in_milli_seconds / 1000;
+//                long hours = seconds / 3600;
+//                long minimutes = (seconds - hours * 3600) / 60;
+//                seconds = seconds - hours * 3600 - minimutes * 60;
+                int minimutes = simulation_time_step;
+                int hours = minimutes / 60;
+                minimutes=minimutes-hours*60;
+//                String simulated_time_str = String.format("%1$02d:%2$02d:%3$02d", hours, minimutes, seconds);
+                String simulated_time_str = String.format("%1$02d:%2$02d:%3$02d", hours, minimutes, 0);
                 ControlPanel.jFormattedTextField1.setText(simulated_time_str);
                 ControlPanel.setTotalHistoryPathLen(world.getTotal_path_len());
             }

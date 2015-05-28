@@ -42,7 +42,7 @@ public class StaticInitConfig {
 
     //Extend towards the goal with probability
     public static float rrt_goal_toward_probability = 0.7f;
-    public static int rrt_iteration_times = 3500;
+    public static int rrt_iteration_times = 3000;
     //Set a safe distance from the target point
     public static int SAFE_DISTANCE_FOR_TARGET = 3;
     public static int SAFE_DISTANCE_FOR_CONFLICT = 2;
@@ -52,7 +52,7 @@ public class StaticInitConfig {
     //how much time it takes to drive the simulaiton to next time step
     public static int INIT_SIMULATION_DELAY = 400; //milliseconds,this value will be set according to the user's simulation speed
     public static Timer SIMULATION_WITH_UI_TIMER; //simulation Timer
-    public static float SIMULATION_SPEED = 8;
+    public static float SIMULATION_SPEED = 2;
 
     public static int scout_radar_radius = 50; //The scout range of radar
     public static int attacker_radar_radius = 20;
@@ -86,7 +86,7 @@ public class StaticInitConfig {
     public static int SPEED_OF_ATTACKER_ON_TASK = 8;
     public static int SPEED_OF_ATTACKER_ON_DESTROYING_THREAT = 4;
     public static int SPEED_OF_SCOUT = 4;
-    public static int SPEED_OF_ATTACKER_IDLE = 4;
+    public static int SPEED_OF_ATTACKER_IDLE = 8;
 
     public static boolean UI_PARAMETER_CONFIG = false;
 

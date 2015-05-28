@@ -60,7 +60,7 @@
           <SubComponents>
             <Component class="ui.ScoutAndAttackerInitPanel" name="scoutAndAttackerInitPanel1">
             </Component>
-            <Component class="ui.EnemyThreatAndTargetInitPanel" name="enemyThreatAndTargetInitPanel1">
+            <Component class="ui.ThreatAndTargetInitPanel" name="enemyThreatAndTargetInitPanel1">
             </Component>
           </SubComponents>
         </Container>
