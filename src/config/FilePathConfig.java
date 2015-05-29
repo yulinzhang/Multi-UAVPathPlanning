@@ -31,6 +31,6 @@ package config;
  */
 public class FilePathConfig {
 
-    public static String ROBOT_ONTOLOGY_TEMPLATE_FILE_PATH = "D:\\KingSoft\\Dissertation\\Simulator\\ontology-owl\\robot_ontology_template.owl";
-    public static String exp_index = "D:\\kingsoft\\dissertation\\simulator\\result";
+    public static String ROBOT_ONTOLOGY_TEMPLATE_FILE_PATH = "/ontology/robot_ontology_template.owl";
+    public static String exp_index = "/simulation_result";//This is unused by log4j
 }

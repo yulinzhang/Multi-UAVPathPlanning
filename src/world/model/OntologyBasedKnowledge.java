@@ -59,6 +59,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import util.ObtacleUtil;
 import util.StringUtil;
 import world.model.shape.Point;
 
@@ -101,8 +102,9 @@ public class OntologyBasedKnowledge extends KnowledgeInterface {
         super();
         ontology_based_knowledge = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, null);
         try {
-            ontology_based_knowledge.read(new FileInputStream(FilePathConfig.ROBOT_ONTOLOGY_TEMPLATE_FILE_PATH), null);
-        } catch (FileNotFoundException ex) {
+//            ontology_based_knowledge.read(new FileInputStream(FilePathConfig.ROBOT_ONTOLOGY_TEMPLATE_FILE_PATH), null);
+            ontology_based_knowledge.read(OntologyBasedKnowledge.class.getResourceAsStream(FilePathConfig.ROBOT_ONTOLOGY_TEMPLATE_FILE_PATH), null);
+        } catch (Exception ex) {
             logger.error(ex);
         }
         initClassAndProperty();
