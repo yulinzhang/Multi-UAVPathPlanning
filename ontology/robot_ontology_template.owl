@@ -1,0 +1,689 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<rdf:RDF xmlns="http://www.multiagent.com.cn/robotontology/"
+     xml:base="http://www.multiagent.com.cn/robotontology/"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="http://www.multiagent.com.cn/robotontology/">
+        <owl:versionIRI rdf:resource="http://www.multiagent.com.cn/robotontology/"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasAction -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasAction">
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/Action"/>
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Behavior"/>
+        <rdfs:subPropertyOf rdf:resource="&owl;topObjectProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasBehavior -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasBehavior">
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/Behavior"/>
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Robot"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasCapability -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasCapability">
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/Capability"/>
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/State"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasCapabilityAttribute -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasCapabilityAttribute">
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Capability"/>
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/CapabilityAttribute"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasCapabilityRequirement -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasCapabilityRequirement">
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/Capability"/>
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Role"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasCommunicaitonTarget -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasCommunicaitonTarget">
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/CommunicationRange"/>
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/CommunicationTarget"/>
+        <rdfs:subPropertyOf rdf:resource="&owl;topObjectProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasCommunicationRange -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasCommunicationRange">
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/CommunicationCapability"/>
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/CommunicationRange"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasConditionalState -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasConditionalState">
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Action"/>
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/ConditionalState"/>
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Role"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasConflict -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasConflict">
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/Conflict"/>
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Envrionment"/>
+        <rdfs:subPropertyOf rdf:resource="&owl;topObjectProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasCustomizedState -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasCustomizedState">
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/CustomizedState"/>
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/State"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasEnvrionment -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasEnvrionment">
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/Envrionment"/>
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Robot"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasEvent -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasEvent">
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/Event"/>
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Robot"/>
+        <rdfs:subPropertyOf rdf:resource="&owl;topObjectProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasLocation -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasLocation">
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/Location"/>
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/State"/>
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Task"/>
+        <rdfs:subPropertyOf rdf:resource="&owl;topObjectProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasLowerBound -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasLowerBound">
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/LowerBoundOfRegion"/>
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Region"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasObstacle -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasObstacle">
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Envrionment"/>
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/Obstacle"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasPolygon -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasPolygon">
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/Polygon"/>
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Region"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasReferencePoint -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasReferencePoint">
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/Point"/>
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/RelativeLocation"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasRegion -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasRegion">
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Obstacle"/>
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/Region"/>
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Region"/>
+        <rdfs:subPropertyOf rdf:resource="&owl;topObjectProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasResource -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasResource">
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/Resource"/>
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/State"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasResourceRequirement -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasResourceRequirement">
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/Resource"/>
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Role"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasRole -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasRole">
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/Role"/>
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/State"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasState -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasState">
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Robot"/>
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/State"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasTargetConditionalState -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasTargetConditionalState">
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/ConditionalState"/>
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Role"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasTask -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasTask">
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Role"/>
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/Task"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasThreat -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasThreat">
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Envrionment"/>
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/Threat"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasUpperBound -->
+
+    <owl:ObjectProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasUpperBound">
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Region"/>
+        <rdfs:range rdf:resource="http://www.multiagent.com.cn/robotontology/UpperBoundOfRegion"/>
+        <rdfs:subPropertyOf rdf:resource="&owl;topObjectProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasActionName -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasActionName">
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Action"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasAltitude -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasAltitude"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasCapability -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasCapability"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasCenter -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasCenter">
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Threat"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasCommunicationProtocol -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasCommunicationProtocol"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasConflictTime -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasConflictTime"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasContent -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasContent"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasDelay -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasDelay"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasDirection -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasDirection"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasDistance -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasDistance"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasEventType -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasEventType"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasExpireTime -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasExpireTime"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasLatitude -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasLatitude"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasLongitude -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasLongitude"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasMaxXCoordinate -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasMaxXCoordinate"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasMaxYCoordinate -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasMaxYCoordinate"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasMinXCoordinate -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasMinXCoordinate"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasMinYCoordinate -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasMinYCoordinate"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasName -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasName"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasOperationName -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasOperationName"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasRange -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasRange">
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Threat"/>
+        <rdfs:range rdf:resource="&xsd;float"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasSpeed -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasSpeed">
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Threat"/>
+        <rdfs:range rdf:resource="&xsd;float"/>
+        <rdfs:subPropertyOf rdf:resource="&owl;topDataProperty"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasTarget -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasTarget"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasThreatCapability -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasThreatCapability">
+        <rdfs:domain rdf:resource="http://www.multiagent.com.cn/robotontology/Threat"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasTime -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasTime"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasUnit -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasUnit"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasValue -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasValue"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasVolume -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasVolume"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasXCoordinate -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasXCoordinate"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/hasYCoordinate -->
+
+    <owl:DatatypeProperty rdf:about="http://www.multiagent.com.cn/robotontology/hasYCoordinate"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/AbsoluteLocation -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/AbsoluteLocation">
+        <rdfs:subClassOf rdf:resource="http://www.multiagent.com.cn/robotontology/Location"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/Action -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/Action"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/Behavior -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/Behavior"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/Capability -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/Capability"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/CapabilityAttribute -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/CapabilityAttribute"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/CommunicationCapability -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/CommunicationCapability">
+        <rdfs:subClassOf rdf:resource="http://www.multiagent.com.cn/robotontology/Capability"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/CommunicationRange -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/CommunicationRange"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/CommunicationTarget -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/CommunicationTarget"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/ConditionalState -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/ConditionalState"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/Conflict -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/Conflict"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/ControlCapability -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/ControlCapability">
+        <rdfs:subClassOf rdf:resource="http://www.multiagent.com.cn/robotontology/Capability"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/CustomizedState -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/CustomizedState"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/DetectionCpability -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/DetectionCpability">
+        <rdfs:subClassOf rdf:resource="http://www.multiagent.com.cn/robotontology/Capability"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/Envrionment -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/Envrionment"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/Event -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/Event"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/Location -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/Location"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/LowerBoundOfRegion -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/LowerBoundOfRegion"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/Obstacle -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/Obstacle"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/Point -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/Point"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/Polygon -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/Polygon"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/Region -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/Region"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/RelativeLocation -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/RelativeLocation">
+        <rdfs:subClassOf rdf:resource="http://www.multiagent.com.cn/robotontology/Location"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/Resource -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/Resource"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/Robot -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/Robot"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/Role -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/Role"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/State -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/State"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/Task -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/Task"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/Threat -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/Threat"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/UpperBoundOfRegion -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/UpperBoundOfRegion"/>
+    
+
+
+    <!-- http://www.multiagent.com.cn/robotontology/Vector -->
+
+    <owl:Class rdf:about="http://www.multiagent.com.cn/robotontology/Vector"/>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.5.0) http://owlapi.sourceforge.net -->
+
