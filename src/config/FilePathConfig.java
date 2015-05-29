@@ -12,5 +12,5 @@ package config;
 public class FilePathConfig {
 
     public static String ROBOT_ONTOLOGY_TEMPLATE_FILE_PATH = "ontology/robot_ontology_template.owl";
-    public static String exp_index = "result/result";
+    public static String exp_index = "simulator/result";
 }
