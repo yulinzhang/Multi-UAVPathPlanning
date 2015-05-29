@@ -1,7 +1,27 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/* 
+ * Copyright (c) Yulin Zhang
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 package util;
 
@@ -11,18 +31,16 @@ import java.util.ArrayList;
 import ui.AnimationPanel;
 import world.model.Conflict;
 import world.model.Obstacle;
-import world.model.Threat;
 import world.model.shape.Point;
-import world.model.shape.Trajectory;
 
-/**
+/** This class is a tool class and providing tool functions to check whether a given unit is conflicted with others.
  *
  * @author Yulin_Zhang
  */
 public class ConflictCheckUtil {
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(AnimationPanel.class);
 
-    /**if conflicted then return true, otherwise return false;
+    /**if current point is within given obstacles, then it means conflicted and return true, otherwise return false;
      * 
      * @param obstacles
      * @param threats
@@ -53,7 +71,7 @@ public class ConflictCheckUtil {
         return false;
     }
 
-    /**if conflicted then return true, otherwise return false;
+    /**if threat intersects with any other obstacle, then it means conflicted and return true, otherwise return false;
      * 
      * @param obstacles
      * @param threat
@@ -82,7 +100,7 @@ public class ConflictCheckUtil {
         return false;
     }
     
-    /** returns true if conflicted
+    /** if the node planned by rrt is too close to a given uav waypoint at the same time step, then it means conflicted and returns true, otherwise returns false.
      * 
      * @param uav_future_path
      * @param uav_conflict
@@ -110,42 +128,10 @@ public class ConflictCheckUtil {
                 return false;
             }
         }
-//        for(int i=0;i<uav_conflict_size;i++)
-//        {
-//            Point conflict_point=uav_conflict.getPath_prefound().get(i);
-//            int conflict_time=conflict_point.getExptected_time_step();
-//            
-//            if(conflict_time==new_node_exptected_time_step&& DistanceUtil.distanceBetween(conflict_point.toFloatArray(), new_node.getCoordinate())<StaticInitConfig.SAFE_DISTANCE_FOR_CONFLICT)
-//            {
-//                return true;
-//            }else if(conflict_time>new_node_exptected_time_step)
-//            {
-//                return false;
-//            }
-//        }
         return false;
     }
     
-    /** return true is the trajectory is in obstacles
-     * 
-     * @param obstacles
-     * @param traj
-     * @return 
-     */
-    public static boolean checkTrajectoryInObstacles(ArrayList<Obstacle> obstacles, Trajectory traj)
-    {
-        Point[] way_points=traj.getPoints();
-        for(Point point:way_points)
-        {
-            if(checkPointInObstacles(obstacles,(float)point.getX(),(float)point.getY()))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    /**check whether new_node in the obstacle 
+    /** check whether given point planned by rrt is within any obstacle. If it is, then it means conflicted and returns true. Otherwise returns false.
      * 
      * @param obstacles
      * @param node
@@ -156,7 +142,7 @@ public class ConflictCheckUtil {
         return checkPointInObstacles(obstacles, coordinate[0], coordinate[1]);
     }
 
-    /** if line is crossed with obstacles return true; otherwise return false;
+    /** if line intersects with any obstacle, then return true; otherwise return false;
      * 
      * @param obstacles
      * @param start_coord
@@ -166,7 +152,7 @@ public class ConflictCheckUtil {
     public static boolean checkLineInObstacles(ArrayList<Obstacle> obstacles, float[] start_coord, float[] end_coord) {
         if (obstacles != null) {
             for (Obstacle obstacle : obstacles) {
-                if (ShapeUtil.isIntersected(obstacle.getShape().getBounds(), start_coord, end_coord)) {
+                if (ShapeIntersectionUtil.isIntersected(obstacle.getShape().getBounds(), start_coord, end_coord)) {
                     return true;
                 }
             }
@@ -174,7 +160,7 @@ public class ConflictCheckUtil {
         return false;
     }
     
-    /** return true if two rectangle intersects
+    /** return true if two rectangle intersects.
      * 
      * @param rect1
      * @param rect2
@@ -183,10 +169,5 @@ public class ConflictCheckUtil {
     public static boolean checkMBRIntersected(Rectangle rect1,Rectangle rect2)
     {
         return rect1.intersects(rect2);
-    }
-    
-    public static void main(String[] args)
-    {
-
     }
 }

@@ -23,44 +23,39 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package world;
+package util;
 
-/**
+import java.awt.Rectangle;
+import world.model.shape.Circle;
+
+/** This is a tool class and it provides tool function to check whether two shape intersected with each other.
  *
  * @author Yulin_Zhang
  */
-public abstract class Message {
-    public int msg_id=-1;
-    public int msg_type=-1;
-    public String content=null;
+public class ShapeIntersectionUtil {
     
-    public static int CONFLICT_MSG=1;
-    public static int OBSTACLE_MSG=2;
-    public static int THREAT_MSG=3;
-
-    public abstract int getMsgSize();
+    /** check whether the given line intersected with given rectangle.
+     * 
+     * @param rect
+     * @param line_starting_point
+     * @param line_ending_point
+     * @return 
+     */
+    public static boolean isIntersected(Rectangle rect, float[] line_starting_point, float[] line_ending_point)
+    {
+        return rect.intersectsLine(line_starting_point[0], line_starting_point[1], line_ending_point[0], line_ending_point[1]);
+    }
     
-    public int getMsg_type() {
-        return msg_type;
-    }
-
-    public void setMsg_type(int msg_type) {
-        this.msg_type = msg_type;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public int getMsg_id() {
-        return msg_id;
-    }
-
-    public void setMsg_id(int msg_id) {
-        this.msg_id = msg_id;
+    
+    /** check whether the given line intersects with given circle.
+     * 
+     * @param circle
+     * @param line_starting_point
+     * @param line_ending_point
+     * @return 
+     */
+    public static boolean isIntersected(Circle circle,float[] line_starting_point, float[] line_ending_point)
+    {
+        return circle.getCollision_rect().intersects(line_starting_point[0], line_starting_point[1], line_ending_point[0], line_ending_point[1]);
     }
 }

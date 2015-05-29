@@ -1,19 +1,39 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/* 
+ * Copyright (c) Yulin Zhang
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 package util;
 
-/**
+/** This is a tool class and provides tool function to deal with vectors.
  *
- * @author boluo
+ * @author Yulin_Zhang
  */
 public class VectorUtil {
 
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(VectorUtil.class);
 
-    /**
+    /** This function calculate the angle between given vector and x coordinate.
      *
      * @param coordinate_x
      * @param coordinate_y
@@ -28,6 +48,12 @@ public class VectorUtil {
         return angle;
     }
 
+    /** This function calculate the angle between two vectors.
+     * 
+     * @param coordinate_vector_1
+     * @param coordinate_vector_2
+     * @return 
+     */
     public static double getAngleOfTwoVector(float[] coordinate_vector_1, float[] coordinate_vector_2) {
         float vector_1_times_vector_2 = coordinate_vector_1[0] * coordinate_vector_2[0] + coordinate_vector_1[1] * coordinate_vector_2[1];
         float length_of_vector_1 = (float) Math.sqrt(Math.pow(coordinate_vector_1[0], 2) + Math.pow(coordinate_vector_1[1], 2));
@@ -36,7 +62,7 @@ public class VectorUtil {
         return angle;
     }
 
-    /**
+    /** This function translate any angle to normal angle, which is in [0, 2PI].
      *
      * @param angle
      * @return the result from 0 to 2PI
@@ -49,7 +75,7 @@ public class VectorUtil {
         return angle;
     }
 
-    /**
+    /** This function calculate the included angle between two angles.
      *
      * @param angle1
      * @param angle2
@@ -61,10 +87,5 @@ public class VectorUtil {
             delta_angle = (float) Math.PI * 2 - delta_angle;
         }
         return delta_angle;
-    }
-
-    public static void main(String[] args) {
-        logger.debug(Math.toDegrees(VectorUtil.getAngleOfVectorRelativeToXCoordinate(0, -2)));
-        logger.debug(Math.toDegrees(VectorUtil.getBetweenAngle((float) Math.PI * 45 / 180, (float) (255.0 / 180.0 * Math.PI))));
     }
 }

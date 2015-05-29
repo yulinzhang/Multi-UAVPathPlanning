@@ -1,7 +1,27 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/* 
+ * Copyright (c) Yulin Zhang
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 package util;
 
@@ -20,13 +40,13 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import world.model.Obstacle;
 
-/**
+/** This is a tool class and provide tool functions to deal with obstacle, which is written by kml 2.0.
  *
  * @author Yulin_Zhang
  */
 public class ObtacleUtil {
 
-    /**Analyse KML file to extract ends of obstacle 
+    /** extract the obstacles from kml input stream. Since the obstacle is represented by a polygon, it extract all the points of the polygon and generate the obstacle object.
      * 
      * @param kml_input_stream
      * @return 
@@ -60,6 +80,11 @@ public class ObtacleUtil {
         return obstacle_list;
     }
 
+    /** extract the obstacles from external kml file.
+     * 
+     * @param external_kml_file_path
+     * @return 
+     */
     public static ArrayList<Obstacle> readObstacleFromExternalKML(String external_kml_file_path) {
         File kml_file = new File(external_kml_file_path);
         try {
@@ -71,11 +96,12 @@ public class ObtacleUtil {
         return null;
     }
 
+    /** extract the obstacles from the resource file in the jar.
+     * 
+     * @param resource_kml_file_path
+     * @return 
+     */
     public static ArrayList<Obstacle> readObstacleFromResourceKML(String resource_kml_file_path) {
         return readObstacleFromKMLInputStream(ObtacleUtil.class.getResourceAsStream(resource_kml_file_path));
-    }
-
-    public static void main(String[] args) {
-        readObstacleFromResourceKML("/Users/Yulin_Zhang/Desktop/simple_obstacle_v2.kml");
     }
 }

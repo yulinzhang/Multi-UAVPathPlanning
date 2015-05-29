@@ -1,19 +1,36 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/* 
+ * Copyright (c) Yulin Zhang
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 package algorithm.RRT;
 
 import config.StaticInitConfig;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ArrayList;
 import util.ConflictCheckUtil;
 import util.DistanceUtil;
 import static util.DistanceUtil.distanceBetween;
-import util.MapSortUtil;
 import util.VectorUtil;
 import world.model.Conflict;
 import world.model.Obstacle;
@@ -21,7 +38,7 @@ import world.model.shape.Point;
 
 /**
  *
- * @author boluo
+ * @author Yulin_Zhang
  */
 public class RRTAlg implements Serializable {
 
@@ -165,29 +182,6 @@ public class RRTAlg implements Serializable {
         return G;
     }
 
-    /**
-     * sort the near nodes with distance, the shorter, the index is smaller
-     *
-     * @param G
-     * @param node
-     * @param radius
-     * @return
-     */
-    protected ArrayList<RRTNode> neareSortedNodesToNode(RRTTree G, float[] node_coordinate, double radius) {
-        RRTNode temp_node;
-        Map<RRTNode, Double> NeareNodeSet = new HashMap<RRTNode, Double>();
-        double temp_dist;
-        int total_node_num = G.getNodeCount();
-        for (int i = 0; i < total_node_num; i++) {
-            temp_node = G.getNode(i);
-            temp_dist = DistanceUtil.distanceBetween(node_coordinate, temp_node.getCoordinate());
-            if (temp_dist < radius) {
-                NeareNodeSet.put(temp_node, temp_dist);
-            }
-        }
-        MapSortUtil<RRTNode> map_sort_util = new MapSortUtil<RRTNode>();
-        return map_sort_util.sortMap(NeareNodeSet);
-    }
 
     /**
      * find the nearest vertex in RRTTree
