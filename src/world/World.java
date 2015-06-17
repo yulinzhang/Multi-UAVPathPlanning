@@ -25,6 +25,10 @@
  */
 package world;
 
+import world.dispatcher.RegisteredMessageDispatcher;
+import world.dispatcher.MessageDispatcher;
+import world.dispatcher.BroadcastMessageDispatcher;
+import world.dispatcher.DummyMessageDispatcher;
 import config.FilePathConfig;
 import world.model.Threat;
 import world.model.Obstacle;
