@@ -8,7 +8,6 @@ package ui;
 import config.GraphicConfig;
 import config.NonStaticInitConfig;
 import config.StaticInitConfig;
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -287,7 +286,7 @@ public class AnimationPanel extends JPanel implements MouseListener {
     }
 
     private void updateThreatImage() {
-        ArrayList<Threat> threats = control_center.getThreats();
+        ArrayList<Threat> threats = world.getThreats();
         for (Threat threat : threats) {
             if (!threat.isEnabled()) {
                 continue;
@@ -425,6 +424,20 @@ public class AnimationPanel extends JPanel implements MouseListener {
             }
         }
         return -1;
+    }
+    
+    private Threat findChosenThreat(Point mouse_point) {
+        float[] mouse_point_coord = new float[]{(float) mouse_point.getX(), (float) mouse_point.getY()};
+        for (Threat threat : world.getThreats()) 
+        {
+            float[] center_coord = threat.getCoordinates();
+            float dist = DistanceUtil.distanceBetween(center_coord, mouse_point_coord);
+            if (dist < 5) {
+                System.out.println("TASK FOUND");
+                return threat;
+            }
+        }
+        return null;
     }
 
     @Override

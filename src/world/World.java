@@ -375,6 +375,7 @@ public class World {
                 Obstacle obs = this.getObstaclesForUIRendering().get(i);
                 if (!control_center.containsObstacle(obs) && obs.getMbr().intersects(scout.getUav_radar().getBounds())) {
                     control_center.addObstacle(obs);
+                    scout.getKb().addObstacle(obs);
                 }
             }
 
@@ -384,6 +385,7 @@ public class World {
                 float dist_from_attacker_to_threat = DistanceUtil.distanceBetween(scout.getCenter_coordinates(), threat.getCoordinates());
                 if (threat.isEnabled() && !control_center.containsThreat(threat) && dist_from_attacker_to_threat < scout.getUav_radar().getRadius() * 0.9) {
                     control_center.addThreat(threat);
+                    scout.getKb().addThreat(threat);
                 }
             }
         }
@@ -764,6 +766,10 @@ public class World {
 
     private void setThreats(ArrayList<Threat> threats) {
         this.threats = threats;
+    }
+
+    public ArrayList<Threat> getThreats() {
+        return threats;
     }
 
     private void addObstacle(Obstacle obs) {

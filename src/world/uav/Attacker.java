@@ -498,4 +498,11 @@ public class Attacker extends UAV implements KnowledgeAwareInterface {
         return this.kb.containsObstacle(obstacle);
     }
 
+    @Override
+    public String toString() {
+        return "Attacker"+this.getIndex();
+    }
+    
+    
+
 }

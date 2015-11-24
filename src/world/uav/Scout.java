@@ -14,7 +14,9 @@ import util.ConflictCheckUtil;
 import util.VectorUtil;
 import world.ControlCenter;
 import world.World;
+import world.model.KnowledgeInterface;
 import world.model.Obstacle;
+import world.model.OntologyBasedKnowledge;
 import world.model.shape.Circle;
 
 /**
@@ -29,6 +31,7 @@ public class Scout extends UAV {
     private int direction = 1;
     private ControlCenter control_center;
     private int conflict_avoid = 1;
+    private KnowledgeInterface kb;
 
     public Scout(int index, int uav_type, float[] center_coordinates, float[] base_coordinate, ControlCenter control_center, float remained_energy) {
         super(index, null, uav_type, center_coordinates,remained_energy);
@@ -36,6 +39,7 @@ public class Scout extends UAV {
         this.base_coordinate = base_coordinate;
         this.control_center = control_center;
         this.move_at_y_coordinate_task = new LinkedList<Float>();
+        this.kb = new OntologyBasedKnowledge();
         this.max_angle = (float) Math.PI / 2;
         this.speed = StaticInitConfig.SPEED_OF_SCOUT;
         center_color = GraphicConfig.uav_colors.get(22);
@@ -115,4 +119,13 @@ public class Scout extends UAV {
         this.move_at_y_coordinate_task = move_at_y_coordinate_task;
     }
 
+    public KnowledgeInterface getKb() {
+        return kb;
+    }
+
+    @Override
+    public String toString() {
+        return "Scout"+this.getIndex();
+    }
+    
 }
